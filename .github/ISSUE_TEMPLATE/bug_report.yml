@@ -1,4 +1,5 @@
 name: "Reportar bug"
+description: "Use este template para reportar um bug no projeto"
 title: "[BUG] "
 labels: [bug]
 
