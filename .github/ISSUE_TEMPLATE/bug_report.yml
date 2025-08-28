@@ -1,0 +1,59 @@
+name: "Reportar bug"
+description: "Use este template para reportar um bug no projeto"
+title: "[BUG] "
+labels: [bug]
+
+body:
+  - type: input
+    id: version
+    attributes:
+      label: "Versão"
+      placeholder: "Ex: v1.2.3"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: platform
+    attributes:
+      label: "💻 Plataforma"
+      options:
+        - Linux
+        - Windows
+        - macOS
+        - Android
+        - iOS
+        - Outro
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: "Passos para reproduzir"
+      description: "Descreva os passos para reproduzir o bug"
+      placeholder: |
+        1. Vá até [...]
+        2. Clique em [...]
+        3. Veja o erro [...]
+
+  - type: textarea
+    id: frequency
+    attributes:
+      label: "Frequência"
+      placeholder: "Sempre? Somente em determinadas condições?"
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: "Comportamento esperado"
+      placeholder: "O que deveria acontecer?"
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: "Comportamento atual"
+      placeholder: "O que realmente acontece?"
+
+  - type: textarea
+    id: extra
+    attributes:
+      label: "📎 Informações adicionais"
+      description: "Logs, prints, ou contexto extra."
