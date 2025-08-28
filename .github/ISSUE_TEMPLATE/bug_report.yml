@@ -1,5 +1,4 @@
 name: "Reportar bug"
-description: "Use este template para reportar um bug no projeto"
 title: "[BUG] "
 labels: [bug]
 
@@ -15,13 +14,11 @@ body:
   - type: dropdown
     id: platform
     attributes:
-      label: "💻 Plataforma"
+      label: "Plataforma"
       options:
         - Linux
         - Windows
         - macOS
-        - Android
-        - iOS
         - Outro
 
   - type: textarea
@@ -29,16 +26,12 @@ body:
     attributes:
       label: "Passos para reproduzir"
       description: "Descreva os passos para reproduzir o bug"
-      placeholder: |
-        1. Vá até [...]
-        2. Clique em [...]
-        3. Veja o erro [...]
 
   - type: textarea
     id: frequency
     attributes:
       label: "Frequência"
-      placeholder: "Sempre? Somente em determinadas condições?"
+      description: "Descreva a frequência que acontece o bug"
 
   - type: textarea
     id: expected
@@ -55,5 +48,5 @@ body:
   - type: textarea
     id: extra
     attributes:
-      label: "📎 Informações adicionais"
+      label: "Informações adicionais"
       description: "Logs, prints, ou contexto extra."
