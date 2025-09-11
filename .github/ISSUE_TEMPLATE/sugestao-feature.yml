@@ -1,0 +1,25 @@
+name: "🚀 Feature Request"
+description: "Use este template para sugerir uma nova funcionalidade para o projeto"
+title: "[FEATURE] "
+labels: [feature, enhancement]
+
+body:
+  - type: textarea
+    id: descricao
+    attributes:
+      label: "Descrição da feature"
+      description: "Explique qual funcionalidade você gostaria de adicionar ao projeto."
+    validations:
+      required: true
+
+  - type: textarea
+    id: beneficio
+    attributes:
+      label: "Benefícios"
+      description: "Explique como essa feature ajudaria os usuários ou o projeto."
+
+  - type: textarea
+    id: alternativa
+    attributes:
+      label: "Alternativas consideradas"
+      description: "Liste se você já pensou em alguma solução alternativa."

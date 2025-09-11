@@ -21,26 +21,21 @@ const generateTimeOptions = () => {
 };
 
 const getFinalTimeOptions = (initialTime, initialDate, finalDate) => {
-    // Se não tiver horário inicial, retorna lista vazia
     if (!initialTime) {
         return [];
     }
 
-    // Se não tiver as datas, retorna lista vazia
     if (!initialDate || !finalDate) {
         return [];
     }
 
-    // Converte as datas para comparação
     const initialDateObj = new Date(initialDate);
     const finalDateObj = new Date(finalDate);
 
-    // Se as datas forem diferentes, retorna todos os horários
     if (initialDateObj.getTime() !== finalDateObj.getTime()) {
         return generateTimeOptions();
     }
 
-    // Se as datas são iguais, filtra os horários após o horário inicial
     const allOptions = generateTimeOptions();
     const initialTimeIndex = allOptions.findIndex(time => time === initialTime);
 
@@ -99,11 +94,9 @@ const CreateReservation = () => {
             return;
         }
 
-        // Carregar recursos quando o componente montar
         fetchResources();
     }, [isAuthenticated, navigate]);
 
-    // Carregar datas ocupadas quando um recurso for selecionado
     useEffect(() => {
         if (formData.resource_type && formData.resource_id) {
             fetchOccupiedDates();
@@ -181,20 +174,17 @@ const CreateReservation = () => {
         const { name, value } = e.target;
         const newFormData = { ...formData, [name]: value };
 
-        // Limpa o horário final apenas se a data inicial ou final for alterada
         if (name === 'initial_date' || name === 'final_date') {
             console.log(`${name} alterado para ${value}, limpando horário final`);
             newFormData.final_time = '';
             newFormData.initial_time = '';
         }
 
-        // Se mudar o horário inicial, apenas limpa o horário final
         if (name === 'initial_time') {
             console.log(`${name} alterado para ${value}`);
             newFormData.final_time = '';
         }
 
-        // Se mudar a data inicial, ajusta a data final se necessário
         if (name === 'initial_date' && newFormData.final_date < value) {
             console.log('Ajustando data final para coincidir com data inicial');
             newFormData.final_date = value;
@@ -203,7 +193,6 @@ const CreateReservation = () => {
 
         setFormData(newFormData);
 
-        // Verifica se algum campo foi modificado em relação ao estado inicial
         const hasChanges = Object.keys(newFormData).some(
             key => newFormData[key] !== initialFormData[key]
         );
@@ -232,7 +221,6 @@ const CreateReservation = () => {
                 return;
             }
 
-            // Validações adicionais
             if (!formData.resource_type || !formData.resource_id) {
                 handleError("Por favor, selecione um recurso.");
                 return;
@@ -253,7 +241,6 @@ const CreateReservation = () => {
                 return;
             }
 
-            // Prepara os dados da reserva
             const reservationData = {
                 initial_date: formData.initial_date,
                 final_date: formData.final_date,
@@ -266,7 +253,6 @@ const CreateReservation = () => {
 
             console.log("Dados que serão enviados:", reservationData);
 
-            // Adiciona o campo correto do recurso
             switch (formData.resource_type) {
                 case 'auditorium':
                     reservationData.auditorium = parseInt(formData.resource_id);
@@ -328,7 +314,6 @@ const CreateReservation = () => {
 
             handleSuccess("Reserva criada com sucesso!");
             
-            // Limpa o formulário
             setFormData({
                 resource_type: "",
                 resource_id: "",

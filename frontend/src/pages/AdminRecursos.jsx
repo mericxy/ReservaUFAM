@@ -148,7 +148,6 @@ function AdminRecursos() {
         Gerenciar Recursos
       </h1>
 
-      {/* Formulário de Adição */}
       <div className="bg-white p-6 rounded-xl shadow-lg mb-8">
         <h2 className="text-xl font-semibold mb-4">Adicionar Novo Recurso</h2>
         <form onSubmit={handleSubmit} className="space-y-4">

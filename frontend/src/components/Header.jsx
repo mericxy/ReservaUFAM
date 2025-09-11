@@ -28,18 +28,18 @@ const Header = () => {
                         <li>
                             Solicitar Reserva
                         </li>
-                    </a> {/* Atualizado para a página de criação de reservas */}
+                    </a>
                     <a href="/reservations" className={`p-4 hover:text-green-600 hover:border-b-2 border-green-600 transition-colors duration-300 ${isActive('/reservations')}`}>
                         <li>
                             Minhas Reservas
                         </li>
-                    </a> {/* Atualizado para a página de lista de reservas */}
+                    </a>
                     
                     <a href="/user/profile" className={`p-4 hover:text-green-600 hover:border-b-2 border-green-600 transition-colors duration-300 ${isActive('/user/profile')}`}>
                         <li>
                             Perfil
                         </li>
-                    </a> {/* Atualizado para a página de lista de reservas */}
+                    </a>
                     
                     <li className="p-4">
                         <button 

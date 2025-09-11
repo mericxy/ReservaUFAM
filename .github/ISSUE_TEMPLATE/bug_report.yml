@@ -1,0 +1,84 @@
+name: "🐛 Reportar bug"
+description: "Use este template para reportar um bug no projeto"
+title: "[BUG] "
+labels: [bug]
+
+body:
+  - type: input
+    id: version
+    attributes:
+      label: "Versão"
+      placeholder: "Ex: v1.2.3"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: browser
+    attributes:
+      label: "Navegador"
+      options:
+        - Chrome
+        - Firefox
+        - Microsoft Edge
+        - Safari
+        - Outro
+    validations:
+      required: true
+
+  - type: dropdown
+    id: bug_type
+    attributes:
+      label: "Classificação"
+      options:
+        - Sintaxe
+        - Lógica
+        - Runtime
+        - Concorrência
+        - Performance
+        - Segurança
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: "Descrição"
+      description: "Explique detalhadamente sobre o bug."
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: "Passos para reproduzir"
+      description: "Descreva os passos para reproduzir o bug"
+
+  - type: textarea
+    id: frequency
+    attributes:
+      label: "Frequência"
+      description: "Descreva a frequência que acontece o bug"
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: "Comportamento esperado"
+      description: "O que deveria acontecer?"
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: "Comportamento atual"
+      description: "O que realmente acontece?"
+
+  - type: textarea
+    id: evidence
+    attributes:
+      label: "Evidências"
+      description: "Logs, prints, ou contexto extra."
+
+  - type: textarea
+    id: extra
+    attributes:
+      label: "Informações adicionais"
+      description: "Caso necessite, preencha com informações adicionais."

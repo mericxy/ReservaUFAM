@@ -9,7 +9,6 @@ User = get_user_model()
 class ReservationDatabaseTest(TestCase):
     def setUp(self):
         """Configuração inicial dos dados no banco"""
-        # Criar um usuário no banco
         self.user = User.objects.create_user(
             username="reservation_user",
             password="testpassword",
@@ -17,7 +16,6 @@ class ReservationDatabaseTest(TestCase):
             cpf="98765432100"
         )
 
-        # Criar um auditório no banco
         self.auditorium = Auditorium.objects.create(
             name="Auditório Principal",
             capacity=150,
@@ -26,7 +24,6 @@ class ReservationDatabaseTest(TestCase):
 
     def test_create_reservation(self):
         """Testa a criação e recuperação de uma reserva no banco PostgreSQL"""
-        # Criar uma reserva
         reservation = Reservation.objects.create(
             user=self.user,
             initial_date=date(2024, 6, 10),
@@ -38,10 +35,8 @@ class ReservationDatabaseTest(TestCase):
             auditorium=self.auditorium
         )
 
-        # Buscar a reserva no banco
         reservation_from_db = Reservation.objects.get(id=reservation.id)
 
-        # Verificar se os dados foram armazenados corretamente
         self.assertEqual(reservation_from_db.user, self.user)
         self.assertEqual(reservation_from_db.auditorium, self.auditorium)
         self.assertEqual(reservation_from_db.initial_date, date(2024, 6, 10))

@@ -9,7 +9,7 @@ const Login = () => {
     const { login } = useAuth();
 
     const [formData, setFormData] = useState({
-        identifier: "", // Pode ser email, username ou siape
+        identifier: "",
         password: ""
     });
     
@@ -24,7 +24,7 @@ const Login = () => {
     const handleLogin = async (e) => {
         e.preventDefault();
         
-        setError(""); // Limpa erros anteriores
+        setError("");
         setIsPending(true);
         console.log("Iniciando login...");
 
@@ -44,12 +44,10 @@ const Login = () => {
             console.log("Resposta do servidor:", data);
             
             if (response.ok) {
-                // Armazena os tokens e atualiza o contexto
                 localStorage.setItem('accessToken', data.access);
                 localStorage.setItem('refreshToken', data.refresh);
                 console.log('Tokens armazenados com sucesso');
                 
-                // Busca informações do usuário
                 try {
                     const userResponse = await fetch('http://127.0.0.1:8000/api/user/', {
                         headers: {
@@ -63,14 +61,11 @@ const Login = () => {
                         throw new Error(userData.detail || 'Erro ao buscar dados do usuário');
                     }
                     
-                    // Armazena os dados do usuário e atualiza o contexto
                     localStorage.setItem('userData', JSON.stringify(userData));
                     console.log('Dados do usuário:', userData);
                     
-                    // Atualiza o contexto com os dados do usuário
                     await login(data.access, userData);
                     
-                    // Redireciona baseado no tipo de usuário
                     if (userData.is_staff === true) {
                         console.log('Usuário é admin, redirecionando para área administrativa...');
                         navigate('/admin/page');
@@ -81,7 +76,7 @@ const Login = () => {
                 } catch (error) {
                     console.error('Erro ao buscar dados do usuário:', error);
                     setError("Erro ao carregar dados do usuário. Por favor, tente novamente.");
-                    // Remove os tokens em caso de erro
+
                     localStorage.removeItem('accessToken');
                     localStorage.removeItem('refreshToken');
                 }
@@ -147,7 +142,6 @@ const Login = () => {
                         required
                     />
 
-                    {/* Exibir mensagem de erro se houver */}
                     {error && (
                         <div className="mt-4 p-3 bg-red-50 border border-red-200 text-red-600 rounded-md">
                             {error}
@@ -163,7 +157,6 @@ const Login = () => {
                         </Link>
                     </div>
 
-                    {/* Submit button */}
                     <div className="flex items-center justify-center mt-2">
                         <button
                             type="submit"

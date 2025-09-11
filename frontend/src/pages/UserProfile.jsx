@@ -168,7 +168,6 @@ function UserProfile() {
     } else {
       setUser({ ...user, [name]: value });
       
-      // Validação dos outros campos
       if (['siape'].includes(name)) {
         setFieldErrors({
           ...fieldErrors,
@@ -179,7 +178,6 @@ function UserProfile() {
   };
 
   const hasChanges = () => {
-    // Verifica se há alterações nos campos e se não há erros
     const hasFieldChanges = JSON.stringify(user) !== JSON.stringify(originalUser);
     const hasFieldErrors = Object.values(fieldErrors).some(error => error);
     const hasPasswordErrors = user.password && Object.values(passwordErrors).some(error => !error);
@@ -188,9 +186,7 @@ function UserProfile() {
   };
 
   const canSendCode = () => {
-    // Verifica se todos os requisitos da senha foram atendidos
     const allPasswordRequirementsMet = !Object.values(passwordErrors).includes(false);
-    // Verifica se ambos os campos de senha estão preenchidos
     const bothPasswordFieldsFilled = user.password && user.confirmPassword;
     
     return bothPasswordFieldsFilled && allPasswordRequirementsMet;
@@ -228,7 +224,6 @@ function UserProfile() {
         setShowPasswordFields(false);
       }
       
-      // Atualiza o originalUser com os novos dados
       setOriginalUser({...user, password: "", confirmPassword: ""});
     } catch (error) {
       console.error("Erro ao atualizar perfil:", error);

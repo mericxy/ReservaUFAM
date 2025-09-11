@@ -1,0 +1,19 @@
+name: "🚑 Sugestão de melhoria"
+description: "Use este template para sugerir uma melhoria em algo que já existe no projeto"
+title: "[MELHORIA] "
+labels: [enhancement]
+
+body:
+  - type: textarea
+    id: descricao
+    attributes:
+      label: "Descrição da melhoria"
+      description: "Explique qual parte do projeto pode ser melhorada e por quê."
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposta
+    attributes:
+      label: "Proposta de solução"
+      description: "Explique como você imagina essa melhoria sendo implementada."

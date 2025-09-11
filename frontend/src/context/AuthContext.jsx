@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
-import api from "../../api"; // Sua configuração do Axios
+import api from "../../api";
 
 const AuthContext = createContext();
 const SESSION_TIMEOUT = 10 * 60 * 1000; // 10 minutos em milissegundos
@@ -70,14 +70,12 @@ export const AuthProvider = ({ children }) => {
         };
     }, []);
 
-    // Adiciona listener para eventos do usuário para resetar o timer
     useEffect(() => {
         if (isAuthenticated) {
             const resetTimerOnActivity = () => {
                 resetSessionTimer();
             };
 
-            // Lista de eventos para monitorar
             const events = ['mousedown', 'keydown', 'scroll', 'touchstart'];
             
             events.forEach(event => {

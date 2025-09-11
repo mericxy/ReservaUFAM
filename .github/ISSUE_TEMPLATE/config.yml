@@ -1,0 +1,18 @@
+blank_issues_enabled: false
+contact_links: []
+
+issue_templates:
+  - name: "Reportar bug"
+    description: "Use este template para reportar um bug no projeto"
+    file: bug_report.yml
+    labels: ["bug"]
+
+  - name: "Sugestão de melhoria"
+    description: "Use este template para sugerir uma melhoria em algo que já existe no projeto"
+    file: sugestao-melhoria.yml
+    labels: ["enhancement"]
+
+  - name: "Feature request"
+    description: "Use este template para sugerir uma nova funcionalidade"
+    file: sugestao-feature.yml
+    labels: ["feature", "enhancement"]

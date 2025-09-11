@@ -27,7 +27,6 @@ const Register = () => {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState({ text: "", type: "" });
 
-  // Validações
   const validations = {
     firstName: (value) => {
       if (!value.trim()) return "Nome é obrigatório";
@@ -86,7 +85,6 @@ const Register = () => {
     }
   };
 
-  // Formatadores
   const formatters = {
     cpf: (value) => {
       return value
@@ -121,7 +119,6 @@ const Register = () => {
       [name]: formattedValue
     }));
 
-    // Validação em tempo real
     const error = validations[name]?.(formattedValue) || "";
     setErrors(prev => ({
       ...prev,

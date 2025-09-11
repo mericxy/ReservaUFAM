@@ -2,12 +2,12 @@ from rest_framework import serializers
 from .models import CustomUser, Auditorium, MeetingRoom, Vehicle, Reservation
 
 class CustomUserSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(write_only=True, required=True)  # Garante que a senha seja fornecida
+    password = serializers.CharField(write_only=True, required=True)
 
     class Meta:
         model = CustomUser
         fields = ['id', 'username', 'email', 'password', 'siape', 'role', 'cpf', 'cellphone', 'status', 'is_staff']
-        read_only_fields = ['id', 'is_staff']  # is_staff será somente leitura
+        read_only_fields = ['id', 'is_staff'] 
 
     def create(self, validated_data):
         return CustomUser.objects.create_user(**validated_data)
@@ -71,7 +71,6 @@ class ReservationSerializer(serializers.ModelSerializer):
                  'resource_id', 'is_deleted']
 
     def validate(self, data):
-        # Valida datas e horários
         initial_date = data.get('initial_date')
         final_date = data.get('final_date')
         initial_time = data.get('initial_time')
@@ -87,7 +86,6 @@ class ReservationSerializer(serializers.ModelSerializer):
                 "O horário inicial deve ser anterior ao horário final no mesmo dia"
             )
 
-        # Verifica se o recurso existe
         resource_type = data.get('resource_type')
         resource_id = data.get('resource_id')
         
@@ -105,7 +103,6 @@ class ReservationSerializer(serializers.ModelSerializer):
         except resource_model.DoesNotExist:
             raise serializers.ValidationError(f"{resource_type} com ID {resource_id} não existe")
 
-        # Verifica se já existe uma reserva para este recurso no mesmo período
         if Reservation.objects.filter(
             resource_type=resource_type,
             resource_id=resource_id,
