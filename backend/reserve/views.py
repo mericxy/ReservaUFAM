@@ -155,7 +155,18 @@ class LoginView(APIView):
         user = authenticate(request, username=identifier, password=password)
 
         if user:
-            # Se a autenticação for bem-sucedida, o login funciona.
+            if user.status == 'Bloqueado':
+                return Response(
+                    {"detail": "Esta conta de usuário está bloqueada."},
+                    status=status.HTTP_403_FORBIDDEN # 403 Forbidden é mais apropriado aqui
+                )
+            
+            if user.status != 'Aprovado':
+                return Response(
+                    {"detail": "Esta conta ainda não foi aprovada por um administrador."},
+                    status=status.HTTP_403_FORBIDDEN
+                )
+
             login(request, user)
             refresh = RefreshToken.for_user(user)
             
@@ -165,7 +176,7 @@ class LoginView(APIView):
                 'user': CustomUserSerializer(user, context={'request': request}).data
             }, status=status.HTTP_200_OK)
         
-        # Se a autenticação falhar, retornamos um erro claro.
+        # Se a autenticação falhar (usuário/senha errados), o erro padrão é retornado.
         return Response(
             {"detail": "Credenciais inválidas ou usuário não encontrado."},
             status=status.HTTP_401_UNAUTHORIZED
