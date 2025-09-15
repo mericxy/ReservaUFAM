@@ -163,12 +163,14 @@ function AdminUsuarios() {
             {usuarios.aprovados.length > 0 ? (
               usuarios.aprovados.map(usuario => 
                 renderUsuarioCard(usuario, (
-                  <button
-                    onClick={() => handleStatusChange(usuario.id, 'Bloqueado')}
-                    className="bg-gray-500 hover:bg-gray-600 text-white py-1 px-3 rounded-lg"
-                  >
-                    Bloquear
-                  </button>
+                  !usuario.is_self && (
+                    <button
+                      onClick={() => handleStatusChange(usuario.id, 'Bloqueado')}
+                      className="bg-gray-500 hover:bg-gray-600 text-white py-1 px-3 rounded-lg"
+                    >
+                      Bloquear
+                    </button>
+                  )
                 ))
               )
             ) : (
