@@ -114,7 +114,7 @@ const Login = () => {
         <section className="flex items-center justify-center flex-col gap-6 py-8 min-h-screen">
             <img src={logo} alt="logo" className="w-17 h-12" />
             
-            <div className="border border-gray-300 rounded-xl p-8 w-full max-w-2xl shadow-lg bg-white px-12">
+            <div className="border border-gray-300 rounded-xl p-8 w-full min-w-[450px] max-w-2xl shadow-lg bg-white px-12">
                 <h2 className="text-2xl font-bold bg-gradient-to-r from-green-500 to-blue-500 text-transparent bg-clip-text mb-4">
                     Login
                 </h2>
@@ -142,19 +142,21 @@ const Login = () => {
                         required
                     />
 
-                    {error && (
-                        <div className="mt-4 p-3 bg-red-50 border border-red-200 text-red-600 rounded-md">
-                            {error}
-                        </div>
-                    )}
-
-                    <div className="text-center p-4">
+                    <div className="text-center p-2">
                         <Link
                             to="/register"
                             className="text-sm text-green-600 hover:text-green-500"
                         >
                             Não tem uma conta? Cadastre-se
                         </Link>
+                    </div>
+
+                    <div className="mt-0 min-h-[50px]">
+                        {error && (
+                            <div className=" p-3 bg-red-50 border border-red-200 text-red-600 rounded-md">
+                                {error}
+                            </div>
+                        )}
                     </div>
 
                     <div className="flex items-center justify-center mt-2">
