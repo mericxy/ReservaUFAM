@@ -2,6 +2,14 @@ from rest_framework import serializers
 from django.db.models import Q
 from .models import CustomUser, Auditorium, MeetingRoom, Vehicle, Reservation
 
+def validate_positive_capacity(value):
+    """
+    Garante que o valor da capacidade seja um número inteiro positivo maior que zero.
+    """
+    if value <= 0:
+        raise serializers.ValidationError("Capacity must be a positive number greater than zero.")
+    return value
+
 class CustomUserSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, required=True)
     is_self = serializers.SerializerMethodField() 
@@ -35,6 +43,9 @@ class LoginSerializer(serializers.Serializer):
     identifier = serializers.CharField(required=True)
     password = serializers.CharField(required=True, write_only=True)
 class AuditoriumSerializer(serializers.ModelSerializer):
+
+    capacity = serializers.IntegerField(validators=[validate_positive_capacity])
+    
     class Meta:
         model = Auditorium
         fields = ['id', 'name', 'capacity', 'location']
@@ -45,6 +56,9 @@ class AuditoriumSerializer(serializers.ModelSerializer):
         return value
 
 class MeetingRoomSerializer(serializers.ModelSerializer):
+
+    capacity = serializers.IntegerField(validators=[validate_positive_capacity])
+    
     class Meta:
         model = MeetingRoom
         fields = ['id', 'name', 'capacity', 'location']
@@ -55,6 +69,8 @@ class MeetingRoomSerializer(serializers.ModelSerializer):
         return value
 
 class VehicleSerializer(serializers.ModelSerializer):
+    
+    capacity = serializers.IntegerField(validators=[validate_positive_capacity])
     class Meta:
         model = Vehicle
         fields = ['id', 'plate_number', 'model', 'capacity']
