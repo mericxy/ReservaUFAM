@@ -1,39 +1,39 @@
 from rest_framework import serializers
+from django.db.models import Q
 from .models import CustomUser, Auditorium, MeetingRoom, Vehicle, Reservation
 
 class CustomUserSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, required=True)
+    is_self = serializers.SerializerMethodField() 
 
     class Meta:
         model = CustomUser
-        fields = ['id', 'username', 'email', 'password', 'siape', 'role', 'cpf', 'cellphone', 'status', 'is_staff']
+        fields = [
+            'id', 'username', 'email', 'password', 'siape', 'role', 
+            'cpf', 'cellphone', 'status', 'is_staff', 'is_self' 
+        ]
         read_only_fields = ['id', 'is_staff'] 
 
+    def get_is_self(self, obj):
+        """
+        Verifica se o usuário sendo serializado é o mesmo que fez a requisição.
+        """
+        request = self.context.get('request', None)
+        if request and hasattr(request, "user"):
+            return obj == request.user
+        return False
+    
     def create(self, validated_data):
         return CustomUser.objects.create_user(**validated_data)
 
 
 class LoginSerializer(serializers.Serializer):
+    """
+    Valida se os campos 'identifier' e 'password' foram enviados na requisição.
+    A lógica de autenticação foi movida para a view.
+    """
     identifier = serializers.CharField(required=True)
     password = serializers.CharField(required=True, write_only=True)
-
-    def get_user(self, identifier):
-        return CustomUser.objects.filter(
-            Q(username=identifier) | Q(email=identifier) | Q(siape=identifier)
-        ).first()
-
-    def validate(self, attrs):
-        identifier = attrs.get('identifier')
-        password = attrs.get('password')
-
-        user = self.get_user(identifier)
-
-        if not user or not user.check_password(password):
-            raise serializers.ValidationError(_('Invalid credentials or user not found'))
-
-        attrs['user'] = user
-        return attrs
-
 class AuditoriumSerializer(serializers.ModelSerializer):
     class Meta:
         model = Auditorium

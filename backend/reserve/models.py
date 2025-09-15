@@ -43,6 +43,7 @@ class CustomUser(AbstractUser):
         ('Pendente', 'Pending'),
         ('Aprovado', 'Approved'),
         ('Reprovado', 'Rejected'),
+        ('Bloqueado', 'Blocked'),
     ]
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='Pendente', blank=True)
 

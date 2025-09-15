@@ -1,7 +1,11 @@
+# reserve/urls.py
+
 from django.urls import path
-from . import views
+from rest_framework_simplejwt import views as jwt_views
+
 from .views import (
     RegisterView,
+    LoginView,  
     CreateReservationView,
     AdminReservationListView,
     UpdateReservationStatusView,
@@ -16,15 +20,14 @@ from .views import (
     VehicleAdminView,
     VehicleDetailAdminView,
     OccupiedDatesView,
-    CustomTokenObtainPairView,
     AdminUserListView,
     UpdateUserStatusView
 )
-from rest_framework_simplejwt import views as jwt_views
 
 urlpatterns = [
+    # --- Autenticação e Usuário ---
     path('register/', RegisterView.as_view(), name='register'),
-    path('token/', CustomTokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('login/', LoginView.as_view(), name='login'), 
     path('token/refresh/', jwt_views.TokenRefreshView.as_view(), name='token_refresh'),
     path("user/", UserDetailView.as_view(), name="user-detail"),
     path("user/profile/", UserProfileView.as_view(), name="user-profile"),
