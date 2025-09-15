@@ -42,4 +42,6 @@ O sistema **ReservaUFAM** é uma aplicação web desenvolvida para gerenciar res
 
 ---
 
-![image1](image1)
+![image1](img/Test1.png)
+![image2](img/Test2.png)
+![image3](img/Test3.png)
