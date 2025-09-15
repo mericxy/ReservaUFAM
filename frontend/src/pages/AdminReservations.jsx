@@ -31,6 +31,14 @@ function AdminReservations() {
                 }
             });
 
+            if (response.status === 401) {
+                setError("Sua sessão expirou. Faça login novamente.");
+                setTimeout(() => {
+                    window.location.href = "/";
+                }, 1500); // 1,5 segundos para o usuário ver a mensagem
+                return;
+            }
+
             if (!response.ok) {
                 throw new Error('Erro ao buscar reservas');
             }
@@ -61,6 +69,14 @@ function AdminReservations() {
                 },
                 body: JSON.stringify({ status: newStatus })
             });
+
+            if (response.status === 401) {
+                setError("Sua sessão expirou. Faça login novamente.");
+                setTimeout(() => {
+                    window.location.href = "/";
+                }, 1500); // 1,5 segundos para o usuário ver a mensagem
+                return;
+            }
 
             if (!response.ok) {
                 throw new Error('Erro ao atualizar status');
