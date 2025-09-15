@@ -15,7 +15,17 @@ O sistema **Reservas UFAM** é uma aplicação web que, como o nome diz, cria e 
 
 # 🗂️ Diagramas Modelo C4 do Reservas UFAM
 
-> (Aqui você pode inserir seus diagramas C4 seguindo a estrutura de contexto, containers, componentes e código, conforme detalhado anteriormente.)
+## 📌 Diagrama de Contexto
+
+![Diagrama de Contexto](docs/imag/Diagrama de contexto.png)
+
+## 📦 Diagrama de Conteiner
+
+![Diagrama de Conteiner](docs/imag/Diagrama de conteiner.png)
+
+## 🧩 Diagrama de Componentes
+
+![Diagrama de Componentes](docs/imag/Diagrama de componentes.png)
 
 ---
 
