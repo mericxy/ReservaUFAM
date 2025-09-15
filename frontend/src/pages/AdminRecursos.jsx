@@ -37,6 +37,18 @@ function AdminRecursos() {
         fetch('http://127.0.0.1:8000/api/vehicle-admin/', { headers })
       ]);
 
+      if (
+        auditoriumResponse.status === 401 ||
+        meetingRoomResponse.status === 401 ||
+        vehicleResponse.status === 401
+      ) {
+        handleError("Sua sessão expirou. Faça login novamente.");
+        setTimeout(() => {
+          window.location.href = "/";
+        }, 1500); // 1,5 segundos para o usuário ver a mensagem
+        return;
+      }
+
       if (!auditoriumResponse.ok || !meetingRoomResponse.ok || !vehicleResponse.ok) {
         throw new Error('HTTP error! status: ' + auditoriumResponse.status + ', ' + meetingRoomResponse.status + ', ' + vehicleResponse.status);
       }
@@ -92,6 +104,14 @@ function AdminRecursos() {
         body: JSON.stringify(newResource)
       });
 
+      if (response.status === 401) {
+        handleError("Sua sessão expirou. Faça login novamente.");
+        setTimeout(() => {
+          window.location.href = "/";
+        }, 1500); // 1,5 segundos para o usuário ver a mensagem
+        return;
+      }
+
       if (!response.ok) throw new Error('Erro ao adicionar recurso');
 
       handleSuccess("Recurso adicionado com sucesso!");
@@ -123,6 +143,14 @@ function AdminRecursos() {
           'Content-Type': 'application/json'
         }
       });
+
+      if (response.status === 401) {
+        handleError("Sua sessão expirou. Faça login novamente.");
+        setTimeout(() => {
+          window.location.href = "/";
+        }, 1500); // 1,5 segundos para o usuário ver a mensagem
+        return;
+      }
 
       if (!response.ok) throw new Error('Erro ao remover recurso');
 

@@ -23,6 +23,14 @@ function AdminUsuarios() {
     try {
       const response = await fetch('http://127.0.0.1:8000/api/admin/users/', { headers });
 
+      if (response.status === 401) {
+        handleError("Sua sessão expirou. Faça login novamente.");
+        setTimeout(() => {
+          window.location.href = "/";
+        }, 1500); // 1,5 segundos para o usuário ver a mensagem
+        return;
+      }
+
       if (!response.ok) {
         throw new Error('HTTP error! status: ' + response.status);
       }
@@ -70,6 +78,14 @@ function AdminUsuarios() {
         },
         body: JSON.stringify({ status: newStatus })
       });
+
+      if (response.status === 401) {
+        handleError("Sua sessão expirou. Faça login novamente.");
+        setTimeout(() => {
+          window.location.href = "/";
+        }, 1500); // 1,5 segundos para o usuário ver a mensagem
+        return;
+      }
 
       if (!response.ok) throw new Error('Erro ao atualizar status do usuário');
 
@@ -163,12 +179,14 @@ function AdminUsuarios() {
             {usuarios.aprovados.length > 0 ? (
               usuarios.aprovados.map(usuario => 
                 renderUsuarioCard(usuario, (
-                  <button
-                    onClick={() => handleStatusChange(usuario.id, 'Bloqueado')}
-                    className="bg-gray-500 hover:bg-gray-600 text-white py-1 px-3 rounded-lg"
-                  >
-                    Bloquear
-                  </button>
+                  !usuario.is_self && (
+                    <button
+                      onClick={() => handleStatusChange(usuario.id, 'Bloqueado')}
+                      className="bg-gray-500 hover:bg-gray-600 text-white py-1 px-3 rounded-lg"
+                    >
+                      Bloquear
+                    </button>
+                  )
                 ))
               )
             ) : (

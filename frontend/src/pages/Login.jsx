@@ -26,85 +26,43 @@ const Login = () => {
         
         setError("");
         setIsPending(true);
-        console.log("Iniciando login...");
 
         try {
-            const response = await fetch('http://127.0.0.1:8000/api/token/', {
+            const response = await fetch('http://127.0.0.1:8000/api/login/', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    username: formData.identifier,
+                    identifier: formData.identifier,
                     password: formData.password,
                 }),
             });
 
             const data = await response.json();
-            console.log("Resposta do servidor:", data);
             
             if (response.ok) {
+                const userData = data.user;
+
                 localStorage.setItem('accessToken', data.access);
                 localStorage.setItem('refreshToken', data.refresh);
-                console.log('Tokens armazenados com sucesso');
+                localStorage.setItem('userData', JSON.stringify(userData));
                 
-                try {
-                    const userResponse = await fetch('http://127.0.0.1:8000/api/user/', {
-                        headers: {
-                            'Authorization': `Bearer ${data.access}`,
-                            'Content-Type': 'application/json',
-                        },
-                    });
-                    const userData = await userResponse.json();
-                    
-                    if (!userResponse.ok) {
-                        throw new Error(userData.detail || 'Erro ao buscar dados do usuário');
-                    }
-                    
-                    localStorage.setItem('userData', JSON.stringify(userData));
-                    console.log('Dados do usuário:', userData);
-                    
-                    await login(data.access, userData);
-                    
-                    if (userData.is_staff === true) {
-                        console.log('Usuário é admin, redirecionando para área administrativa...');
-                        navigate('/admin/page');
-                    } else {
-                        console.log('Usuário comum, redirecionando para home...');
-                        navigate('/home');
-                    }
-                } catch (error) {
-                    console.error('Erro ao buscar dados do usuário:', error);
-                    setError("Erro ao carregar dados do usuário. Por favor, tente novamente.");
+                await login(data.access, userData);
+                
+                if (userData.is_staff === true) {
+                    navigate('/admin/page');
+                } else {
+                    navigate('/home');
+                }
 
-                    localStorage.removeItem('accessToken');
-                    localStorage.removeItem('refreshToken');
-                }
             } else {
-                let mensagemErro = "Erro ao fazer login. Por favor, verifique suas credenciais.";
-                
-                if (data.detail) {
-                    switch(data.detail) {
-                        case "No active account found with the given credentials":
-                            mensagemErro = "Usuário não cadastrado ou senha incorreta.";
-                            break;
-                        case "Given token not valid for any token type":
-                            mensagemErro = "Sessão expirada. Por favor, faça login novamente.";
-                            break;
-                        case "Sua conta ainda não foi aprovada pelo administrador.":
-                            mensagemErro = "Sua conta está pendente de aprovação pelo administrador.";
-                            break;
-                        default:
-                            mensagemErro = "Erro ao fazer login. Por favor, tente novamente.";
-                    }
-                }
-                
-                setError(mensagemErro);
-                console.error('Erro no login:', data);
+                const errorMessage = data.detail || (data.non_field_errors ? data.non_field_errors[0] : "Credenciais inválidas ou usuário não encontrado.");
+                setError(errorMessage);
             }
         } catch (error) {
             console.error('Erro na requisição:', error);
-            setError("Não foi possível conectar ao servidor. Por favor, verifique sua conexão e tente novamente.");
+            setError("Não foi possível conectar ao servidor. Verifique sua conexão e tente novamente.");
         } finally {
             setIsPending(false);
         }
@@ -119,7 +77,7 @@ const Login = () => {
                     Login
                 </h2>
                 <form onSubmit={handleLogin}>
-                    <label htmlFor="username" className='block font-medium'>Usuário: </label>
+                    <label htmlFor="identifier" className='block font-medium'>Usuário, E-mail ou SIAPE: </label>
                     <input
                         type="text"
                         name="identifier"
@@ -127,7 +85,7 @@ const Login = () => {
                         className='w-full border p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500'
                         style={{ border: "1px solid #ccc" }}
                         onChange={handleChange}
-                        placeholder="Usuário"
+                        placeholder="Digite seu identificador"
                         required
                     />
                     <label htmlFor="password" className='block font-medium mt-4'>Senha: </label>
