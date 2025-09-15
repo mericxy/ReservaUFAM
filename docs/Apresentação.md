@@ -17,15 +17,15 @@ O sistema **Reservas UFAM** é uma aplicação web que, como o nome diz, cria e 
 
 ## 📌 Diagrama de Contexto
 
-![Diagrama de Contexto](docs/imag/Diagrama de contexto.png)
+![Diagrama de Contexto](img/Contexto.png)
 
 ## 📦 Diagrama de Conteiner
 
-![Diagrama de Conteiner](docs/imag/Diagrama de conteiner.png)
+![Diagrama de Container](img/Conteiners.png)
 
 ## 🧩 Diagrama de Componentes
 
-![Diagrama de Componentes](docs/imag/Diagrama de componentes.png)
+![Diagrama de Componentes](img/Componentes.png)
 
 ---
 
