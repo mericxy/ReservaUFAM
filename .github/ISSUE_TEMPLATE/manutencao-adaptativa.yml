@@ -19,16 +19,17 @@ body:
       label: "Contexto"
       description: "Detalhe a origem e impacto da mudança."
 
-  - type: checkboxes
+  - type: textarea
     id: tasks
     attributes:
       label: "Tarefas / Passos"
-      options:
-        - label: "Identificar módulos impactados"
-        - label: "Atualizar dependências / código"
-        - label: "Ajustar scripts de build/deploy"
-        - label: "Executar testes de regressão"
-        - label: "Documentar mudanças"
+      description: "Liste os passos necessários para adaptação"
+      placeholder: |
+        - Identificar módulos impactados
+        - Atualizar dependências / código
+        - Ajustar scripts de build/deploy
+        - Executar testes de regressão
+        - Documentar mudanças
 
   - type: textarea
     id: impact
