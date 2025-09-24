@@ -24,12 +24,6 @@ body:
     attributes:
       label: "Tarefas / Passos"
       description: "Liste os passos necessários para adaptação"
-      placeholder: |
-        - Identificar módulos impactados
-        - Atualizar dependências / código
-        - Ajustar scripts de build/deploy
-        - Executar testes de regressão
-        - Documentar mudanças
 
   - type: textarea
     id: impact
