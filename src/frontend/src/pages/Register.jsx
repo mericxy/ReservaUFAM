@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import logo from "../assets/logo.png";
 import MessagePopup from "../components/MessagePopup";
+import PrivacyPolicyModal from "../components/PrivacyPolicyModal";
 
 const Register = () => {
   const navigate = useNavigate();
@@ -15,7 +16,10 @@ const Register = () => {
     email: "",
     cellphone: "",
     password: "",
-    confirmPassword: ""
+    confirmPassword: "",
+    role: "TECHNICIAN",
+    privacyConsent: false,
+    dataProcessingConsent: false
   });
 
   const [showPassword, setShowPassword] = useState({
@@ -26,6 +30,7 @@ const Register = () => {
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState({ text: "", type: "" });
+  const [showPrivacyModal, setShowPrivacyModal] = useState(false);
 
   const validations = {
     firstName: (value) => {
@@ -82,6 +87,14 @@ const Register = () => {
       if (!cleanPhone) return "Telefone é obrigatório";
       if (cleanPhone.length !== 11) return "Telefone deve ter 11 dígitos";
       return "";
+    },
+    privacyConsent: (value) => {
+      if (!value) return "É obrigatório aceitar a Política de Privacidade para utilizar o sistema.";
+      return "";
+    },
+    dataProcessingConsent: (value) => {
+      if (!value) return "É obrigatório aceitar o tratamento de dados para utilizar o sistema.";
+      return "";
     }
   };
 
@@ -107,10 +120,10 @@ const Register = () => {
   };
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    let formattedValue = value;
+    const { name, value, type, checked } = e.target;
+    let formattedValue = type === 'checkbox' ? checked : value;
 
-    if (formatters[name]) {
+    if (type !== 'checkbox' && formatters[name]) {
       formattedValue = formatters[name](value);
     }
 
@@ -161,9 +174,12 @@ const Register = () => {
           username: formData.username,
           email: formData.email,
           password: formData.password,
+          role: formData.role,
           siape: formData.siape.replace(/\D/g, ""),
           cpf: formData.cpf.replace(/\D/g, ""),
-          cellphone: formData.cellphone.replace(/\D/g, "")
+          cellphone: formData.cellphone.replace(/\D/g, ""),
+          privacy_consent: formData.privacyConsent,
+          data_processing_consent: formData.dataProcessingConsent
         }),
       });
 
@@ -196,6 +212,11 @@ const Register = () => {
     }));
   };
 
+  const openPrivacyModal = (e) => {
+    e.preventDefault();
+    setShowPrivacyModal(true);
+  };
+
   return (
     <section className="flex items-center justify-center flex-col gap-6 py-8 min-h-screen">
       <div className="absolute left-5 top-8">
@@ -216,7 +237,7 @@ const Register = () => {
         <form onSubmit={handleSubmit} className="grid grid-cols-3 gap-3">
           {/* Nome */}
           <div>
-            <label className="block font-medium mb-1">Nome:</label>
+            <label className="block font-medium mb-1">Nome: <span className="text-red-500">*</span></label>
             <input
               type="text"
               name="firstName"
@@ -232,7 +253,7 @@ const Register = () => {
 
           {/* Sobrenome */}
           <div>
-            <label className="block font-medium mb-1">Sobrenome:</label>
+            <label className="block font-medium mb-1">Sobrenome: <span className="text-red-500">*</span></label>
             <input
               type="text"
               name="lastName"
@@ -248,7 +269,7 @@ const Register = () => {
 
           {/* Nome de Usuário */}
           <div>
-            <label className="block font-medium mb-1">Nome de Usuário:</label>
+            <label className="block font-medium mb-1">Nome de Usuário: <span className="text-red-500">*</span></label>
             <input
               type="text"
               name="username"
@@ -264,7 +285,7 @@ const Register = () => {
 
           {/* Email */}
           <div className="col-span-2">
-            <label className="block font-medium mb-1">Email:</label>
+            <label className="block font-medium mb-1">Email: <span className="text-red-500">*</span></label>
             <input
               type="email"
               name="email"
@@ -281,7 +302,7 @@ const Register = () => {
           {/* Cargo */}
           <div className="mb-2">
             <label className="block text-gray-700 text-sm font-bold mb-2">
-              Cargo
+              Cargo <span className="text-red-500">*</span>
             </label>
             <select
               name="role"
@@ -296,7 +317,7 @@ const Register = () => {
 
           {/* SIAPE */}
           <div>
-            <label className="block font-medium mb-1">SIAPE:</label>
+            <label className="block font-medium mb-1">SIAPE: <span className="text-red-500">*</span></label>
             <input
               type="text"
               name="siape"
@@ -312,7 +333,7 @@ const Register = () => {
 
           {/* CPF */}
           <div>
-            <label className="block font-medium mb-1">CPF:</label>
+            <label className="block font-medium mb-1">CPF: <span className="text-red-500">*</span></label>
             <input
               type="text"
               name="cpf"
@@ -328,7 +349,7 @@ const Register = () => {
 
           {/* Telefone */}
           <div>
-            <label className="block font-medium mb-1">Telefone:</label>
+            <label className="block font-medium mb-1">Telefone: <span className="text-red-500">*</span></label>
             <input
               type="text"
               name="cellphone"
@@ -347,7 +368,7 @@ const Register = () => {
 
           {/* Senha */}
           <div>
-            <label className="block font-medium mb-1">Senha:</label>
+            <label className="block font-medium mb-1">Senha: <span className="text-red-500">*</span></label>
             <div className="relative">
               <input
                 type={showPassword.password ? "text" : "password"}
@@ -382,7 +403,7 @@ const Register = () => {
 
           {/* Confirmar Senha */}
           <div>
-            <label className="block font-medium mb-1">Confirmar Senha:</label>
+            <label className="block font-medium mb-1">Confirmar Senha: <span className="text-red-500">*</span></label>
             <div className="relative">
               <input
                 type={showPassword.confirmPassword ? "text" : "password"}
@@ -415,6 +436,61 @@ const Register = () => {
             {errors.confirmPassword && <p className="text-red-500 text-sm mt-1">{errors.confirmPassword}</p>}
           </div>
 
+          {/* Divisor para seção de consentimento */}
+          <div className="col-span-3 h-px bg-gray-200 mt-4"></div>
+          
+          {/* Seção de Consentimento LGPD */}
+          <div className="col-span-3 bg-white p-4 rounded-lg border border-gray-200">
+            {/* Checkbox Política de Privacidade */}
+            <div className="mb-3">
+              <label className="flex items-start space-x-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  name="privacyConsent"
+                  checked={formData.privacyConsent}
+                  onChange={handleChange}
+                  className="mt-1 w-4 h-4 text-green-600 border-gray-300 rounded focus:ring-green-500"
+                  required
+                />
+                <span className="text-sm text-gray-700">
+                  Li e aceito a{" "}
+                  <button
+                    type="button"
+                    onClick={openPrivacyModal}
+                    className="text-green-600 hover:text-green-800 underline font-medium"
+                  >
+                    Política de Privacidade
+                  </button>
+                  {" "}e autorizo o tratamento dos meus dados pessoais para as finalidades descritas. <span className="text-red-500">*</span>
+                </span>
+              </label>
+              {errors.privacyConsent && (
+                <p className="text-red-500 text-sm mt-1 ml-7">{errors.privacyConsent}</p>
+              )}
+            </div>
+
+            {/* Checkbox Processamento de Dados */}
+            <div className="mb-3">
+              <label className="flex items-start space-x-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  name="dataProcessingConsent"
+                  checked={formData.dataProcessingConsent}
+                  onChange={handleChange}
+                  className="mt-1 w-4 h-4 text-green-600 border-gray-300 rounded focus:ring-green-500"
+                  required
+                />
+                <span className="text-sm text-gray-700">
+                  Concordo com o processamento dos meus dados para gestão de cadastro, 
+                  autenticação, processamento de reservas e comunicações relacionadas ao sistema ReservaUFAM. <span className="text-red-500">*</span>
+                </span>
+              </label>
+              {errors.dataProcessingConsent && (
+                <p className="text-red-500 text-sm mt-1 ml-7">{errors.dataProcessingConsent}</p>
+              )}
+            </div>
+          </div>
+
           {/* Botão de Cadastrar */}
           <button
             type="submit"
@@ -440,6 +516,11 @@ const Register = () => {
           onClose={() => setMessage({ text: "", type: "" })}
         />
       )}
+
+      <PrivacyPolicyModal
+        isOpen={showPrivacyModal}
+        onClose={() => setShowPrivacyModal(false)}
+      />
     </section>
   );
 };

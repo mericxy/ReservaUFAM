@@ -8,6 +8,7 @@ import HeaderAdmin from "./components/HeaderAdmin";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Home from "./pages/Home";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
 import CreateReservation from "./pages/CreateReservation";
 import AdminReservations from "./pages/AdminReservations";
 import UpdateReservationStatus from "./pages/UpdateReservationStatus";
@@ -44,6 +45,7 @@ const protectedElementAdmin = (Component) => (
 const router = createBrowserRouter([
   { path: "/", element: <Main><Login /></Main> },
   { path: "/register", element: <Main><Register /></Main> },
+  { path: "/privacy-policy", element: <Main><PrivacyPolicy /></Main> },
   { path: "/admin/page", element: protectedElementAdmin(AdminPage)},
   { path: "/admin/reservations", element: protectedElementAdmin(AdminReservations) },
   { path: "/admin/users", element: protectedElementAdmin(AdminUsuarios)},
