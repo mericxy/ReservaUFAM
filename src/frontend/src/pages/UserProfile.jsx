@@ -1,7 +1,12 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom"; 
+import { useAuth } from "../context/AuthContext"; 
 import BackButton from "../components/BackButton";
 
 function UserProfile() {
+  const navigate = useNavigate();
+  const { logout } = useAuth();
+
   const [originalUser, setOriginalUser] = useState(null);
   const [user, setUser] = useState({
     username: "",
@@ -103,7 +108,6 @@ function UserProfile() {
   };
 
   const unformatValue = (value) => {
-    // Remove tudo que não é número
     return value.replace(/\D/g, '');
   };
 
@@ -223,11 +227,39 @@ function UserProfile() {
         setUser(prev => ({ ...prev, password: "", confirmPassword: "" }));
         setShowPasswordFields(false);
       }
-      
       setOriginalUser({...user, password: "", confirmPassword: ""});
     } catch (error) {
       console.error("Erro ao atualizar perfil:", error);
       setMessage("Erro ao salvar alterações");
+    }
+  };
+
+  const handleDeleteAccount = async () => {
+    const isConfirmed = window.confirm(
+        "Você tem certeza que deseja excluir sua conta? Esta ação é irreversível. Todos os seus dados pessoais serão removidos e você perderá o acesso ao sistema."
+    );
+
+    if (isConfirmed) {
+        try {
+            const response = await fetch("http://127.0.0.1:8000/api/user/delete/", {
+                method: "DELETE",
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+                },
+            });
+
+            if (response.status !== 204) {
+                throw new Error("Erro ao excluir a conta.");
+            }
+            
+            alert("Sua conta foi excluída com sucesso.");
+            logout(); 
+            navigate("/");
+
+        } catch (error) {
+            console.error("Erro ao excluir conta:", error);
+            setMessage("Não foi possível excluir sua conta. Tente novamente mais tarde.");
+        }
     }
   };
 
@@ -441,7 +473,6 @@ function UserProfile() {
                   />
                 </div>
 
-                {/* Requisitos da senha */}
                 <div className="text-sm space-y-1">
                   <p className={passwordErrors.length ? 'text-green-600' : 'text-red-600'}>
                     ✓ Mínimo de 6 caracteres
@@ -490,6 +521,19 @@ function UserProfile() {
             </button>
           </div>
         </form>
+        <div className="border-t mt-6 pt-6">
+          <h3 className="text-lg font-bold text-red-700">Zona de Perigo</h3>
+          <p className="text-sm text-gray-600 my-2">
+            A exclusão da sua conta removerá permanentemente todos os seus dados pessoais. Esta ação não pode ser desfeita.
+          </p>
+          <button
+            type="button"
+            onClick={handleDeleteAccount}
+            className="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg transition-colors duration-300"
+          >
+            Excluir Minha Conta Permanentemente
+          </button>
+        </div>
       </div>
     </div>
   );
