@@ -68,7 +68,7 @@
 
 **Dados Coletados:**
 - **Logs de Acesso:** Data/hora, IP, ações realizadas
-- **Dados de Sessão:** Tokens de autenticação, preferências temporárias
+- **Dados de Sessão:** Tokens de autenticação (localStorage), preferências temporárias
 
 **Origem dos Dados:** Coleta automática do sistema  
 **Compartilhamento:** Equipe técnica (manutenção), DPO (investigações)  

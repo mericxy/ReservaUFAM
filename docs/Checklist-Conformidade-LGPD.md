@@ -36,10 +36,10 @@
   - Direitos dos titulares especificados
   - Contato do DPO disponível
 
-- [x] **Aviso de Cookies**
-  - Componente implementado
-  - Opções de aceitar/recusar
-  - Link para política de privacidade
+- [x] **Armazenamento Local Transparente**
+  - Uso de localStorage documentado
+  - Informações claras sobre dados armazenados localmente
+  - Orientações sobre remoção de dados locais
 
 - [x] **Informações de Conformidade**
   - Links nas páginas principais

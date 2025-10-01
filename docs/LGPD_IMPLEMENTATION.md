@@ -43,7 +43,7 @@ Este documento detalha as implementações realizadas para adequar o sistema Res
 
 #### 3. Transparência e Informação
 
-- ✅ Aviso de cookies implementado (`/src/frontend/src/components/CookieNotice.jsx`)
+- ✅ Transparência sobre armazenamento local documentada na política de privacidade
 - ✅ Link para Política de Privacidade na página de login
 - ✅ Informações sobre conformidade LGPD visíveis
 - ✅ Contato do DPO disponibilizado
@@ -79,7 +79,7 @@ npm start
 
 - [ ] Confirmar que campos de consentimento aparecem no admin Django
 - [ ] Testar responsividade da página de Política de Privacidade
-- [ ] Verificar comportamento do aviso de cookies
+- [x] Verificar transparência sobre armazenamento local
 - [ ] Validar mensagens de erro de consentimento
 
 ### 🔧 Arquivos Modificados/Criados
@@ -93,7 +93,7 @@ npm start
 - `src/frontend/src/pages/Register.jsx` - Formulário com consentimento
 - `src/frontend/src/pages/Login.jsx` - Link para política
 - `src/frontend/src/pages/PrivacyPolicy.jsx` - Nova página
-- `src/frontend/src/components/CookieNotice.jsx` - Novo componente
+
 - `src/frontend/src/data/privacyPolicy.js` - Conteúdo da política
 - `src/frontend/src/App.jsx` - Nova rota e componente
 
@@ -116,7 +116,7 @@ npm start
 - **Art. 7º, I** - Consentimento do titular implementado
 - **Art. 9º** - Informações claras sobre tratamento (Política de Privacidade)
 - **Art. 18º** - Direitos dos titulares documentados
-- **Transparência** - Política acessível e aviso de cookies
+- **Transparência** - Política acessível e informações sobre armazenamento local
 
 #### Riscos Mitigados:
 - **Reputacional** - Transparência implementada
@@ -136,7 +136,7 @@ npm start
 1. **Validação de Consentimento**: Obrigatória para registro
 2. **Registro de Auditoria**: Timestamp e IP do consentimento
 3. **Transparência**: Política de privacidade acessível
-4. **Informação sobre Cookies**: Aviso implementado
+4. **Informação sobre Armazenamento Local**: Documentada na política
 5. **Base Legal**: Documentada na política
 
 ---
