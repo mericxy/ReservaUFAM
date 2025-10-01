@@ -1,3 +1,4 @@
+# models.py
 from django.contrib.auth.models import AbstractUser, BaseUserManager, Group, Permission
 from django.db import models
 
@@ -23,8 +24,12 @@ class CustomUserManager(BaseUserManager):
         extra_fields.setdefault("is_active", True)
         extra_fields.setdefault("status", "Aprovado")
 
-        extra_fields.setdefault('siape', f"ADM{self.model.objects.count() + 1}")
-        extra_fields.setdefault('cpf', f"000000000{self.model.objects.count() + 1}"[-11:])
+        # Garante que o superusuário tenha valores únicos para campos unique
+        if 'siape' not in extra_fields:
+            extra_fields.setdefault('siape', f"ADM{self.model.objects.count() + 1}")
+        if 'cpf' not in extra_fields:
+            extra_fields.setdefault('cpf', f"00000000000{self.model.objects.count() + 1}"[-11:])
+
 
         return self.create_user(username, email, password, **extra_fields)
 
@@ -55,16 +60,44 @@ class CustomUser(AbstractUser):
 
     groups = models.ManyToManyField(Group, related_name='customuser_set', blank=True)
     user_permissions = models.ManyToManyField(Permission, related_name='customuser_set', blank=True)
+    is_anonymized = models.BooleanField(default=False)
 
     objects = CustomUserManager()
 
     def __str__(self):
-        return f"{self.get_full_name()} ({self.get_role_display()})"
+        if self.is_anonymized:
+            return f"Usuário Removido ({self.id})"
+        return f"{self.first_name} {self.last_name} ({self.username})"
+
+    def anonymize(self):
+        """
+        Anonimiza os dados de identificação pessoal do usuário e desativa a conta,
+        preservando a integridade dos registros relacionados (ex: Reservas).
+        """
+        # Gera valores únicos e anônimos baseados no ID do usuário
+        anonymous_username = f"anon_{self.id}"
+        anonymous_email = f"anon_{self.id}@deleted.user"
+        
+        self.username = anonymous_username
+        self.email = anonymous_email
+        self.first_name = "Usuário"
+        self.last_name = "Removido"
+        self.siape = str(self.id).zfill(7)
+        self.cpf = str(self.id).zfill(11)
+        self.cellphone = None
+
+        self.is_active = False
+        self.is_staff = False
+        self.is_superuser = False
+        self.is_anonymized = True
+        self.set_unusable_password()
+
+        self.save()
 
 class Auditorium(models.Model):
-    name = models.CharField(max_length=100, unique=True)  
-    capacity = models.IntegerField()  
-    location = models.CharField(max_length=255) 
+    name = models.CharField(max_length=100, unique=True)
+    capacity = models.IntegerField()
+    location = models.CharField(max_length=255)
     
     def __str__(self):
         return self.name
@@ -78,9 +111,9 @@ class MeetingRoom(models.Model):
         return self.name
     
 class Vehicle(models.Model):
-    plate_number = models.CharField(max_length=10, unique=True) 
-    model = models.CharField(max_length=100) 
-    capacity = models.IntegerField() 
+    plate_number = models.CharField(max_length=10, unique=True)
+    model = models.CharField(max_length=100)
+    capacity = models.IntegerField()
     
     def __str__(self):
         return f"{self.model} - {self.plate_number}"
@@ -113,31 +146,18 @@ class Reservation(models.Model):
     vehicle = models.ForeignKey(Vehicle, on_delete=models.SET_NULL, null=True, blank=True)
     
     def save(self, *args, **kwargs):
-        if self.auditorium_id:
+        if self.auditorium:
             self.resource_type = self.ResourceType.AUDITORIUM
-            self.resource_id = self.auditorium_id
-        elif self.meeting_room_id:
+            self.resource_id = self.auditorium.id
+        elif self.meeting_room:
             self.resource_type = self.ResourceType.MEETING_ROOM
-            self.resource_id = self.meeting_room_id
-        elif self.vehicle_id:
+            self.resource_id = self.meeting_room.id
+        elif self.vehicle:
             self.resource_type = self.ResourceType.VEHICLE
-            self.resource_id = self.vehicle_id
-
-        if self.resource_type and self.resource_id:
-            if self.resource_type == self.ResourceType.AUDITORIUM:
-                self.auditorium_id = self.resource_id
-                self.meeting_room = None
-                self.vehicle = None
-            elif self.resource_type == self.ResourceType.MEETING_ROOM:
-                self.meeting_room_id = self.resource_id
-                self.auditorium = None
-                self.vehicle = None
-            elif self.resource_type == self.ResourceType.VEHICLE:
-                self.vehicle_id = self.resource_id
-                self.auditorium = None
-                self.meeting_room = None
+            self.resource_id = self.vehicle.id
         
         super().save(*args, **kwargs)
     
     def __str__(self):
-        return f"Reservation by {self.user.get_full_name()} ({self.status})"
+        user_name = self.user.get_full_name() if not self.user.is_anonymized else "Usuário Removido"
+        return f"Reservation by {user_name} ({self.status})"

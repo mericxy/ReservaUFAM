@@ -3,13 +3,22 @@ import os
 from os import environ
 from dotenv import load_dotenv
 
+<<<<<<< HEAD
 # Carrega as variáveis de ambiente do arquivo .env
 load_dotenv()
+=======
+load_dotenv()
+
+>>>>>>> 26a196f90ee67327cc0c2cd3aeb1e2e266783b9d
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get('SECRET_KEY')
 DEBUG = bool(os.environ.get("DEBUG", False))
 ALLOWED_HOSTS = environ.get('ALLOWED_HOSTS', '').split(',')
+
+# Configurações do SendGrid
+SENDGRID_API_KEY = os.environ.get('SENDGRID_API_KEY')
+DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'noreply@seusistema.com')
 
 INSTALLED_APPS = [
     "django.contrib.admin",

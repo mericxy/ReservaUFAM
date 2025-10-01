@@ -1,3 +1,4 @@
+# serializers.py
 from rest_framework import serializers
 from django.db.models import Q
 from .models import CustomUser, Auditorium, MeetingRoom, Vehicle, Reservation
