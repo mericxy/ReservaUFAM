@@ -1,6 +1,10 @@
 from pathlib import Path
 import os
 from os import environ
+from dotenv import load_dotenv
+
+# Carrega as variáveis de ambiente do arquivo .env
+load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get('SECRET_KEY')

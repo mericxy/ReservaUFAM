@@ -12,15 +12,18 @@ def validate_positive_capacity(value):
 
 class CustomUserSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, required=True)
+    privacy_consent = serializers.BooleanField(required=True)
+    data_processing_consent = serializers.BooleanField(required=True)
     is_self = serializers.SerializerMethodField() 
 
     class Meta:
         model = CustomUser
         fields = [
-            'id', 'username', 'email', 'password', 'siape', 'role', 
-            'cpf', 'cellphone', 'status', 'is_staff', 'is_self' 
+            'id', 'username', 'email', 'password', 'first_name', 'last_name',
+            'siape', 'role', 'cpf', 'cellphone', 'status', 'is_staff', 'is_self',
+            'privacy_consent', 'data_processing_consent', 'privacy_consent_date'
         ]
-        read_only_fields = ['id', 'is_staff'] 
+        read_only_fields = ['id', 'is_staff', 'privacy_consent_date'] 
 
     def get_is_self(self, obj):
         """
@@ -31,7 +34,40 @@ class CustomUserSerializer(serializers.ModelSerializer):
             return obj == request.user
         return False
     
+    def validate_privacy_consent(self, value):
+        """
+        Valida se o consentimento de privacidade foi dado.
+        """
+        if not value:
+            raise serializers.ValidationError(
+                "O consentimento para tratamento de dados pessoais é obrigatório conforme a LGPD."
+            )
+        return value
+    
+    def validate_data_processing_consent(self, value):
+        """
+        Valida se o consentimento para processamento de dados foi dado.
+        """
+        if not value:
+            raise serializers.ValidationError(
+                "O consentimento para processamento de dados é obrigatório para utilizar o sistema."
+            )
+        return value
+    
     def create(self, validated_data):
+        from django.utils import timezone
+        
+        # Registra data e IP do consentimento
+        request = self.context.get('request')
+        if request:
+            validated_data['privacy_consent_date'] = timezone.now()
+            # Captura o IP do usuário
+            x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+            if x_forwarded_for:
+                validated_data['privacy_consent_ip'] = x_forwarded_for.split(',')[0]
+            else:
+                validated_data['privacy_consent_ip'] = request.META.get('REMOTE_ADDR')
+        
         return CustomUser.objects.create_user(**validated_data)
 
 

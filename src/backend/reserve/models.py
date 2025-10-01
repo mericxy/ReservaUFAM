@@ -46,6 +46,12 @@ class CustomUser(AbstractUser):
         ('Bloqueado', 'Blocked'),
     ]
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='Pendente', blank=True)
+    
+    # Campos para conformidade com LGPD
+    privacy_consent = models.BooleanField(default=False, help_text="Consentimento para tratamento de dados pessoais conforme LGPD")
+    privacy_consent_date = models.DateTimeField(null=True, blank=True, help_text="Data e hora do consentimento")
+    privacy_consent_ip = models.GenericIPAddressField(null=True, blank=True, help_text="IP do usuário no momento do consentimento")
+    data_processing_consent = models.BooleanField(default=False, help_text="Consentimento específico para processamento de dados")
 
     groups = models.ManyToManyField(Group, related_name='customuser_set', blank=True)
     user_permissions = models.ManyToManyField(Permission, related_name='customuser_set', blank=True)
