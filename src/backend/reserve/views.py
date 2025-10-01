@@ -1,3 +1,4 @@
+# views.py
 # Bibliotecas padrão do Django
 from django.contrib.auth import login
 from django.shortcuts import get_object_or_404
@@ -19,6 +20,55 @@ from .serializers import (
     CustomUserSerializer, ReservationSerializer, LoginSerializer
 )
 
+from .services import EmailService
+
+class UpdateUserStatusView(APIView):
+    """
+    View para administradores atualizarem o status de um usuário.
+    """
+    permission_classes = [permissions.IsAdminUser]
+
+    def patch(self, request, pk):
+        """
+        Altera o status de um usuário específico (ex: aprovar, bloquear).
+        """
+        from .models import CustomUser
+        user = get_object_or_404(CustomUser, pk=pk)
+        old_status = user.status
+        new_status = request.data.get('status')
+        
+        valid_statuses = [s[0] for s in CustomUser.STATUS_CHOICES]
+        if new_status not in valid_statuses:
+            return Response({"error": "Status inválido"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        user.status = new_status
+        user.save()
+        
+        if old_status != 'Aprovado' and new_status == 'Aprovado':
+            success = EmailService.send_approval_email(
+                user_email=user.email,
+                user_name=user.get_full_name() or user.username,
+                username=user.username
+            )
+            
+            email_status = "enviado" if success else "falha no envio"
+            message = f"Status do usuário alterado para {new_status}. Email: {email_status}"
+        
+        elif old_status != 'Reprovado' and new_status == 'Reprovado':
+            reason = request.data.get('reason', None)
+            success = EmailService.send_rejection_email(
+                user_email=user.email,
+                user_name=user.get_full_name() or user.username,
+                reason=reason
+            )
+            
+            email_status = "enviado" if success else "falha no envio"
+            message = f"Status do usuário alterado para {new_status}. Email: {email_status}"
+        
+        else:
+            message = f"Status do usuário alterado para {new_status}"
+        
+        return Response({"message": message})
 
 class AdminOrAuthenticatedReadOnlyPermissionMixin:
     """
@@ -255,28 +305,6 @@ class AdminUserListView(APIView):
         users = CustomUser.objects.all().order_by('-date_joined')
         serializer = CustomUserSerializer(users, many=True, context={'request': request})
         return Response(serializer.data)
-    
-class UpdateUserStatusView(APIView):
-    """
-    View para administradores atualizarem o status de um usuário.
-    """
-    permission_classes = [permissions.IsAdminUser]
-
-    def patch(self, request, pk):
-        """
-        Altera o status de um usuário específico (ex: aprovar, bloquear).
-        """
-        from .models import CustomUser
-        user = get_object_or_404(CustomUser, pk=pk)
-        new_status = request.data.get('status')
-        
-        valid_statuses = [s[0] for s in CustomUser.STATUS_CHOICES]
-        if new_status not in valid_statuses:
-            return Response({"error": "Status inválido"}, status=status.HTTP_400_BAD_REQUEST)
-        
-        user.status = new_status
-        user.save()
-        return Response({"message": f"Status do usuário alterado para {new_status}"})
 
 class AdminReservationListView(generics.ListAPIView):
     """
