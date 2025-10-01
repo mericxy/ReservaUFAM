@@ -225,6 +225,20 @@ class UserProfileView(APIView):
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+class DeleteAccountView(APIView):
+    """
+    View para um usuário solicitar a exclusão (anonimização) de sua própria conta.
+    """
+    permission_classes = [IsAuthenticated]
+
+    def delete(self, request):
+        """
+        Aciona o processo de anonimização para o usuário autenticado.
+        """
+        user = request.user
+        user.anonymize()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
 # --- Views de Gerenciamento (Admin) ---
 
 class AdminUserListView(APIView):
