@@ -8,6 +8,10 @@
 __localcode
 /data/
 
+## Ocultando o arquivo .env
+.env
+src/backend/.env
+
 ### Django ###
 *.log
 *.pot
