@@ -16,3 +16,8 @@ issue_templates:
     description: "Use este template para sugerir uma nova funcionalidade"
     file: sugestao-feature.yml
     labels: ["feature", "enhancement"]
+
+  - name: "Solicitar Refatoração"
+    description: "Use este template para propor melhorias no código por meio de refatoração"
+    file: refatoracao.yml
+    labels: ["refatoração"]
