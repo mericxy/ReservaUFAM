@@ -1,0 +1,73 @@
+name: "🧹 Solicitar Refatoração"
+description: "Use este template para propor melhorias no código por meio de refatoração."
+title: "[REFACTOR] "
+labels: [refatoração]
+
+body:
+  - type: input
+    id: module
+    attributes:
+      label: "Módulo / Arquivo"
+      placeholder: "Ex: src/components/Button.js ou app/models/user.py"
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: "Descrição da área a ser refatorada"
+      description: "Descreva brevemente o trecho ou funcionalidade que precisa de refatoração."
+    validations:
+      required: true
+
+  - type: textarea
+    id: reason
+    attributes:
+      label: "Por que essa área precisa de refatoração?"
+      description: "Explique os motivos que justificam a necessidade de refatorar (ex: legibilidade, duplicação, alta complexidade, baixo desempenho, etc)."
+    validations:
+      required: true
+
+  - type: dropdown
+    id: smell_type
+    attributes:
+      label: "Tipo de Code Smell"
+      description: "Classifique o problema segundo o tipo de *code smell* identificado."
+      options:
+        - Long Method
+        - Large Class / God Class
+        - Duplicated Code
+        - Long Parameter List
+        - Feature Envy
+        - Data Clumps
+        - Primitive Obsession
+        - Switch Statements / Long Conditionals
+        - Divergent Change
+        - Shotgun Surgery
+        - Lazy Class
+        - Speculative Generality
+        - Inappropriate Intimacy
+        - Temporary Field
+        - Message Chains
+        - Middle Man
+        - Refused Bequest
+        - Data Class
+        - Magic Numbers / Strings
+        - Dead Code
+        - Comments Smell
+        - Outro
+    validations:
+      required: true
+
+
+  - type: textarea
+    id: impact
+    attributes:
+      label: "Impacto atual"
+      description: "Descreva como o problema afeta o sistema ou o time (ex: manutenção difícil, bugs recorrentes, baixo desempenho, etc)."
+
+  - type: textarea
+    id: suggestion
+    attributes:
+      label: "Sugestão de melhoria"
+      description: "Sugira possíveis abordagens ou estratégias de refatoração (ex: extrair método, renomear variáveis, aplicar padrão de projeto)."
