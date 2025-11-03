@@ -1,0 +1,44 @@
+name: "🛠️ Manutenção Adaptativa"
+description: "Use este template para registrar uma mudança externa que exige adaptação no sistema."
+title: "[ADAPTAÇÃO] "
+labels: [Adaptção]
+
+body:
+
+  - type: textarea
+    id: description
+    attributes:
+      label: "Descrição"
+      description: "Explique a mudança externa que exige adaptação."
+    validations:
+      required: true
+
+  - type: textarea
+    id: context
+    attributes:
+      label: "Contexto"
+      description: "Detalhe a origem e impacto da mudança."
+
+  - type: textarea
+    id: tasks
+    attributes:
+      label: "Tarefas / Passos"
+      description: "Liste os passos necessários para adaptação"
+
+  - type: textarea
+    id: impact
+    attributes:
+      label: "Impacto esperado"
+      description: "Informe risco, tempo estimado e equipes envolvidas."
+
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: "Critérios de aceite"
+      description: "Defina os critérios de sucesso para a adaptação."
+
+  - type: textarea
+    id: references
+    attributes:
+      label: "Referências"
+      description: "Links para changelogs, documentação oficial ou tickets relacionados."

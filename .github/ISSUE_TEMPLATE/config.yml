@@ -17,6 +17,12 @@ issue_templates:
     file: sugestao-feature.yml
     labels: ["feature", "enhancement"]
 
+  - name: "Manutenção Adaptativa"
+    description: "Use este template para registrar uma mudança externa que exige adaptação no sistema"
+    file: manutencao-adaptativa.yml
+    labels: ["enhancement", "manutenção"]
+
+
   - name: "Solicitar Refatoração"
     description: "Use este template para propor melhorias no código por meio de refatoração"
     file: refatoracao.yml
