@@ -21,6 +21,25 @@ services:
       db:
         condition: service_healthy
 
+  tests:
+    build: ./backend
+    container_name: reservaufam_tests
+    volumes:
+      - ./backend:/app
+    environment:
+      DJANGO_SETTINGS_MODULE: setup.settings
+    command: >
+      sh -c "
+      pip install pytest pytest-django &&
+      pytest -v
+      "
+    env_file:
+      - .env
+    depends_on:
+      db:
+        condition: service_healthy
+
+
   frontend:
     build: ./frontend
     container_name: reservaufam_frontend
