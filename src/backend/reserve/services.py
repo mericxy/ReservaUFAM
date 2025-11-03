@@ -2,12 +2,87 @@
 import os
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
+import logging
+logger = logging.getLogger(__name__)
 
 class EmailService:
+    """
+    Serviço centralizado para o envio de e-mails transacionais.
+    """
+    
     @staticmethod
     def send_approval_email(user_email, user_name, username):
         """
-        Envia email de aprovação de cadastro usando SendGrid API
+        Constrói e envia um e-mail de aprovação de cadastro.
+        """
+        try:
+            subject, html_content, plain_content = EmailService._build_approval_content(user_name, username)
+            
+            return EmailService._send_mail(
+                user_email=user_email,
+                subject=subject,
+                html_content=html_content,
+                plain_text_content=plain_content
+            )
+        except Exception as e:
+            logger.error(f"Falha ao orquestrar e-mail de aprovação para {user_email}: {e}")
+            return False
+
+    @staticmethod
+    def send_rejection_email(user_email, user_name, reason=None):
+        """
+        Constrói e envia um e-mail de reprovação de cadastro.
+        """
+        try:
+            subject, html_content, plain_content = EmailService._build_rejection_content(user_name, reason)
+            
+            return EmailService._send_mail(
+                user_email=user_email,
+                subject=subject,
+                html_content=html_content,
+                plain_text_content=plain_content
+            )
+        except Exception as e:
+            logger.error(f"Falha ao orquestrar e-mail de reprovação para {user_email}: {e}")
+            return False
+
+    # --- Método Privado de Transporte ---
+
+    @staticmethod
+    def _send_mail(user_email, subject, html_content, plain_text_content):
+        """
+        Método privado responsável por configurar e enviar o e-mail via SendGrid.
+        """
+        try:
+            from_email = (os.environ.get('DEFAULT_FROM_EMAIL', 'navir.ufam@gmail.com'), 'ReservasUFAM')
+            
+            message = Mail(
+                from_email=from_email,
+                to_emails=user_email,
+                subject=subject,
+                html_content=html_content,
+                plain_text_content=plain_content
+            )
+            message.custom_headers = {
+                "X-Priority": "3",
+                "X-MSMail-Priority": "Normal", 
+                "Importance": "Normal"
+            }
+
+            sg = SendGridAPIClient(os.environ.get('SENDGRID_API_KEY'))
+            response = sg.send(message)
+            
+            logger.info(f"✅ Email enviado para {user_email}! Assunto: {subject}. Status: {response.status_code}")
+            return True
+            
+        except Exception as e:
+            logger.error(f"❌ Erro ao enviar email para {user_email} via SendGrid: {e}")
+            return False
+
+    @staticmethod
+    def _build_approval_content(user_name, username):
+        """
+        Gera o conteúdo (assunto, html, texto) para o e-mail de aprovação.
         """
         subject = "🎉 Cadastro Aprovado - ReservasUFAM"
         
@@ -18,56 +93,13 @@ class EmailService:
             <meta charset="utf-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <style>
-                body {{ 
-                    font-family: 'Arial', sans-serif; 
-                    line-height: 1.6; 
-                    margin: 0; 
-                    padding: 0; 
-                    background-color: #f5f5f5;
-                }}
-                .container {{ 
-                    max-width: 600px; 
-                    margin: 0 auto; 
-                    background: white;
-                    border-radius: 10px;
-                    overflow: hidden;
-                    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-                }}
-                .header {{ 
-                    background: #22C55E; 
-                    color: white; 
-                    padding: 30px 20px; 
-                    text-align: center; 
-                }}
-                .content {{ 
-                    padding: 30px; 
-                }}
-                .footer {{ 
-                    text-align: center; 
-                    padding: 20px; 
-                    font-size: 12px; 
-                    color: #666666;
-                    background: #f9f9f9;
-                }}
-                .button {{ 
-                    border: 3px solid #22C55E; 
-                    color: white; 
-                    padding: 15px 30px; 
-                    text-decoration: none; 
-                    border-radius: 6px; 
-                    display: inline-block;
-                    font-weight: bold;
-                    margin: 20px 0;
-                    font-size: 16px;
-                }}
-                .user-info {{
-                    background: #f8f9fa;
-                    padding: 15px;
-                    border-radius: 6px;
-                    text-align: center;
-                    margin: 25px 0;
-                    border-left: 4px solid #22C55E;
-                }}
+                body {{ font-family: 'Arial', sans-serif; line-height: 1.6; margin: 0; padding: 0; background-color: #f5f5f5; }}
+                .container {{ max-width: 600px; margin: 0 auto; background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }}
+                .header {{ background: #22C55E; color: white; padding: 30px 20px; text-align: center; }}
+                .content {{ padding: 30px; }}
+                .footer {{ text-align: center; padding: 20px; font-size: 12px; color: #666666; background: #f9f9f9; }}
+                .button {{ background: #22C55E; color: white; padding: 15px 30px; text-decoration: none; border-radius: 6px; display: inline-block; font-weight: bold; margin: 20px 0; font-size: 16px; }}
+                .user-info {{ background: #f8f9fa; padding: 15px; border-radius: 6px; text-align: center; margin: 25px 0; border-left: 4px solid #22C55E; }}
             </style>
         </head>
         <body>
@@ -76,26 +108,19 @@ class EmailService:
                     <h1>🎉 ReservasUFAM</h1>
                     <h2>Cadastro Aprovado!</h2>
                 </div>
-                
                 <div class="content">
                     <p>Olá <strong>{user_name}</strong>,</p>
-                    
                     <p>Seu cadastro no <strong>ReservasUFAM</strong> foi <strong style="color: #22C55E;">aprovado</strong> com sucesso! ✅</p>
-                    
                     <p>Agora você pode acessar o sistema e fazer reservas de auditórios, salas de reunião e veículos.</p>
-                    
                     <div class="user-info">
                         <p><strong>👤 Usuário:</strong> {username}</p>
                     </div>
-                    
-                    <div style="text-align: center; color: #fff;">
-                        <a href="http://localhost:5173/login" class="button">Acessar o Sistema</a>
+                    <div style="text-align: center;">
+                        <a href="http://localhost:5173/" class="button" style="color: white;">Acessar o Sistema</a>
                     </div>
-                    
                     <p>Se você tiver qualquer dúvida, entre em contato conosco pelo email: 
                     <a href="mailto:navir.ufam@gmail.com">reservaufam@gmail.com</a></p>
                 </div>
-                
                 <div class="footer">
                     <p>Este é um email automático, por favor não responda.</p>
                     <p>&copy; 2025 ReservasUFAM - Sistema em Desenvolvimento</p>
@@ -125,37 +150,12 @@ class EmailService:
         © 2025 ReservasUFAM - Sistema em Desenvolvimento
         """
         
-        try:
-            from_email = ('navir.ufam@gmail.com', 'ReservasUFAM')
-            
-            message = Mail(
-                from_email=from_email,
-                to_emails=user_email,
-                subject=subject,
-                html_content=html_content,
-                plain_text_content=plain_content
-            )
-
-            message.custom_headers = {
-                "X-Priority": "3",
-                "X-MSMail-Priority": "Normal", 
-                "Importance": "Normal"
-            }
-
-            sg = SendGridAPIClient(os.environ.get('SENDGRID_API_KEY'))
-            response = sg.send(message)
-            
-            print(f"✅ Email enviado para {user_email}! Status: {response.status_code}")
-            return True
-            
-        except Exception as e:
-            print(f"❌ Erro ao enviar email: {e}")
-            return False
+        return subject, html_content, plain_content
 
     @staticmethod
-    def send_rejection_email(user_email, user_name, reason=None):
+    def _build_rejection_content(user_name, reason=None):
         """
-        Envia email de rejeição de cadastro (opcional)
+        Gera o conteúdo (assunto, html, texto) para o e-mail de reprovação.
         """
         subject = "Status do Cadastro - ReservasUFAM"
         
@@ -168,45 +168,12 @@ class EmailService:
             <meta charset="utf-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <style>
-                body {{ 
-                    font-family: 'Arial', sans-serif; 
-                    line-height: 1.6; 
-                    color: #333333; 
-                    margin: 0; 
-                    padding: 20px; 
-                    background-color: #f5f5f5;
-                }}
-                .container {{ 
-                    max-width: 600px; 
-                    margin: 0 auto; 
-                    background: white;
-                    border-radius: 8px;
-                    overflow: hidden;
-                    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-                }}
-                .header {{ 
-                    background: #f44336; 
-                    color: white; 
-                    padding: 25px 20px; 
-                    text-align: center; 
-                }}
-                .content {{ 
-                    padding: 30px; 
-                }}
-                .footer {{ 
-                    text-align: center; 
-                    padding: 20px; 
-                    font-size: 12px; 
-                    color: #666666;
-                    background: #f9f9f9;
-                }}
-                .reason-box {{
-                    background: #ffebee;
-                    padding: 15px;
-                    border-radius: 5px;
-                    margin: 20px 0;
-                    border-left: 4px solid #f44336;
-                }}
+                body {{ font-family: 'Arial', sans-serif; line-height: 1.6; color: #333333; margin: 0; padding: 20px; background-color: #f5f5f5; }}
+                .container {{ max-width: 600px; margin: 0 auto; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }}
+                .header {{ background: #f44336; color: white; padding: 25px 20px; text-align: center; }}
+                .content {{ padding: 30px; }}
+                .footer {{ text-align: center; padding: 20px; font-size: 12px; color: #666666; background: #f9f9f9; }}
+                .reason-box {{ background: #ffebee; padding: 15px; border-radius: 5px; margin: 20px 0; border-left: 4px solid #f44336; }}
             </style>
         </head>
         <body>
@@ -214,22 +181,17 @@ class EmailService:
                 <div class="header">
                     <h1>Status do Cadastro</h1>
                 </div>
-                
                 <div class="content">
                     <p>Olá <strong>{user_name}</strong>,</p>
-                    
                     <p>Seu cadastro no ReservasUFAM <strong>não foi aprovado</strong>.</p>
-                    
                     <div class="reason-box">
                         <p><strong>Motivo:</strong><br>
                         {rejection_reason}</p>
                     </div>
-                    
                     <p>Se você acredita que houve um engano ou precisa de mais informações, 
                     entre em contato conosco pelo email: 
                     <a href="mailto:navir.ufam@gmail.com">reservaufam@gmail.com</a></p>
                 </div>
-                
                 <div class="footer">
                     <p>Este é um email automático, por favor não responda.</p>
                     <p>&copy; 2025 ReservasUFAM - Sistema em Desenvolvimento</p>
@@ -241,43 +203,14 @@ class EmailService:
         
         plain_content = f"""
         Status do Cadastro - ReservasUFAM
-
         Olá {user_name},
-
         Seu cadastro no ReservasUFAM NÃO FOI APROVADO.
-
         Motivo: {rejection_reason}
-
         Se você acredita que houve um engano ou precisa de mais informações, 
         entre em contato conosco pelo email: navir.ufam@gmail.com
-
         ---
         Este é um email automático, por favor não responda.
         © 2025 ReservasUFAM - Sistema em Desenvolvimento
         """
         
-        try:
-            from_email = ('navir.ufam@gmail.com', 'ReservasUFAM')
-            
-            message = Mail(
-                from_email=from_email,
-                to_emails=user_email,
-                subject=subject,
-                html_content=html_content,
-                plain_text_content=plain_content
-            )
-            
-            message.custom_headers = {
-                "X-Priority": "3",
-                "Importance": "Normal"
-            }
-
-            sg = SendGridAPIClient(os.environ.get('SENDGRID_API_KEY'))
-            response = sg.send(message)
-            
-            print(f"📧 Email de rejeição enviado para {user_email}! Status: {response.status_code}")
-            return True
-            
-        except Exception as e:
-            print(f"❌ Erro ao enviar email de rejeição: {e}")
-            return False
+        return subject, html_content, plain_content
