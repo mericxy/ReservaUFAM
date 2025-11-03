@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { apiFetch } from "../../api";
 
 function AdminPage() {
   const [username, setUsername] = useState("");
@@ -9,15 +10,11 @@ function AdminPage() {
     const fetchUser = async () => {
       const token = localStorage.getItem("accessToken");
       try {
-        const response = await fetch("http://127.0.0.1:8000/api/user/", {
+        const userData = await apiFetch("/api/user/", {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
-        if (!response.ok) {
-          throw new Error('Erro ao carregar dados do administrador');
-        }
-        const userData = await response.json();
         setUsername(userData.username);
       } catch (error) {
         setError("Não foi possível carregar os dados do administrador");

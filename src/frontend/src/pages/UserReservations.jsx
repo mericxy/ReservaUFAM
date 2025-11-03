@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import BackButton from "../components/BackButton";
+import { apiFetch } from "../../api";
 
 function UserReservations() {
     const [reservations, setReservations] = useState([]);
@@ -19,19 +20,14 @@ function UserReservations() {
         const fetchReservations = async () => {
             try {
                 const token = localStorage.getItem("accessToken");
-                const response = await fetch("http://127.0.0.1:8000/api/user/reservations/", {
+                
+                const data = await apiFetch("/api/user/reservations/", {
                     headers: {
                         'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json'
                     }
                 });
-                
-                if (!response.ok) {
-                    throw new Error('Erro ao buscar reservas');
-                }
-                
-                const data = await response.json();
                 setReservations(data);
+
             } catch (error) {
                 setError("Não foi possível carregar suas reservas");
             } finally {
