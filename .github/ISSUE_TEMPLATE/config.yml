@@ -22,7 +22,6 @@ issue_templates:
     file: manutencao-adaptativa.yml
     labels: ["enhancement", "manutenção"]
 
-
   - name: "Solicitar Refatoração"
     description: "Use este template para propor melhorias no código por meio de refatoração"
     file: refatoracao.yml
