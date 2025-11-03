@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { apiFetch } from "../../api";
 
 function AdminReservations() {
     const [reservations, setReservations] = useState({
@@ -24,26 +25,12 @@ function AdminReservations() {
     const fetchReservations = async () => {
         try {
             const token = localStorage.getItem("accessToken");
-            const response = await fetch("http://127.0.0.1:8000/api/admin/reservations/", {
+            const data = await apiFetch("/api/admin/reservations/", {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json'
                 }
             });
-
-            if (response.status === 401) {
-                setError("Sua sessão expirou. Faça login novamente.");
-                setTimeout(() => {
-                    window.location.href = "/";
-                }, 1500); // 1,5 segundos para o usuário ver a mensagem
-                return;
-            }
-
-            if (!response.ok) {
-                throw new Error('Erro ao buscar reservas');
-            }
-
-            const data = await response.json();
 
             const pendentes = data.filter(res => res.status === 'Pendente');
             const aprovadas = data.filter(res => res.status === 'Aprovado');
@@ -52,6 +39,10 @@ function AdminReservations() {
             setReservations({ pendentes, aprovadas, arquivadas });
         } catch (error) {
             setError("Não foi possível carregar as reservas");
+
+            if (error.message.includes("401")) {
+                setError("Sua sessão expirou. Faça login novamente.");
+            }
         } finally {
             setLoading(false);
         }
@@ -60,7 +51,7 @@ function AdminReservations() {
     const handleStatusUpdate = async (reservationId, newStatus) => {
         try {
             const token = localStorage.getItem("accessToken");
-            const response = await fetch(`http://127.0.0.1:8000/api/admin/reservations/${reservationId}/status/`, {
+            const response = await apiFetch(`/api/admin/reservations/${reservationId}/status/`, {
                 method: 'PATCH',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -69,21 +60,13 @@ function AdminReservations() {
                 body: JSON.stringify({ status: newStatus })
             });
 
-            if (response.status === 401) {
-                setError("Sua sessão expirou. Faça login novamente.");
-                setTimeout(() => {
-                    window.location.href = "/";
-                }, 1500); // 1,5 segundos para o usuário ver a mensagem
-                return;
-            }
-
-            if (!response.ok) {
-                throw new Error('Erro ao atualizar status');
-            }
-
             fetchReservations();
         } catch (error) {
             setError("Erro ao atualizar o status da reserva");
+
+            if (error.message.includes("401")) {
+                setError("Sua sessão expirou. Faça login novamente.");
+            }
         }
     };
 

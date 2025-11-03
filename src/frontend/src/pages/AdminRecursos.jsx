@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import MessagePopup from '../components/MessagePopup';
+import { apiFetch } from '../../api';
 
 function AdminRecursos() {
   const [message, setMessage] = useState({ text: "", type: "" });
@@ -26,36 +27,29 @@ function AdminRecursos() {
   const fetchResources = async () => {
     const token = localStorage.getItem("accessToken");
     const headers = {
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json'
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
     };
 
     try {
-      const [auditoriumResponse, meetingRoomResponse, vehicleResponse] = await Promise.all([
-        fetch('http://127.0.0.1:8000/api/auditorium-admin/', { headers }),
-        fetch('http://127.0.0.1:8000/api/meeting-room-admin/', { headers }),
-        fetch('http://127.0.0.1:8000/api/vehicle-admin/', { headers })
+      const results = await Promise.allSettled([
+        apiFetch("/api/auditorium-admin/", { headers }),
+        apiFetch("/api/meeting-room-admin/", { headers }),
+        apiFetch("/api/vehicle-admin/", { headers }),
       ]);
 
+      const auditoriumData =
+        results[0].status === "fulfilled" ? results[0].value : [];
+      const meetingRoomData =
+        results[1].status === "fulfilled" ? results[1].value : [];
+      const vehicleData =
+        results[2].status === "fulfilled" ? results[2].value : [];
+
       if (
-        auditoriumResponse.status === 401 ||
-        meetingRoomResponse.status === 401 ||
-        vehicleResponse.status === 401
+        results.every((r) => r.status === "rejected")
       ) {
-        handleError("Sua sessão expirou. Faça login novamente.");
-        setTimeout(() => {
-          window.location.href = "/";
-        }, 1500); // 1,5 segundos para o usuário ver a mensagem
-        return;
+        throw new Error("Nenhum recurso pôde ser carregado.");
       }
-
-      if (!auditoriumResponse.ok || !meetingRoomResponse.ok || !vehicleResponse.ok) {
-        throw new Error('HTTP error! status: ' + auditoriumResponse.status + ', ' + meetingRoomResponse.status + ', ' + vehicleResponse.status);
-      }
-
-      const auditoriumData = await auditoriumResponse.json();
-      const meetingRoomData = await meetingRoomResponse.json();
-      const vehicleData = await vehicleResponse.json();
 
       setResources({
         auditorium: auditoriumData,
@@ -90,71 +84,74 @@ function AdminRecursos() {
     if (!formModified) return;
 
     try {
+      const resourceType =
+        selectedType === "meeting_room"
+          ? "meeting-room-admin"
+          : `${selectedType}-admin`;
+
       const token = localStorage.getItem("accessToken");
-      const resourceType = selectedType === 'meeting_room' ? 'meeting-room-admin' : `${selectedType}-admin`;
-      const endpoint = `http://127.0.0.1:8000/api/${resourceType}/`;
-      
-      const response = await fetch(endpoint, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(newResource)
+
+      const headers = {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      };
+
+      await apiFetch(`/api/${resourceType}/`, {
+        method: "POST",
+        headers,
+        body: JSON.stringify(newResource),
       });
-
-      if (response.status === 401) {
-        handleError("Sua sessão expirou. Faça login novamente.");
-        setTimeout(() => {
-          window.location.href = "/";
-        }, 1500); // 1,5 segundos para o usuário ver a mensagem
-        return;
-      }
-
-      if (!response.ok) throw new Error('Erro ao adicionar recurso');
 
       handleSuccess("Recurso adicionado com sucesso!");
       fetchResources();
       setNewResource({
-        name: '',
-        location: '',
-        capacity: '',
-        model: '',
-        plate_number: ''
+        name: "",
+        location: "",
+        capacity: "",
+        model: "",
+        plate_number: "",
       });
       setFormModified(false);
     } catch (error) {
+
+      // Detecção específica de token expirado
+      if (error.message.includes("401")) {
+        handleError("Sua sessão expirou. Faça login novamente.");
+        setTimeout(() => {
+          window.location.href = "/";
+        }, 1500);
+        return;
+      }
       handleError("Erro ao adicionar recurso");
     }
   };
 
   const handleDelete = async (id, type) => {
     try {
+      const resourceType =
+        type === "meeting_room" ? "meeting-room-admin" : `${type}-admin`;
+
       const token = localStorage.getItem("accessToken");
-      const resourceType = type === 'meeting_room' ? 'meeting-room-admin' : `${type}-admin`;
-      const endpoint = `http://127.0.0.1:8000/api/${resourceType}/${id}/`;
-      
-      const response = await fetch(endpoint, {
-        method: 'DELETE',
+
+      await apiFetch(`/api/${resourceType}/${id}/`, {
+        method: "DELETE",
         headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
+          Authorization: `Bearer ${token}`,
+        },
       });
-
-      if (response.status === 401) {
-        handleError("Sua sessão expirou. Faça login novamente.");
-        setTimeout(() => {
-          window.location.href = "/";
-        }, 1500); // 1,5 segundos para o usuário ver a mensagem
-        return;
-      }
-
-      if (!response.ok) throw new Error('Erro ao remover recurso');
 
       handleSuccess("Recurso removido com sucesso!");
       fetchResources();
     } catch (error) {
+
+      if (error.message.includes("401")) {
+        handleError("Sua sessão expirou. Faça login novamente.");
+        setTimeout(() => {
+          window.location.href = "/";
+        }, 1500);
+        return;
+      }
+
       handleError("Erro ao remover recurso");
     }
   };

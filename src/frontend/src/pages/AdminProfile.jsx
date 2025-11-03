@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { apiFetch } from "../../api";
 import BackButton from "../components/BackButton";
 
 function AdminProfile() {
@@ -35,15 +36,12 @@ function AdminProfile() {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const response = await fetch("http://127.0.0.1:8000/api/user/", {
+        const data = await apiFetch("/api/user/", {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
           },
         });
 
-        if (!response.ok) throw new Error("Erro ao buscar perfil");
-        const data = await response.json();
-        
         const userData = {
           username: data.username || "",
           email: data.email || "",
@@ -69,6 +67,7 @@ function AdminProfile() {
 
     fetchUser();
   }, []);
+
 
   const validatePassword = (password) => {
     return {

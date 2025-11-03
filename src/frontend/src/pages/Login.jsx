@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import logo from '../assets/logo.png';
 import { Link } from 'react-router-dom';
+import { apiFetch } from '../../api';
 
 const Login = () => {
     const navigate = useNavigate();
@@ -28,40 +29,34 @@ const Login = () => {
         setIsPending(true);
 
         try {
-            const response = await fetch('http://127.0.0.1:8000/api/login/', {
+            const data = await apiFetch('/api/login/', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
                 body: JSON.stringify({
                     identifier: formData.identifier,
                     password: formData.password,
                 }),
             });
 
-            const data = await response.json();
+            const userData = data.user;
+
+            localStorage.setItem('accessToken', data.access);
+            localStorage.setItem('refreshToken', data.refresh);
+            localStorage.setItem('userData', JSON.stringify(userData));
             
-            if (response.ok) {
-                const userData = data.user;
-
-                localStorage.setItem('accessToken', data.access);
-                localStorage.setItem('refreshToken', data.refresh);
-                localStorage.setItem('userData', JSON.stringify(userData));
-                
-                await login(data.access, userData);
-                
-                if (userData.is_staff === true) {
-                    navigate('/admin/page');
-                } else {
-                    navigate('/home');
-                }
-
+            await login(data.access, userData);
+            
+            if (userData.is_staff === true) {
+                navigate('/admin/page');
             } else {
-                const errorMessage = data.detail || (data.non_field_errors ? data.non_field_errors[0] : "Credenciais inválidas ou usuário não encontrado.");
-                setError(errorMessage);
+                navigate('/home');
             }
+
         } catch (error) {
-            setError("Não foi possível conectar ao servidor. Verifique sua conexão e tente novamente.");
+            if (error.message.includes('401') || error.message.includes('400')) {
+                setError("Credenciais inválidas ou usuário não encontrado.");
+            } else {
+                setError("Não foi possível conectar ao servidor. Verifique sua conexão e tente novamente.");
+            }
         } finally {
             setIsPending(false);
         }
