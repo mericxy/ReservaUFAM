@@ -29,7 +29,6 @@ function UserReservations() {
                 setReservations(data);
 
             } catch (error) {
-                console.error('Erro:', error.message);
                 setError("Não foi possível carregar suas reservas");
             } finally {
                 setLoading(false);

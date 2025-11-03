@@ -52,8 +52,6 @@ const Login = () => {
             }
 
         } catch (error) {
-            console.error('Erro na requisição:', error);
-            
             if (error.message.includes('401') || error.message.includes('400')) {
                 setError("Credenciais inválidas ou usuário não encontrado.");
             } else {

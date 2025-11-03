@@ -17,7 +17,6 @@ function AdminPage() {
         });
         setUsername(userData.username);
       } catch (error) {
-        console.error("Erro ao buscar usuário:", error);
         setError("Não foi possível carregar os dados do administrador");
       } finally {
         setLoading(false);

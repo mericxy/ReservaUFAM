@@ -59,7 +59,6 @@ function AdminProfile() {
         setUser(userData);
         setOriginalUser(userData);
       } catch (error) {
-        console.error("Erro ao carregar perfil:", error);
         setMessage("Erro ao carregar perfil");
       } finally {
         setLoading(false);
@@ -224,7 +223,6 @@ function AdminProfile() {
       
       setOriginalUser({...user, password: "", confirmPassword: ""});
     } catch (error) {
-      console.error("Erro ao atualizar perfil:", error);
       setMessage("Erro ao salvar alterações");
     }
   };
@@ -241,7 +239,6 @@ function AdminProfile() {
       if (!response.ok) throw new Error("Erro ao enviar email");
       setMessage("Email de confirmação enviado com sucesso!");
     } catch (error) {
-      console.error("Erro ao enviar email:", error);
       setMessage("Erro ao enviar email de confirmação");
     }
   };

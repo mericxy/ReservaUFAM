@@ -57,7 +57,6 @@ function AdminRecursos() {
         vehicle: vehicleData
       });
     } catch (error) {
-      console.error("Erro ao carregar recursos:", error);
       handleError("Erro ao carregar recursos. Por favor, tente novamente mais tarde.");
     }
   };
@@ -114,7 +113,6 @@ function AdminRecursos() {
       });
       setFormModified(false);
     } catch (error) {
-      console.error("Erro:", error);
 
       // Detecção específica de token expirado
       if (error.message.includes("401")) {
@@ -124,7 +122,6 @@ function AdminRecursos() {
         }, 1500);
         return;
       }
-
       handleError("Erro ao adicionar recurso");
     }
   };
@@ -146,7 +143,6 @@ function AdminRecursos() {
       handleSuccess("Recurso removido com sucesso!");
       fetchResources();
     } catch (error) {
-      console.error("Erro:", error);
 
       if (error.message.includes("401")) {
         handleError("Sua sessão expirou. Faça login novamente.");

@@ -30,7 +30,6 @@ function UpdateReservationStatus() {
                 setReservation(data);
 
             } catch (error) {
-                console.error('Erro:', error.message);
                 setError("Não foi possível carregar os dados da reserva");
             } finally {
                 setLoading(false);
@@ -55,7 +54,6 @@ function UpdateReservationStatus() {
             navigate('/admin/reservations');
 
         } catch (error) {
-            console.error('Erro:', error.message);
             setError("Erro ao atualizar o status da reserva");
         }
     };

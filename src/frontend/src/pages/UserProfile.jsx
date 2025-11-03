@@ -66,7 +66,6 @@ useEffect(() => {
           setOriginalUser(userData);
         }
       } catch (error) {
-        console.error("Erro ao carregar perfil:", error.message);
         setMessage("Erro ao carregar perfil");
       } finally {
         setLoading(false);
@@ -228,7 +227,6 @@ const handleSubmit = async (e) => {
       setOriginalUser({...user, password: "", confirmPassword: ""});
     
     } catch (error) {
-      console.error("Erro ao atualizar perfil:", error.message);
       setMessage("Erro ao salvar alterações");
     }
   };
@@ -252,7 +250,6 @@ const handleDeleteAccount = async () => {
             navigate("/");
 
         } catch (error) {
-            console.error("Erro ao excluir conta:", error.message);
             setMessage("Não foi possível excluir sua conta. Tente novamente mais tarde.");
         }
     }
@@ -270,7 +267,6 @@ const handleSendEmailConfirmation = async () => {
       setMessage("Email de confirmação enviado com sucesso!");
     
     } catch (error) {
-      console.error("Erro ao enviar email:", error.message);
       setMessage("Erro ao enviar email de confirmação");
     }
   };

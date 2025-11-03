@@ -138,7 +138,6 @@ const CreateReservation = () => {
             });
 
         } catch (error) {
-            console.error('Erro ao carregar recursos:', error);
             handleError("Erro ao carregar recursos disponíveis. Por favor, tente novamente mais tarde.");
             if (error.message.includes("401")) {
                 handleError("Sessão expirada. Por favor, faça login novamente.");
@@ -161,7 +160,6 @@ const CreateReservation = () => {
             
             setOccupiedDates(data);
         } catch (error) {
-            console.error('Erro ao carregar datas ocupadas:', error);
             handleError("Erro ao carregar disponibilidade do recurso");
             if (error.message.includes("401")) {
                 handleError("Sessão expirada. Por favor, faça login novamente.");
@@ -174,18 +172,15 @@ const CreateReservation = () => {
         const newFormData = { ...formData, [name]: value };
 
         if (name === 'initial_date' || name === 'final_date') {
-            console.log(`${name} alterado para ${value}, limpando horário final`);
             newFormData.final_time = '';
             newFormData.initial_time = '';
         }
 
         if (name === 'initial_time') {
-            console.log(`${name} alterado para ${value}`);
             newFormData.final_time = '';
         }
 
         if (name === 'initial_date' && newFormData.final_date < value) {
-            console.log('Ajustando data final para coincidir com data inicial');
             newFormData.final_date = value;
             newFormData.final_time = '';
         }
@@ -250,8 +245,6 @@ const CreateReservation = () => {
                 resource_id: parseInt(formData.resource_id)
             };
 
-            console.log("Dados que serão enviados:", reservationData);
-
             switch (formData.resource_type) {
                 case 'auditorium':
                     reservationData.auditorium = parseInt(formData.resource_id);
@@ -266,8 +259,6 @@ const CreateReservation = () => {
                     throw new Error('Tipo de recurso inválido');
             }
 
-            console.log('Dados que serão enviados:', JSON.stringify(reservationData, null, 2));
-
             const formDataToSend = new FormData();
             Object.keys(reservationData).forEach(key => {
                 formDataToSend.append(key, reservationData[key]);
@@ -280,8 +271,6 @@ const CreateReservation = () => {
                 },
                 body: formDataToSend
             });
-
-            console.log('Resposta do servidor:', responseData);
 
             handleSuccess("Reserva criada com sucesso!");
             
@@ -298,8 +287,6 @@ const CreateReservation = () => {
             setSelectedResource(null);
             
         } catch (error) {
-            console.error('Erro completo:', error);
-            
             if (error.message.includes('400') || error.message.includes('validation')) {
                 handleError(`Erro de validação: ${error.message}`);
             } else {

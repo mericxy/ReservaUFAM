@@ -38,7 +38,6 @@ function AdminReservations() {
 
             setReservations({ pendentes, aprovadas, arquivadas });
         } catch (error) {
-            console.error('Erro:', error);
             setError("Não foi possível carregar as reservas");
 
             if (error.message.includes("401")) {
@@ -63,7 +62,6 @@ function AdminReservations() {
 
             fetchReservations();
         } catch (error) {
-            console.error('Erro:', error);
             setError("Erro ao atualizar o status da reserva");
 
             if (error.message.includes("401")) {
