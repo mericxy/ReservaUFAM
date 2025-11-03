@@ -61,7 +61,6 @@ const Login = () => {
                 setError(errorMessage);
             }
         } catch (error) {
-            console.error('Erro na requisição:', error);
             setError("Não foi possível conectar ao servidor. Verifique sua conexão e tente novamente.");
         } finally {
             setIsPending(false);

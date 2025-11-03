@@ -50,7 +50,6 @@ function AdminUsuarios() {
         arquivados
       });
     } catch (error) {
-      console.error('Erro ao carregar usuários:', error);
       handleError("Erro ao carregar usuários. Por favor, tente novamente mais tarde.");
     }
   };
@@ -92,7 +91,6 @@ function AdminUsuarios() {
       handleSuccess(`Usuário ${newStatus.toLowerCase()} com sucesso!`);
       fetchUsuarios();
     } catch (error) {
-      console.error('Erro:', error);
       handleError("Erro ao atualizar status do usuário");
     }
   };

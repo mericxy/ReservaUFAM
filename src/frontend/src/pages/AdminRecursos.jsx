@@ -63,7 +63,6 @@ function AdminRecursos() {
         vehicle: vehicleData
       });
     } catch (error) {
-      console.error('Erro ao carregar recursos:', error);
       handleError("Erro ao carregar recursos. Por favor, tente novamente mais tarde.");
     }
   };
@@ -125,7 +124,6 @@ function AdminRecursos() {
       });
       setFormModified(false);
     } catch (error) {
-      console.error('Erro:', error);
       handleError("Erro ao adicionar recurso");
     }
   };
@@ -157,7 +155,6 @@ function AdminRecursos() {
       handleSuccess("Recurso removido com sucesso!");
       fetchResources();
     } catch (error) {
-      console.error('Erro:', error);
       handleError("Erro ao remover recurso");
     }
   };
