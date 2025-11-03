@@ -3,203 +3,70 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import BackButton from "../components/BackButton";
 import MessagePopup from "../components/MessagePopup";
+import { generateTimeOptions, getMinDate } from "../utils/dateUtils";
+import { resourceTranslations, initialFormData } from "../constants/reservation";
+import { useMessages } from "../hooks/useMessages";
+import { useResources } from "../hooks/useResources";
+import ResourceSelector from "../components/ResourceSelector";
+import DateTimeSelector from "../components/DateTimeSelector";
+import ReservationDetails from "../components/ReservationDetails";
 import { apiFetch } from "../../api";
 
-const resourceTranslations = {
-    "auditorium": "Auditório",
-    "meeting_room": "Sala de Reunião",
-    "vehicle": "Veículo"
-};
-
-const generateTimeOptions = () => {
-    const options = [];
-    for (let hour = 7; hour < 23; hour++) {
-        const formattedHour = hour.toString().padStart(2, '0');
-        options.push(`${formattedHour}:00`);
-        options.push(`${formattedHour}:30`);
-    }
-    return options;
-};
-
-const getFinalTimeOptions = (initialTime, initialDate, finalDate) => {
-    if (!initialTime) {
-        return [];
-    }
-
-    if (!initialDate || !finalDate) {
-        return [];
-    }
-
-    const initialDateObj = new Date(initialDate);
-    const finalDateObj = new Date(finalDate);
-
-    if (initialDateObj.getTime() !== finalDateObj.getTime()) {
-        return generateTimeOptions();
-    }
-
-    const allOptions = generateTimeOptions();
-    const initialTimeIndex = allOptions.findIndex(time => time === initialTime);
-
-    if (initialTimeIndex === -1) {
-        return [];
-    }
-
-    return allOptions.slice(initialTimeIndex + 1);
-};
 
 const CreateReservation = () => {
     const navigate = useNavigate();
     const { isAuthenticated } = useAuth();
-    const [loading, setLoading] = useState(false);
-    const [message, setMessage] = useState({ text: "", type: "" });
-    const [resources, setResources] = useState({
-        auditorium: [],
-        meeting_room: [],
-        vehicle: []
-    });
-    const [occupiedDates, setOccupiedDates] = useState([]);
+    const { message, handleError, handleSuccess, clearMessage } = useMessages();
+
+    const [formData, setFormData] = useState(initialFormData);
+    const [formModified, setFormModified] = useState(false);
     const [selectedResource, setSelectedResource] = useState(null);
 
-    const [formModified, setFormModified] = useState(false);
-    const [initialFormData] = useState({
-        resource_type: "",
-        resource_id: "",
-        initial_date: "",
-        final_date: "",
-        initial_time: "",
-        final_time: "",
-        description: ""
-    });
-
-    const [formData, setFormData] = useState({
-        resource_type: "",
-        resource_id: "",
-        initial_date: "",
-        final_date: "",
-        initial_time: "",
-        final_time: "",
-        description: ""
-    });
+    const { resources, occupiedDates } = useResources(formData, handleError);
 
     const timeOptions = generateTimeOptions();
 
-    const getMinDate = () => {
-        const today = new Date();
-        today.setDate(today.getDate() + 2);
-        return today.toISOString().split("T")[0];
-    };
-
     useEffect(() => {
         if (!isAuthenticated) {
-            navigate('/');
-            return;
+        navigate("/");
         }
-
-        fetchResources();
     }, [isAuthenticated, navigate]);
-
-    useEffect(() => {
-        if (formData.resource_type && formData.resource_id) {
-            fetchOccupiedDates();
-        }
-    }, [formData.resource_type, formData.resource_id]);
-
-    const handleError = (errorMessage) => {
-        setMessage({ text: errorMessage, type: 'error' });
-    };
-
-    const handleSuccess = (successMessage) => {
-        setMessage({ text: successMessage, type: 'success' });
-    };
-
-    const clearMessage = () => {
-        setMessage({ text: "", type: "" });
-    };
-
-    const fetchResources = async () => {
-        const token = localStorage.getItem("accessToken");
-        const options = {
-            headers: {
-                'Authorization': `Bearer ${token}`,
-            },
-        };
-
-        try {
-            const [auditoriums, meetingRooms, vehicles] = await Promise.all([
-                apiFetch('/api/resources/auditoriums/', options),
-                apiFetch('/api/resources/meeting-rooms/', options),
-                apiFetch('/api/resources/vehicles/', options)
-            ]);
-
-            setResources({
-                auditorium: auditoriums,
-                meeting_room: meetingRooms,
-                vehicle: vehicles
-            });
-
-        } catch (error) {
-            handleError("Erro ao carregar recursos disponíveis. Por favor, tente novamente mais tarde.");
-            if (error.message.includes("401")) {
-                handleError("Sessão expirada. Por favor, faça login novamente.");
-            }
-        }
-    };
-
-    const fetchOccupiedDates = async () => {
-        const token = localStorage.getItem("accessToken");
-        const options = {
-            headers: {
-                'Authorization': `Bearer ${token}`,
-            },
-        };
-        
-        const endpoint = `/api/resources/occupied-dates/${formData.resource_type}/${formData.resource_id}/`;
-
-        try {
-            const data = await apiFetch(endpoint, options);
-            
-            setOccupiedDates(data);
-        } catch (error) {
-            handleError("Erro ao carregar disponibilidade do recurso");
-            if (error.message.includes("401")) {
-                handleError("Sessão expirada. Por favor, faça login novamente.");
-            }
-        }
-    };
 
     const handleChange = (e) => {
         const { name, value } = e.target;
         const newFormData = { ...formData, [name]: value };
 
-        if (name === 'initial_date' || name === 'final_date') {
-            newFormData.final_time = '';
-            newFormData.initial_time = '';
+        if (name === "initial_date" || name === "final_date") {
+        newFormData.final_time = "";
+        newFormData.initial_time = "";
         }
 
-        if (name === 'initial_time') {
-            newFormData.final_time = '';
+        if (name === "initial_time") {
+        newFormData.final_time = "";
         }
 
-        if (name === 'initial_date' && newFormData.final_date < value) {
-            newFormData.final_date = value;
-            newFormData.final_time = '';
+        if (name === "initial_date" && newFormData.final_date < value) {
+        newFormData.final_date = value;
+        newFormData.final_time = "";
         }
 
         setFormData(newFormData);
 
         const hasChanges = Object.keys(newFormData).some(
-            key => newFormData[key] !== initialFormData[key]
+        (key) => newFormData[key] !== initialFormData[key]
         );
         setFormModified(hasChanges);
 
-        if (name === 'resource_type') {
-            setFormData(prev => ({ ...prev, resource_id: '' }));
-            setSelectedResource(null);
+        if (name === "resource_type") {
+        setFormData((prev) => ({ ...prev, resource_id: "" }));
+        setSelectedResource(null);
         }
 
-        if (name === 'resource_id') {
-            const resource = resources[formData.resource_type]?.find(r => r.id === parseInt(value));
-            setSelectedResource(resource);
+        if (name === "resource_id") {
+        const resource = resources[formData.resource_type]?.find(
+            (r) => r.id === parseInt(value)
+        );
+        setSelectedResource(resource);
         }
     };
 
@@ -208,93 +75,80 @@ const CreateReservation = () => {
         if (!formModified) return;
 
         try {
-            const token = localStorage.getItem("accessToken");
-            if (!token) {
-                handleError("Sessão expirada. Por favor, faça login novamente.");
-                navigate('/');
-                return;
-            }
+        const token = localStorage.getItem("accessToken");
+        if (!token) {
+            handleError("Sessão expirada. Por favor, faça login novamente.");
+            navigate("/");
+            return;
+        }
 
-            if (!formData.resource_type || !formData.resource_id) {
-                handleError("Por favor, selecione um recurso.");
-                return;
-            }
+        const requiredFields = [
+            "resource_type",
+            "resource_id",
+            "initial_date",
+            "final_date",
+            "initial_time",
+            "final_time",
+            "description",
+        ];
 
-            if (!formData.initial_date || !formData.final_date) {
-                handleError("Por favor, selecione as datas inicial e final.");
-                return;
-            }
-
-            if (!formData.initial_time || !formData.final_time) {
-                handleError("Por favor, selecione os horários inicial e final.");
-                return;
-            }
-
-            if (!formData.description.trim()) {
-                handleError("Por favor, forneça uma descrição para a reserva.");
-                return;
-            }
-
-            const reservationData = {
-                initial_date: formData.initial_date,
-                final_date: formData.final_date,
-                initial_time: formData.initial_time,
-                final_time: formData.final_time,
-                description: formData.description,
-                resource_type: formData.resource_type,
-                resource_id: parseInt(formData.resource_id)
-            };
-
-            switch (formData.resource_type) {
-                case 'auditorium':
-                    reservationData.auditorium = parseInt(formData.resource_id);
-                    break;
-                case 'meeting_room':
-                    reservationData.meeting_room = parseInt(formData.resource_id);
-                    break;
-                case 'vehicle':
-                    reservationData.vehicle = parseInt(formData.resource_id);
-                    break;
-                default:
-                    throw new Error('Tipo de recurso inválido');
-            }
-
-            const formDataToSend = new FormData();
-            Object.keys(reservationData).forEach(key => {
-                formDataToSend.append(key, reservationData[key]);
-            });
-
-            const responseData = await apiFetch("/api/user/reservations/create/", {
-                method: "POST",
-                headers: {
-                    "Authorization": `Bearer ${token}`
-                },
-                body: formDataToSend
-            });
-
-            handleSuccess("Reserva criada com sucesso!");
-            
-            setFormData({
-                resource_type: "",
-                resource_id: "",
-                initial_date: "",
-                final_date: "",
-                initial_time: "",
-                final_time: "",
-                description: ""
-            });
-            setFormModified(false);
-            setSelectedResource(null);
-            
-        } catch (error) {
-            if (error.message.includes('400') || error.message.includes('validation')) {
-                handleError(`Erro de validação: ${error.message}`);
-            } else {
-                handleError(`Erro ao criar reserva: ${error.message}`);
+        for (const field of requiredFields) {
+            if (!formData[field] || (typeof formData[field] === "string" && !formData[field].trim())) {
+            handleError("Por favor, preencha todos os campos obrigatórios.");
+            return;
             }
         }
-    };
 
+        const reservationData = {
+            ...formData,
+            resource_id: parseInt(formData.resource_id),
+        };
+
+        reservationData[formData.resource_type] = parseInt(formData.resource_id);
+
+        const response = await fetch(
+            "http://127.0.0.1:8000/api/user/reservations/create/",
+            {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify(reservationData),
+            }
+        );
+
+        const text = await response.text();
+        let data;
+
+        try {
+            data = JSON.parse(text);
+        } catch {
+            throw new Error("Erro ao processar resposta do servidor");
+        }
+
+        if (!response.ok) {
+            let errorMessage = "Erro na resposta do servidor";
+            if (data.detail) {
+            errorMessage = data.detail;
+            } else if (typeof data === "object") {
+            const errors = Object.entries(data).map(([key, value]) =>
+                Array.isArray(value) ? `${key}: ${value.join(", ")}` : `${key}: ${value}`
+            );
+            errorMessage = errors.join(". ");
+            }
+            throw new Error(errorMessage);
+        }
+
+        handleSuccess("Reserva criada com sucesso!");
+        setFormData(initialFormData);
+        setFormModified(false);
+        setSelectedResource(null);
+        } catch (error) {
+        console.error("Erro completo:", error);
+        handleError(`Erro ao criar reserva: ${error.message}`);
+        }
+    };
     return (
         <div className="container mx-auto px-4 py-8">
             {message.text && (
@@ -315,180 +169,24 @@ const CreateReservation = () => {
                     <div className="lg:col-span-2">
                         <div className="bg-white p-2 rounded-xl shadow-lg">
                             <form onSubmit={handleSubmit} className="space-y-6">
-                                {/* Seção de Seleção de Recurso */}
-                                <div className="bg-gray-50 p-4 rounded-lg space-y-4">
-                                    <h2 className="text-xl font-semibold text-gray-800 mb-4">
-                                        Selecione o Recurso
-                                    </h2>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                        <div>
-                                            <label className="block text-gray-700 text-sm font-bold mb-2">
-                                                Tipo de Recurso
-                                            </label>
-                                            <select
-                                                name="resource_type"
-                                                value={formData.resource_type}
-                                                onChange={handleChange}
-                                                className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 transition-all duration-200 hover:border-green-400"
-                                                required
-                                            >
-                                                <option value="">Selecione um tipo</option>
-                                                {Object.entries(resourceTranslations).map(([key, value]) => (
-                                                    <option key={key} value={key}>{value}</option>
-                                                ))}
-                                            </select>
-                                        </div>
+                                <ResourceSelector
+                                    formData={formData}
+                                    handleChange={handleChange}
+                                    resources={resources}
+                                    resourceTranslations={resourceTranslations}
+                                />
 
-                                        {formData.resource_type && (
-                                            <div>
-                                                <label className="block text-gray-700 text-sm font-bold mb-2">
-                                                    Recurso Específico
-                                                </label>
-                                                <select
-                                                    name="resource_id"
-                                                    value={formData.resource_id}
-                                                    onChange={handleChange}
-                                                    className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 transition-all duration-200 hover:border-green-400"
-                                                    required
-                                                >
-                                                    <option value="">Selecione um recurso</option>
-                                                    {resources[formData.resource_type]?.map(resource => (
-                                                        <option key={resource.id} value={resource.id}>
-                                                            {resource.name || resource.model || resource.plate_number}
-                                                        </option>
-                                                    ))}
-                                                </select>
-                                            </div>
-                                        )}
-                                    </div>
-                                </div>
+                                <DateTimeSelector
+                                    formData={formData}
+                                    handleChange={handleChange}
+                                    timeOptions={timeOptions}
+                                    getMinDate={getMinDate}
+                                />
 
-                                {/* Seção de Data e Hora */}
-                                <div className="bg-gray-50 p-4 rounded-lg">
-                                    <h2 className="text-xl font-semibold text-gray-800 mb-4">
-                                        Período da Reserva
-                                    </h2>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                        <div className="space-y-4">
-                                            <div>
-                                                <label className="block text-gray-700 text-sm font-bold mb-2">
-                                                    Data Inicial
-                                                </label>
-                                                <input 
-                                                    type="date" 
-                                                    name="initial_date" 
-                                                    value={formData.initial_date} 
-                                                    onChange={handleChange} 
-                                                    min={getMinDate()} 
-                                                    required 
-                                                    className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 transition-all duration-200 hover:border-green-400"
-                                                />
-                                            </div>
-                                            <div>
-                                                <label className="block text-gray-700 text-sm font-bold mb-2">
-                                                    Horário Inicial
-                                                </label>
-                                                <select 
-                                                    name="initial_time" 
-                                                    value={formData.initial_time} 
-                                                    onChange={handleChange} 
-                                                    required 
-                                                    className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 transition-all duration-200 hover:border-green-400"
-                                                >
-                                                    <option value="">Selecione um horário</option>
-                                                    {timeOptions.map((time) => (
-                                                        <option key={time} value={time}>
-                                                            {time}
-                                                        </option>
-                                                    ))}
-                                                </select>
-                                            </div>
-                                        </div>
-                                        <div className="space-y-4">
-                                            <div>
-                                                <label className="block text-gray-700 text-sm font-bold mb-2">
-                                                    Data Final
-                                                </label>
-                                                <input 
-                                                    type="date" 
-                                                    name="final_date" 
-                                                    value={formData.final_date} 
-                                                    onChange={handleChange} 
-                                                    min={formData.initial_date || getMinDate()} 
-                                                    required 
-                                                    className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 transition-all duration-200 hover:border-green-400"
-                                                />
-                                            </div>
-                                            <div>
-                                                <label className="block text-gray-700 text-sm font-bold mb-2">
-                                                    Horário Final
-                                                </label>
-                                                <select 
-                                                    name="final_time" 
-                                                    value={formData.final_time} 
-                                                    onChange={handleChange} 
-                                                    required 
-                                                    className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 transition-all duration-200 hover:border-green-400"
-                                                >
-                                                    <option value="">Selecione um horário</option>
-                                                    <option value="07:00">07:00</option>
-                                                    <option value="07:30">07:30</option>
-                                                    <option value="08:00">08:00</option>
-                                                    <option value="08:30">08:30</option>
-                                                    <option value="09:00">09:00</option>
-                                                    <option value="09:30">09:30</option>
-                                                    <option value="10:00">10:00</option>
-                                                    <option value="10:30">10:30</option>
-                                                    <option value="11:00">11:00</option>
-                                                    <option value="11:30">11:30</option>
-                                                    <option value="12:00">12:00</option>
-                                                    <option value="12:30">12:30</option>
-                                                    <option value="13:00">13:00</option>
-                                                    <option value="13:30">13:30</option>
-                                                    <option value="14:00">14:00</option>
-                                                    <option value="14:30">14:30</option>
-                                                    <option value="15:00">15:00</option>
-                                                    <option value="15:30">15:30</option>
-                                                    <option value="16:00">16:00</option>
-                                                    <option value="16:30">16:30</option>
-                                                    <option value="17:00">17:00</option>
-                                                    <option value="17:30">17:30</option>
-                                                    <option value="18:00">18:00</option>
-                                                    <option value="18:30">18:30</option>
-                                                    <option value="19:00">19:00</option>
-                                                    <option value="19:30">19:30</option>
-                                                    <option value="20:00">20:00</option>
-                                                    <option value="20:30">20:30</option>
-                                                    <option value="21:00">21:00</option>
-                                                    <option value="21:30">21:30</option>
-                                                    <option value="22:00">22:00</option>
-                                                    <option value="22:30">22:30</option>
-                                                </select>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {/* Seção de Descrição */}
-                                <div className="bg-gray-50 p-4 rounded-lg">
-                                    <h2 className="text-xl font-semibold text-gray-800 mb-4">
-                                        Detalhes da Reserva
-                                    </h2>
-                                    <div>
-                                        <label className="block text-gray-700 text-sm font-bold mb-2">
-                                            Descrição
-                                        </label>
-                                        <textarea 
-                                            name="description" 
-                                            value={formData.description} 
-                                            onChange={handleChange} 
-                                            required 
-                                            rows="4"
-                                            className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 transition-all duration-200 hover:border-green-400"
-                                            placeholder="Descreva o propósito da reserva..."
-                                        />
-                                    </div>
-                                </div>
+                                <ReservationDetails
+                                    formData={formData}
+                                    handleChange={handleChange}
+                                />
 
                                 <div className="flex justify-end">
                                     <button
