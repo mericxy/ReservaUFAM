@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import MessagePopup from '../components/MessagePopup';
+import { apiFetch } from '../../api';
 
 function AdminUsuarios() {
   const [message, setMessage] = useState({ text: "", type: "" });
@@ -21,21 +22,7 @@ function AdminUsuarios() {
     };
 
     try {
-      const response = await fetch('http://127.0.0.1:8000/api/admin/users/', { headers });
-
-      if (response.status === 401) {
-        handleError("Sua sessão expirou. Faça login novamente.");
-        setTimeout(() => {
-          window.location.href = "/";
-        }, 1500); // 1,5 segundos para o usuário ver a mensagem
-        return;
-      }
-
-      if (!response.ok) {
-        throw new Error('HTTP error! status: ' + response.status);
-      }
-
-      const data = await response.json();
+      const data = await apiFetch('/api/admin/users/', { headers });
       
       const pendentes = data.filter(user => user.status === 'Pendente')
         .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
@@ -52,6 +39,10 @@ function AdminUsuarios() {
     } catch (error) {
       console.error('Erro ao carregar usuários:', error);
       handleError("Erro ao carregar usuários. Por favor, tente novamente mais tarde.");
+
+      if (error.message.includes("401")) {
+        handleError("Sua sessão expirou. Faça login novamente.");
+      }
     }
   };
 
@@ -70,7 +61,7 @@ function AdminUsuarios() {
   const handleStatusChange = async (userId, newStatus) => {
     try {
       const token = localStorage.getItem("accessToken");
-      const response = await fetch(`http://127.0.0.1:8000/api/admin/users/${userId}/status/`, {
+      const response = await apiFetch(`/api/admin/users/${userId}/status/`, {
         method: 'PATCH',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -79,21 +70,15 @@ function AdminUsuarios() {
         body: JSON.stringify({ status: newStatus })
       });
 
-      if (response.status === 401) {
-        handleError("Sua sessão expirou. Faça login novamente.");
-        setTimeout(() => {
-          window.location.href = "/";
-        }, 1500); // 1,5 segundos para o usuário ver a mensagem
-        return;
-      }
-
-      if (!response.ok) throw new Error('Erro ao atualizar status do usuário');
-
       handleSuccess(`Usuário ${newStatus.toLowerCase()} com sucesso!`);
       fetchUsuarios();
     } catch (error) {
       console.error('Erro:', error);
       handleError("Erro ao atualizar status do usuário");
+
+      if (error.message.includes("401")) {
+        handleError("Sua sessão expirou. Faça login novamente.");
+      }
     }
   };
 

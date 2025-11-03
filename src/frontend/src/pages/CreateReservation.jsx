@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import BackButton from "../components/BackButton";
 import MessagePopup from "../components/MessagePopup";
+import { apiFetch } from "../../api";
 
 const resourceTranslations = {
     "auditorium": "Auditório",
@@ -117,26 +118,17 @@ const CreateReservation = () => {
 
     const fetchResources = async () => {
         const token = localStorage.getItem("accessToken");
-        const headers = {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
+        const options = {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+            },
         };
 
         try {
-            const [auditoriumResponse, meetingRoomResponse, vehicleResponse] = await Promise.all([
-                fetch('http://127.0.0.1:8000/api/resources/auditoriums/', { headers }),
-                fetch('http://127.0.0.1:8000/api/resources/meeting-rooms/', { headers }),
-                fetch('http://127.0.0.1:8000/api/resources/vehicles/', { headers })
-            ]);
-
-            if (!auditoriumResponse.ok || !meetingRoomResponse.ok || !vehicleResponse.ok) {
-                throw new Error('Erro ao carregar recursos');
-            }
-
             const [auditoriums, meetingRooms, vehicles] = await Promise.all([
-                auditoriumResponse.json(),
-                meetingRoomResponse.json(),
-                vehicleResponse.json()
+                apiFetch('/api/resources/auditoriums/', options),
+                apiFetch('/api/resources/meeting-rooms/', options),
+                apiFetch('/api/resources/vehicles/', options)
             ]);
 
             setResources({
@@ -144,29 +136,36 @@ const CreateReservation = () => {
                 meeting_room: meetingRooms,
                 vehicle: vehicles
             });
+
         } catch (error) {
             console.error('Erro ao carregar recursos:', error);
             handleError("Erro ao carregar recursos disponíveis. Por favor, tente novamente mais tarde.");
+            if (error.message.includes("401")) {
+                handleError("Sessão expirada. Por favor, faça login novamente.");
+            }
         }
     };
 
     const fetchOccupiedDates = async () => {
+        const token = localStorage.getItem("accessToken");
+        const options = {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+            },
+        };
+        
+        const endpoint = `/api/resources/occupied-dates/${formData.resource_type}/${formData.resource_id}/`;
+
         try {
-            const token = localStorage.getItem("accessToken");
-            const response = await fetch(`http://127.0.0.1:8000/api/resources/occupied-dates/${formData.resource_type}/${formData.resource_id}/`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                }
-            });
+            const data = await apiFetch(endpoint, options);
             
-            if (!response.ok) throw new Error('Erro ao carregar datas ocupadas');
-            
-            const data = await response.json();
             setOccupiedDates(data);
         } catch (error) {
             console.error('Erro ao carregar datas ocupadas:', error);
             handleError("Erro ao carregar disponibilidade do recurso");
+            if (error.message.includes("401")) {
+                handleError("Sessão expirada. Por favor, faça login novamente.");
+            }
         }
     };
 
@@ -269,48 +268,20 @@ const CreateReservation = () => {
 
             console.log('Dados que serão enviados:', JSON.stringify(reservationData, null, 2));
 
-            const response = await fetch("http://127.0.0.1:8000/api/user/reservations/create/", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${token}`
-                },
-                body: JSON.stringify(reservationData)
+            const formDataToSend = new FormData();
+            Object.keys(reservationData).forEach(key => {
+                formDataToSend.append(key, reservationData[key]);
             });
 
-            const responseText = await response.text();
-            console.log('Resposta bruta do servidor:', responseText);
+            const responseData = await apiFetch("/api/user/reservations/create/", {
+                method: "POST",
+                headers: {
+                    "Authorization": `Bearer ${token}`
+                },
+                body: formDataToSend
+            });
 
-            let responseData;
-            try {
-                responseData = JSON.parse(responseText);
-                console.log('Resposta do servidor (parsed):', responseData);
-            } catch (e) {
-                console.log('Erro ao fazer parse da resposta');
-                throw new Error('Erro ao processar resposta do servidor');
-            }
-
-            if (!response.ok) {
-                let errorMessage = 'Erro na resposta do servidor';
-                
-                if (responseData.detail) {
-                    errorMessage = responseData.detail;
-                } else if (typeof responseData === 'object') {
-                    const errors = [];
-                    Object.entries(responseData).forEach(([key, value]) => {
-                        if (Array.isArray(value)) {
-                            errors.push(`${key}: ${value.join(', ')}`);
-                        } else if (typeof value === 'string') {
-                            errors.push(`${key}: ${value}`);
-                        }
-                    });
-                    if (errors.length > 0) {
-                        errorMessage = errors.join('. ');
-                    }
-                }
-                
-                throw new Error(errorMessage);
-            }
+            console.log('Resposta do servidor:', responseData);
 
             handleSuccess("Reserva criada com sucesso!");
             
@@ -328,7 +299,12 @@ const CreateReservation = () => {
             
         } catch (error) {
             console.error('Erro completo:', error);
-            handleError(`Erro ao criar reserva: ${error.message}`);
+            
+            if (error.message.includes('400') || error.message.includes('validation')) {
+                handleError(`Erro de validação: ${error.message}`);
+            } else {
+                handleError(`Erro ao criar reserva: ${error.message}`);
+            }
         }
     };
 

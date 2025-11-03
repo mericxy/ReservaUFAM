@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom"; 
 import { useAuth } from "../context/AuthContext"; 
 import BackButton from "../components/BackButton";
+import { apiFetch } from "../../api";
 
 function UserProfile() {
   const navigate = useNavigate();
@@ -37,36 +38,35 @@ function UserProfile() {
     cellphone: false
   });
 
-  useEffect(() => {
+useEffect(() => {
     const fetchUser = async () => {
       try {
-        const response = await fetch("http://127.0.0.1:8000/api/user/", {
+        const data = await apiFetch("/api/user/", {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
           },
         });
 
-        if (!response.ok) throw new Error("Erro ao buscar perfil");
-        const data = await response.json();
-        
-        const userData = {
-          username: data.username || "",
-          email: data.email || "",
-          cellphone: data.cellphone || "",
-          password: "",
-          confirmPassword: "",
-          siape: data.siape || "",
-          cpf: data.cpf || "",
-          first_name: data.first_name || "",
-          last_name: data.last_name || "",
-          role: data.role || "",
-          is_staff: data.is_staff || false
-        };
-        
-        setUser(userData);
-        setOriginalUser(userData);
+        if (data) {
+          const userData = {
+            username: data.username || "",
+            email: data.email || "",
+            cellphone: data.cellphone || "",
+            password: "",
+            confirmPassword: "",
+            siape: data.siape || "",
+            cpf: data.cpf || "",
+            first_name: data.first_name || "",
+            last_name: data.last_name || "",
+            role: data.role || "",
+            is_staff: data.is_staff || false
+          };
+          
+          setUser(userData);
+          setOriginalUser(userData);
+        }
       } catch (error) {
-        console.error("Erro ao carregar perfil:", error);
+        console.error("Erro ao carregar perfil:", error.message);
         setMessage("Erro ao carregar perfil");
       } finally {
         setLoading(false);
@@ -196,7 +196,7 @@ function UserProfile() {
     return bothPasswordFieldsFilled && allPasswordRequirementsMet;
   };
 
-  const handleSubmit = async (e) => {
+const handleSubmit = async (e) => {
     e.preventDefault();
     setMessage("");
 
@@ -208,10 +208,9 @@ function UserProfile() {
     }
 
     try {
-      const response = await fetch("http://127.0.0.1:8000/api/user/profile/", {
+      await apiFetch("/api/user/profile/", {
         method: "PATCH",
         headers: {
-          "Content-Type": "application/json",
           Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
         },
         body: JSON.stringify({
@@ -219,8 +218,7 @@ function UserProfile() {
           password: showPasswordFields ? user.password : undefined
         }),
       });
-
-      if (!response.ok) throw new Error("Erro ao atualizar perfil");
+      
       setMessage("Perfil atualizado com sucesso!");
       
       if (showPasswordFields) {
@@ -228,65 +226,54 @@ function UserProfile() {
         setShowPasswordFields(false);
       }
       setOriginalUser({...user, password: "", confirmPassword: ""});
+    
     } catch (error) {
-      console.error("Erro ao atualizar perfil:", error);
+      console.error("Erro ao atualizar perfil:", error.message);
       setMessage("Erro ao salvar alterações");
     }
   };
 
-  const handleDeleteAccount = async () => {
+const handleDeleteAccount = async () => {
     const isConfirmed = window.confirm(
         "Você tem certeza que deseja excluir sua conta? Esta ação é irreversível. Todos os seus dados pessoais serão removidos e você perderá o acesso ao sistema."
     );
 
     if (isConfirmed) {
         try {
-            const response = await fetch("http://127.0.0.1:8000/api/user/delete/", {
+            await apiFetch("/api/user/delete/", {
                 method: "DELETE",
                 headers: {
                     Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
                 },
             });
-
-            if (response.status !== 204) {
-                throw new Error("Erro ao excluir a conta.");
-            }
             
             alert("Sua conta foi excluída com sucesso.");
             logout(); 
             navigate("/");
 
         } catch (error) {
-            console.error("Erro ao excluir conta:", error);
+            console.error("Erro ao excluir conta:", error.message);
             setMessage("Não foi possível excluir sua conta. Tente novamente mais tarde.");
         }
     }
   };
 
-  const handleSendEmailConfirmation = async () => {
+const handleSendEmailConfirmation = async () => {
     try {
-      const response = await fetch("http://127.0.0.1:8000/api/user/send-confirmation/", {
+      await apiFetch("/api/user/send-confirmation/", {
         method: "POST",
         headers: {
           Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
         },
       });
 
-      if (!response.ok) throw new Error("Erro ao enviar email");
       setMessage("Email de confirmação enviado com sucesso!");
+    
     } catch (error) {
-      console.error("Erro ao enviar email:", error);
+      console.error("Erro ao enviar email:", error.message);
       setMessage("Erro ao enviar email de confirmação");
     }
   };
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-500"></div>
-      </div>
-    );
-  }
 
   const roleTranslations = {
     ADMIN: "Administrador",

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { apiFetch } from "../../api";
 
 function UpdateReservationStatus() {
     const { id } = useParams();
@@ -19,21 +20,17 @@ function UpdateReservationStatus() {
         const fetchReservation = async () => {
             try {
                 const token = localStorage.getItem("accessToken");
-                const response = await fetch(`http://127.0.0.1:8000/api/admin/reservations/${id}/`, {
+                
+                const data = await apiFetch(`/api/admin/reservations/${id}/`, {
                     headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json'
+                        'Authorization': `Bearer ${token}`
                     }
                 });
                 
-                if (!response.ok) {
-                    throw new Error('Erro ao buscar reserva');
-                }
-                
-                const data = await response.json();
                 setReservation(data);
+
             } catch (error) {
-                console.error('Erro:', error);
+                console.error('Erro:', error.message);
                 setError("Não foi possível carregar os dados da reserva");
             } finally {
                 setLoading(false);
@@ -46,22 +43,19 @@ function UpdateReservationStatus() {
     const handleStatusUpdate = async (newStatus) => {
         try {
             const token = localStorage.getItem("accessToken");
-            const response = await fetch(`http://127.0.0.1:8000/api/admin/reservations/${id}/status/`, {
+
+            await apiFetch(`/api/admin/reservations/${id}/status/`, {
                 method: 'PATCH',
                 headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
+                    'Authorization': `Bearer ${token}`
                 },
                 body: JSON.stringify({ status: newStatus })
             });
 
-            if (!response.ok) {
-                throw new Error('Erro ao atualizar status');
-            }
-
             navigate('/admin/reservations');
+
         } catch (error) {
-            console.error('Erro:', error);
+            console.error('Erro:', error.message);
             setError("Erro ao atualizar o status da reserva");
         }
     };
