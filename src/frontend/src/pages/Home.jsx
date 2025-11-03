@@ -22,7 +22,6 @@ function Home() {
         const userData = await response.json();
         setUsername(userData.username);
       } catch (error) {
-        console.error(error);
         setError("Erro ao carregar dados do usuário");
       }
     };
@@ -41,7 +40,6 @@ function Home() {
         const data = await response.json();
         setReservations(data);
       } catch (error) {
-        console.error('Erro ao buscar reservas:', error);
         setError("Erro ao carregar suas reservas");
       } finally {
         setLoading(false);

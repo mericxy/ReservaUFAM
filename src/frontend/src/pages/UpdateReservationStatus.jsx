@@ -33,7 +33,6 @@ function UpdateReservationStatus() {
                 const data = await response.json();
                 setReservation(data);
             } catch (error) {
-                console.error('Erro:', error);
                 setError("Não foi possível carregar os dados da reserva");
             } finally {
                 setLoading(false);
@@ -61,7 +60,6 @@ function UpdateReservationStatus() {
 
             navigate('/admin/reservations');
         } catch (error) {
-            console.error('Erro:', error);
             setError("Erro ao atualizar o status da reserva");
         }
     };

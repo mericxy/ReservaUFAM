@@ -33,7 +33,6 @@ function UserReservations() {
                 const data = await response.json();
                 setReservations(data);
             } catch (error) {
-                console.error('Erro:', error);
                 setError("Não foi possível carregar suas reservas");
             } finally {
                 setLoading(false);

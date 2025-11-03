@@ -66,7 +66,6 @@ function UserProfile() {
         setUser(userData);
         setOriginalUser(userData);
       } catch (error) {
-        console.error("Erro ao carregar perfil:", error);
         setMessage("Erro ao carregar perfil");
       } finally {
         setLoading(false);
@@ -229,7 +228,6 @@ function UserProfile() {
       }
       setOriginalUser({...user, password: "", confirmPassword: ""});
     } catch (error) {
-      console.error("Erro ao atualizar perfil:", error);
       setMessage("Erro ao salvar alterações");
     }
   };
@@ -257,7 +255,6 @@ function UserProfile() {
             navigate("/");
 
         } catch (error) {
-            console.error("Erro ao excluir conta:", error);
             setMessage("Não foi possível excluir sua conta. Tente novamente mais tarde.");
         }
     }
@@ -275,7 +272,6 @@ function UserProfile() {
       if (!response.ok) throw new Error("Erro ao enviar email");
       setMessage("Email de confirmação enviado com sucesso!");
     } catch (error) {
-      console.error("Erro ao enviar email:", error);
       setMessage("Erro ao enviar email de confirmação");
     }
   };

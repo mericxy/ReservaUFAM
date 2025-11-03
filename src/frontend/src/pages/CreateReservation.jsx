@@ -145,7 +145,6 @@ const CreateReservation = () => {
                 vehicle: vehicles
             });
         } catch (error) {
-            console.error('Erro ao carregar recursos:', error);
             handleError("Erro ao carregar recursos disponíveis. Por favor, tente novamente mais tarde.");
         }
     };
@@ -165,7 +164,6 @@ const CreateReservation = () => {
             const data = await response.json();
             setOccupiedDates(data);
         } catch (error) {
-            console.error('Erro ao carregar datas ocupadas:', error);
             handleError("Erro ao carregar disponibilidade do recurso");
         }
     };
@@ -175,18 +173,15 @@ const CreateReservation = () => {
         const newFormData = { ...formData, [name]: value };
 
         if (name === 'initial_date' || name === 'final_date') {
-            console.log(`${name} alterado para ${value}, limpando horário final`);
             newFormData.final_time = '';
             newFormData.initial_time = '';
         }
 
         if (name === 'initial_time') {
-            console.log(`${name} alterado para ${value}`);
             newFormData.final_time = '';
         }
 
         if (name === 'initial_date' && newFormData.final_date < value) {
-            console.log('Ajustando data final para coincidir com data inicial');
             newFormData.final_date = value;
             newFormData.final_time = '';
         }
@@ -251,8 +246,6 @@ const CreateReservation = () => {
                 resource_id: parseInt(formData.resource_id)
             };
 
-            console.log("Dados que serão enviados:", reservationData);
-
             switch (formData.resource_type) {
                 case 'auditorium':
                     reservationData.auditorium = parseInt(formData.resource_id);
@@ -267,8 +260,6 @@ const CreateReservation = () => {
                     throw new Error('Tipo de recurso inválido');
             }
 
-            console.log('Dados que serão enviados:', JSON.stringify(reservationData, null, 2));
-
             const response = await fetch("http://127.0.0.1:8000/api/user/reservations/create/", {
                 method: "POST",
                 headers: {
@@ -279,14 +270,11 @@ const CreateReservation = () => {
             });
 
             const responseText = await response.text();
-            console.log('Resposta bruta do servidor:', responseText);
 
             let responseData;
             try {
                 responseData = JSON.parse(responseText);
-                console.log('Resposta do servidor (parsed):', responseData);
             } catch (e) {
-                console.log('Erro ao fazer parse da resposta');
                 throw new Error('Erro ao processar resposta do servidor');
             }
 
@@ -327,7 +315,6 @@ const CreateReservation = () => {
             setSelectedResource(null);
             
         } catch (error) {
-            console.error('Erro completo:', error);
             handleError(`Erro ao criar reserva: ${error.message}`);
         }
     };
