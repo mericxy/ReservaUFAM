@@ -159,5 +159,14 @@ class Reservation(models.Model):
         super().save(*args, **kwargs)
     
     def __str__(self):
-        user_name = self.user.get_full_name() if not self.user.is_anonymized else "Usuário Removido"
+        if self.auditorium:
+            return f"{self.auditorium.name} - {self.initial_date}"
+        if self.meeting_room:
+            return f"{self.meeting_room.name} - {self.initial_date}"
+        if self.vehicle:
+            return f"{self.vehicle.model} - {self.initial_date}" # O modelo Vehicle tem .model, não .name
+        
+        user_name = getattr(self.user, "get_full_name", lambda: str(self.user))()
+        if hasattr(self.user, "is_anonymized") and self.user.is_anonymized:
+            user_name = "Usuário Removido"
         return f"Reservation by {user_name} ({self.status})"
