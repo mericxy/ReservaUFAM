@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { apiFetch } from "../../api";
 
 function Home() {
   const [reservations, setReservations] = useState([]);
@@ -9,39 +10,27 @@ function Home() {
 
   useEffect(() => {
     const fetchUser = async () => {
-      const token = localStorage.getItem("accessToken");
       try {
-        const response = await fetch("http://127.0.0.1:8000/api/user/", {
+        const userData = await apiFetch("/api/user/", {
           headers: {
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
           },
         });
-        if (!response.ok) {
-          throw new Error(`Erro ao buscar usuário: ${response.status}`);
-        }
-        const userData = await response.json();
         setUsername(userData.username);
       } catch (error) {
-        console.error(error);
         setError("Erro ao carregar dados do usuário");
       }
     };
 
     const fetchReservations = async () => {
-      const token = localStorage.getItem("accessToken");
       try {
-        const response = await fetch("http://127.0.0.1:8000/api/user/reservations/", {
+        const data = await apiFetch("/api/user/reservations/", {
           headers: {
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
           },
         });
-        if (!response.ok) {
-          throw new Error(`Erro ao buscar reservas: ${response.status}`);
-        }
-        const data = await response.json();
         setReservations(data);
       } catch (error) {
-        console.error('Erro ao buscar reservas:', error);
         setError("Erro ao carregar suas reservas");
       } finally {
         setLoading(false);

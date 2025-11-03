@@ -10,6 +10,7 @@ import { useResources } from "../hooks/useResources";
 import ResourceSelector from "../components/ResourceSelector";
 import DateTimeSelector from "../components/DateTimeSelector";
 import ReservationDetails from "../components/ReservationDetails";
+import { apiFetch } from "../../api";
 
 
 const CreateReservation = () => {

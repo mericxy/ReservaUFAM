@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import logo from "../assets/logo.png";
 import MessagePopup from "../components/MessagePopup";
 import PrivacyPolicyModal from "../components/PrivacyPolicyModal";
+import { apiFetch } from "../../api";
 
 const Register = () => {
   const navigate = useNavigate();
@@ -165,9 +166,8 @@ const Register = () => {
     setLoading(true);
 
     try {
-      const response = await fetch("http://127.0.0.1:8000/api/register/", {
+      await apiFetch("/api/register/", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           first_name: formData.firstName,
           last_name: formData.lastName,
@@ -183,10 +183,6 @@ const Register = () => {
         }),
       });
 
-      if (!response.ok) {
-        throw new Error("Erro ao registrar usuário");
-      }
-
       setMessage({
         text: "Cadastro realizado com sucesso! Aguarde a aprovação do administrador. Você receberá um email quando seu cadastro for aprovado.",
         type: "success"
@@ -196,8 +192,40 @@ const Register = () => {
         navigate("/");
       }, 5000);
     } catch (error) {
+      console.error('Erro no cadastro:', error);
+      
+      let errorMessage = "Erro ao realizar cadastro. Por favor, tente novamente.";
+      
+      if (error.message.includes('400')) {
+        try {
+          const errorMatch = error.message.match(/: ({.*})/);
+          if (errorMatch) {
+            const errorData = JSON.parse(errorMatch[1]);
+            
+            if (typeof errorData === 'object') {
+              const errors = [];
+              Object.entries(errorData).forEach(([key, value]) => {
+                if (Array.isArray(value)) {
+                  errors.push(`${key}: ${value.join(', ')}`);
+                } else if (typeof value === 'string') {
+                  errors.push(value);
+                }
+              });
+              if (errors.length > 0) {
+                errorMessage = errors.join('. ');
+              }
+            } else if (typeof errorData === 'string') {
+              errorMessage = errorData;
+            }
+          }
+        } catch (parseError) {
+        }
+      } else if (error.message.includes('409')) {
+        errorMessage = "Usuário ou email já cadastrado no sistema.";
+      }
+
       setMessage({
-        text: "Erro ao realizar cadastro. Por favor, tente novamente.",
+        text: errorMessage,
         type: "error"
       });
     } finally {
