@@ -1,117 +1,136 @@
 # 📝 Avaliação Heurística - ReservaUFAM
 
-## 👁️ Visibilidade do Status do Sistema
+## ✅ Formato unificado por problema
 
-### 🚨 Violações Identificadas:
-
-#### Ausência de Indicação de Progresso no Cadastro
-- **🟡 Severidade:** MÉDIA
-- **📱 Tela:** Register.jsx
-- **📝 Descrição:** No formulário de cadastro extenso, não há indicação de progresso ou etapas.
-- **⚠️ Problema:** Usuário não sabe quantos campos ainda precisa preencher.
+Cada problema está descrito com: Problema → Descrição → Tela → Severidade → Heurísticas violadas.
 
 ---
 
-## 🌍 Correspondência Entre Sistema e Mundo Real
-
-### 🚨 Violações Identificadas:
-
----
-
-## 🎮 Controle e Liberdade do Usuário
-
-### 🚨 Violações Identificadas:
-
-#### Falta de Função "Cancelar" no Formulário de Cadastro
-- **🔴 Severidade:** ALTA
-- **📱 Tela:** Register.jsx
-- **📝 Descrição:** Não existe botão de cancelar ou voltar que preserva dados.
-- **⚠️ Problema:** Usuário pode perder dados preenchidos acidentalmente.
-
-#### Logout Sem Confirmação
-- **🔴 Severidade:** ALTA
-- **📱 Tela:** Header.jsx, HeaderAdmin.jsx
-- **📝 Descrição:** O botão de logout executa imediatamente sem confirmação.
-- **⚠️ Problema:** Risco de logout acidental com perda de trabalho.
+### 1) Ausência de Indicação de Progresso no Cadastro
+- Problema: Usuário não sabe quantos campos ainda precisa preencher.
+- Descrição: No formulário de cadastro extenso, não há indicação de progresso ou etapas.
+- Tela: Register.jsx
+- Severidade: 🟡 MÉDIA
+- Heurísticas violadas: Visibilidade do Status do Sistema
 
 ---
 
-## 🔄 Consistência e Padrões
-
-### 🚨 Violações Identificadas:
-
-#### Ícone de Obrigatoriedade em Todas as Telas
-- **🟡 Severidade:** MÉDIA
-- **📱 Tela:** Cadastro
-- **📝 Descrição:** O sistema não possui asteriscos em todos os campos obrigatórios do sistema.
-- **⚠️ Problema:** Eventual confusão sobre campos obrigatórios ou não.
-
-#### Ícone de Ocultação de Senha
-- **🟡 Severidade:** MÉDIA
-- **📱 Tela:** Cadastro
-- **📝 Descrição:** O sistema possui alguns campos com a falta do ícone de ocultar senha.
-- **⚠️ Problema:** Inconsistência na funcionalidade de senha.
+### 2) Falta de Função "Cancelar" no Formulário de Cadastro
+- Problema: Usuário pode perder dados preenchidos acidentalmente.
+- Descrição: Não existe botão de cancelar ou voltar que preserva dados.
+- Tela: Register.jsx
+- Severidade: 🔴 ALTA
+- Heurísticas violadas: Controle e Liberdade do Usuário
 
 ---
 
-## 🛡️ Prevenção de Erros
-
-### 🚨 Violações Identificadas:
-
-#### Conflitos de Horário Não Prevenidos
-- **🔴 Severidade:** ALTA
-- **📱 Tela:** CreateReservation.jsx
-- **📝 Descrição:** Sistema não previne seleção de horários conflitantes na interface.
-- **⚠️ Problema:** Erro descoberto apenas no backend.
+### 3) Logout Sem Confirmação
+- Problema: Risco de logout acidental com perda de trabalho.
+- Descrição: O botão de logout executa imediatamente sem confirmação.
+- Tela: Header.jsx, HeaderAdmin.jsx
+- Severidade: 🔴 ALTA
+- Heurísticas violadas: Controle e Liberdade do Usuário
 
 ---
 
-## 🧠 Reconhecimento ao Invés de Lembrança
-
-### 🚨 Violações Identificadas:
-
-#### Falta de Histórico de Ações Recentes
-- **🟡 Severidade:** MÉDIA
-- **📱 Tela:** Home.jsx
-- **📝 Descrição:** Não mostra recursos utilizados recentemente.
-- **⚠️ Problema:** Usuário precisa lembrar de escolhas anteriores.
+### 4) Falta de Opção para Voltar à Home
+- Problema: Navegação depende do botão do navegador e reduz sensação de controle.
+- Descrição: Algumas telas do usuário não oferecem um elemento claro (botão/link) para retornar à página inicial.
+- Tela: UserProfile.jsx / páginas internas após login
+- Severidade: 🟡 MÉDIA
+- Heurísticas violadas: Controle e Liberdade do Usuário
 
 ---
 
-## ⚡ Flexibilidade e Eficiência de Uso
-
-### 🚨 Violações Identificadas:
-
-#### Ausência de Ações em Lote para Administradores
-- **🟡 Severidade:** MÉDIA
-- **📱 Tela:** AdminReservations.jsx
-- **📝 Descrição:** Admin precisa aprovar/reprovar reservas uma por uma.
-- **⚠️ Problema:** Ineficiência para volume alto de reservas.
+### 5) Alterar Senha sem Opção de Mostrar/Ocultar
+- Problema: Aumenta erros de digitação e dificulta confirmação visual.
+- Descrição: Os campos de nova senha e confirmação não possuem alternador para visualizar/ocultar o conteúdo.
+- Tela: UserProfile.jsx (Alterar Senha)
+- Severidade: 🟡 MÉDIA
+- Heurísticas violadas: Controle e Liberdade do Usuário
 
 ---
 
-
-## 🔧 Ajudar Usuários a Reconhecer, Diagnosticar e Recuperar Erros
-
-### 🚨 Violações Identificadas:
-
-####  Falta de Sugestões de Recuperação
-- **🟡 Severidade:** MÉDIA
-- **📱 Tela:** ErrorPopup.jsx
-- **📝 Descrição:** Erros não oferecem sugestões de como resolver.
-- **⚠️ Problema:** Usuário fica perdido após erro.
+### 6) Ícone de Obrigatoriedade em Todas as Telas
+- Problema: Confusão sobre o que é obrigatório preencher.
+- Descrição: O sistema não possui asteriscos em todos os campos obrigatórios do sistema.
+- Tela: Cadastro
+- Severidade: 🟡 MÉDIA
+- Heurísticas violadas: Consistência e Padrões
 
 ---
 
-##  📚 Ajuda e Documentação
+### 7) Ícone de Ocultação de Senha
+- Problema: Inconsistência na funcionalidade de senha entre telas/componentes.
+- Descrição: O sistema possui alguns campos com a falta do ícone de ocultar senha.
+- Tela: Cadastro, UserProfile.jsx (Alterar Senha)
+- Severidade: 🟡 MÉDIA
+- Heurísticas violadas: Consistência e Padrões
 
-### 🚨 Violações Identificadas:
+---
 
-####  Ausência de Sistema de Ajuda
-- **🟡 Severidade:** MÉDIA
-- **📱 Tela:** Todas as telas
-- **📝 Descrição:** Não existe sistema de ajuda contextual.
-- **⚠️ Problema:** Usuários novos ficam perdidos.
+### 8) CPF, SIAPE e Telefone Sem Formatação Padronizada
+- Problema: Maior chance de erro de digitação e dificuldade de leitura/validação visual.
+- Descrição: Campos de identificação e contato são exibidos/aceitos sem máscara ou validação de formato (ex.: CPF 000.000.000-00, SIAPE 7 dígitos, telefone (99) 99999-9999).
+- Tela: Register.jsx, UserProfile.jsx, AdminUsuarios.jsx
+- Severidade: 🟡 MÉDIA
+- Heurísticas violadas: Consistência e Padrões
+
+---
+
+### 9) Navegação para Home Inconsistente Entre Perfis
+- Problema: Quebra de consistência e expectativa, prejudicando aprendizagem do fluxo.
+- Descrição: Perfis administrativos possuem botão/link claro para retornar à Home, enquanto as telas do usuário comum não oferecem a mesma opção.
+- Tela: Header.jsx, HeaderAdmin.jsx, telas de usuário pós-login
+- Severidade: 🟡 MÉDIA
+- Heurísticas violadas: Consistência e Padrões
+
+---
+
+### 10) Conflitos de Horário Não Prevenidos
+- Problema: Conflitos só são descobertos no backend, gerando retrabalho.
+- Descrição: Sistema não previne seleção de horários conflitantes na interface.
+- Tela: CreateReservation.jsx
+- Severidade: 🔴 ALTA
+- Heurísticas violadas: Prevenção de Erros
+
+---
+
+### 11) Campos Imutáveis Sem Indicação (SIAPE, CPF, Cargo)
+- Problema: Usuário tenta alterar repetidamente, gerando frustração e dúvida sobre erro do sistema.
+- Descrição: Campos de identificação (SIAPE, CPF e Cargo) não podem ser editados por regra de negócio, mas a interface não deixa isso explícito (parecem editáveis ou não mostram estado de bloqueio).
+- Tela: UserProfile.jsx / AdminProfile.jsx
+- Severidade: 🟡 MÉDIA
+- Heurísticas violadas: Prevenção de Erros
+
+---
+
+### 12) Falta de Histórico de Ações Recentes
+- Problema: Usuário precisa lembrar de escolhas anteriores.
+- Descrição: Não mostra recursos utilizados recentemente.
+- Tela: Home.jsx
+- Severidade: 🟡 MÉDIA
+- Heurísticas violadas: Reconhecimento ao Invés de Lembrança
+
+---
+
+### 13) Ausência de Ações em Lote para Administradores
+- Problema: Ineficiência para volume alto de reservas.
+- Descrição: Admin precisa aprovar/reprovar reservas uma por uma.
+- Tela: AdminReservations.jsx
+- Severidade: � MÉDIA
+- Heurísticas violadas: Flexibilidade e Eficiência de Uso
+
+---
+
+### 14) Ausência de Sistema de Ajuda
+- Problema: Usuários novos ficam perdidos sem orientação.
+- Descrição: Não existe sistema de ajuda contextual.
+- Tela: Todas as telas
+- Severidade: 🟡 MÉDIA
+- Heurísticas violadas: Ajuda e Documentação
+
+
 
 
 
