@@ -26,3 +26,8 @@ issue_templates:
     description: "Use este template para propor melhorias no código por meio de refatoração"
     file: refatoracao.yml
     labels: ["refatoração"]
+
+  - name: "Solicitar redesign"
+    description: "Use este template para sugerir melhorias de design ou interface no projeto"
+    file: redesign.yml
+    labels: ["design", "ux", "ui", "redesign"]
