@@ -1,0 +1,56 @@
+name: "🎨 Solicitar redesign"
+description: "Use este template para sugerir melhorias de design ou interface no projeto"
+title: "[REDESIGN] "
+labels: [design, ux, ui, redesign]
+
+body:
+  - type: textarea
+    id: descricao
+    attributes:
+      label: "Descrição da issue"
+      description: "Descreva o problema de design ou usabilidade identificado. Explique onde ele ocorre e como afeta a experiência do usuário."
+    validations:
+      required: true
+
+  - type: textarea
+    id: objetivo
+    attributes:
+      label: "Objetivo do redesign"
+      description: "Explique qual é o objetivo da proposta de redesign. O que se espera melhorar ou corrigir com essa alteração?"
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: classificacao
+    attributes:
+      label: "Classificação"
+      description: "Selecione quais heurísticas de usabilidade de Nielsen estão sendo violadas ou podem ser aprimoradas."
+      options:
+        - label: "1. Visibilidade do status do sistema"
+        - label: "2. Correspondência entre o sistema e o mundo real"
+        - label: "3. Controle e liberdade do usuário"
+        - label: "4. Consistência e padrões"
+        - label: "5. Prevenção de erros"
+        - label: "6. Reconhecimento em vez de recordação"
+        - label: "7. Flexibilidade e eficiência de uso"
+        - label: "8. Design estético e minimalista"
+        - label: "9. Ajudar os usuários a reconhecer, diagnosticar e corrigir erros"
+        - label: "10. Ajuda e documentação"
+
+  - type: textarea
+    id: evidencias
+    attributes:
+      label: "Evidências"
+      description: "Adicione capturas de tela, gravações, feedbacks de usuários ou qualquer outro dado que comprove o problema ou a necessidade do redesign."
+
+  - type: textarea
+    id: impacto_atual
+    attributes:
+      label: "Impacto atual"
+      description: "Explique como o problema afeta a experiência do usuário ou o desempenho do produto atualmente."
+
+  - type: textarea
+    id: impacto_esperado
+    attributes:
+      label: "Impacto esperado"
+      description: "Descreva os benefícios esperados após o redesign. Como isso deve melhorar a experiência do usuário ou a eficiência do sistema?"
