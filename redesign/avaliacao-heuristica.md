@@ -110,6 +110,8 @@ Header do usuário e administrador
 - Prevenção de erros  
 - Aumento de segurança e controle
 
+**Pull Request:** #57
+
 ---
 
 ### 3) ❗ Campos obrigatórios sem identificação — Issue #38
@@ -266,6 +268,7 @@ Home e header
 - Consistência visual
 
 **Pull Request:** #56
+
 ---
 
 ### 7) ❌ Campos imutáveis sem indicação (SIAPE, CPF, Cargo) — Issue #50
@@ -348,6 +351,7 @@ Agora o sistema notifica o administrador que existem reservas pendentes.
 - Acesso rápido e eficiente às solicitações
 
 **Pull Request:** #58
+
 ---
 
 ### 9) ❌ Falta de sugestões de recuperação nas mensagens de erro — Issue #42
@@ -389,6 +393,7 @@ ErrorPopup.jsx
 - Atendimento mais eficiente
 
 **Pull Request:** #55
+
 ---
 
 ## ✅ Conclusão
