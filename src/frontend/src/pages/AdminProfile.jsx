@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { apiFetch } from "../../api";
 import BackButton from "../components/BackButton";
+import { formatCPF, formatPhone, removeFormatting } from "../utils/formatters";
 
 function AdminProfile() {
   const [originalUser, setOriginalUser] = useState(null);
@@ -38,6 +39,11 @@ function AdminProfile() {
     cpf: false,
     cellphone: false
   });
+  const [blockedFieldClicked, setBlockedFieldClicked] = useState({
+    siape: false,
+    cpf: false,
+    role: false
+  });
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -51,11 +57,11 @@ function AdminProfile() {
         const userData = {
           username: data.username || "",
           email: data.email || "",
-          cellphone: data.cellphone || "",
+          cellphone: data.cellphone ? formatPhone(data.cellphone) : "",
           password: "",
           confirmPassword: "",
           siape: data.siape || "",
-          cpf: data.cpf || "",
+          cpf: data.cpf ? formatCPF(data.cpf) : "",
           first_name: data.first_name || "",
           last_name: data.last_name || "",
           role: data.role || "",
@@ -65,7 +71,7 @@ function AdminProfile() {
         setUser(userData);
         setOriginalUser(userData);
       } catch (error) {
-        setMessage("Erro ao carregar perfil");
+        setMessage("Erro ao carregar perfil. Verifique sua conexão com a internet e tente novamente.");
       } finally {
         setLoading(false);
       }
@@ -86,24 +92,26 @@ function AdminProfile() {
   };
 
   const formatCPF = (value) => {
-    const numbers = value.replace(/\D/g, '').slice(0, 11);
-    
-    if (numbers.length <= 3) return numbers;
-    if (numbers.length <= 6) return `${numbers.slice(0, 3)}.${numbers.slice(3)}`;
-    if (numbers.length <= 9) return `${numbers.slice(0, 3)}.${numbers.slice(3, 6)}.${numbers.slice(6)}`;
-    return `${numbers.slice(0, 3)}.${numbers.slice(3, 6)}.${numbers.slice(6, 9)}-${numbers.slice(9, 11)}`;
+    const cleanValue = value.replace(/\D/g, "");
+    return cleanValue
+      .replace(/(\d{3})(\d)/, "$1.$2")
+      .replace(/(\d{3})(\d)/, "$1.$2")
+      .replace(/(\d{3})(\d{1,2})/, "$1-$2")
+      .replace(/(-\d{2})\d+?$/, "$1")
+      .slice(0, 14); // Limita o tamanho para 000.000.000-00
   };
 
   const formatPhone = (value) => {
-    const numbers = value.replace(/\D/g, '').slice(0, 11);
-    
-    if (numbers.length <= 2) return numbers;
-    if (numbers.length <= 7) return `(${numbers.slice(0, 2)}) ${numbers.slice(2)}`;
-    return `(${numbers.slice(0, 2)}) ${numbers.slice(2, 7)}-${numbers.slice(7)}`;
+    const cleanValue = value.replace(/\D/g, "");
+    return cleanValue
+      .replace(/(\d{2})(\d)/, "($1) $2")
+      .replace(/(\d{5})(\d)/, "$1-$2")
+      .replace(/(-\d{4})\d+?$/, "$1")
+      .slice(0, 15); // Limita o tamanho para (99) 99999-9999
   };
 
   const formatSIAPE = (value) => {
-    return value.replace(/\D/g, '').slice(0, 7);
+    return value.replace(/\D/g, "").slice(0, 7);
   };
 
   const unformatValue = (value) => {
@@ -195,6 +203,23 @@ function AdminProfile() {
     return bothPasswordFieldsFilled && allPasswordRequirementsMet;
   };
 
+  const handleBlockedFieldClick = (fieldName) => {
+    if (!user.is_staff) {
+      setBlockedFieldClicked(prev => ({
+        ...prev,
+        [fieldName]: true
+      }));
+      
+      // Remove o efeito após 2 segundos
+      setTimeout(() => {
+        setBlockedFieldClicked(prev => ({
+          ...prev,
+          [fieldName]: false
+        }));
+      }, 2000);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setMessage("");
@@ -215,11 +240,14 @@ function AdminProfile() {
         },
         body: JSON.stringify({
           ...user,
+          cpf: removeFormatting(user.cpf),
+          cellphone: removeFormatting(user.cellphone),
+          siape: removeFormatting(user.siape),
           password: showPasswordFields ? user.password : undefined
         }),
       });
 
-      if (!response.ok) throw new Error("Erro ao atualizar perfil");
+      if (!response.ok) throw new Error("Erro ao atualizar perfil. Verifique sua conexão com a internet e tente novamente.");
       setMessage("Perfil atualizado com sucesso!");
       
       if (showPasswordFields) {
@@ -229,7 +257,7 @@ function AdminProfile() {
       
       setOriginalUser({...user, password: "", confirmPassword: ""});
     } catch (error) {
-      setMessage("Erro ao salvar alterações");
+      setMessage("Erro ao salvar alterações. Verifique sua conexão com a internet e tente novamente.");
     }
   };
 
@@ -242,10 +270,10 @@ function AdminProfile() {
         },
       });
 
-      if (!response.ok) throw new Error("Erro ao enviar email");
+      if (!response.ok) throw new Error("Erro ao enviar email. Verifique sua conexão com a internet e tente novamente.");
       setMessage("Email de confirmação enviado com sucesso!");
     } catch (error) {
-      setMessage("Erro ao enviar email de confirmação");
+      setMessage("Erro ao enviar email de confirmação. Verifique sua conexão com a internet e tente novamente.");
     }
   };
 
@@ -321,32 +349,70 @@ function AdminProfile() {
 
           <div className="grid grid-cols-2 gap-4">
             <div className="mb-4">
-              <label className="block text-gray-700 text-sm font-bold mb-2">
+              <label className="block text-gray-700 text-sm font-bold mb-2 flex items-center gap-2">
                 SIAPE
+                {!user.is_staff && (
+                  <svg 
+                    className="w-4 h-4 text-gray-500" 
+                    fill="currentColor" 
+                    viewBox="0 0 20 20"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path 
+                      fillRule="evenodd" 
+                      d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" 
+                      clipRule="evenodd" 
+                    />
+                  </svg>
+                )}
               </label>
               <input
                 type="text"
                 name="siape"
                 value={user.siape}
                 onChange={handleChange}
-                className={`w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 ${fieldErrors.siape ? 'border-red-300' : 'border-gray-300'}`}
+                onClick={() => handleBlockedFieldClick('siape')}
+                className={`w-full p-3 border rounded-lg focus:outline-none focus:ring-2 ${
+                  fieldErrors.siape ? 'border-red-300 focus:ring-red-500' : 
+                  blockedFieldClicked.siape && !user.is_staff ? 'border-red-500 focus:ring-red-500' :
+                  'border-gray-300 focus:ring-green-500'
+                } ${!user.is_staff ? 'cursor-not-allowed' : ''}`}
                 disabled={!user.is_staff}
-                placeholder="0000000"
+                placeholder="1234567"
               />
               {fieldErrors.siape && (
                 <p className="text-red-500 text-xs mt-1">SIAPE deve ter exatamente 7 dígitos</p>
               )}
             </div>
             <div>
-              <label className="block text-gray-700 text-sm font-bold mb-2">
+              <label className="block text-gray-700 text-sm font-bold mb-2 flex items-center gap-2">
                 CPF
+                {!user.is_staff && (
+                  <svg 
+                    className="w-4 h-4 text-gray-500" 
+                    fill="currentColor" 
+                    viewBox="0 0 20 20"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path 
+                      fillRule="evenodd" 
+                      d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" 
+                      clipRule="evenodd" 
+                    />
+                  </svg>
+                )}
               </label>
               <input
                 type="text"
                 name="cpf"
                 value={user.cpf}
                 onChange={handleChange}
-                className={`w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 ${fieldErrors.cpf ? 'border-red-300' : 'border-gray-300'}`}
+                onClick={() => handleBlockedFieldClick('cpf')}
+                className={`w-full p-3 border rounded-lg focus:outline-none focus:ring-2 ${
+                  fieldErrors.cpf ? 'border-red-300 focus:ring-red-500' : 
+                  blockedFieldClicked.cpf && !user.is_staff ? 'border-red-500 focus:ring-red-500' :
+                  'border-gray-300 focus:ring-green-500'
+                } ${!user.is_staff ? 'cursor-not-allowed' : ''}`}
                 disabled={!user.is_staff}
                 placeholder="000.000.000-00"
               />
@@ -357,14 +423,32 @@ function AdminProfile() {
           </div>
 
           <div>
-            <label className="block text-gray-700 text-sm font-bold mb-2">
+            <label className="block text-gray-700 text-sm font-bold mb-2 flex items-center gap-2">
               Cargo
+              {!user.is_staff && (
+                <svg 
+                  className="w-4 h-4 text-gray-500" 
+                  fill="currentColor" 
+                  viewBox="0 0 20 20"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path 
+                    fillRule="evenodd" 
+                    d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" 
+                    clipRule="evenodd" 
+                  />
+                </svg>
+              )}
             </label>
             <select
               name="role"
               value={user.role}
               onChange={handleChange}
-              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+              onClick={() => handleBlockedFieldClick('role')}
+              className={`w-full p-3 border rounded-lg focus:outline-none focus:ring-2 ${
+                blockedFieldClicked.role && !user.is_staff ? 'border-red-500 focus:ring-red-500' :
+                'border-gray-300 focus:ring-green-500'
+              } ${!user.is_staff ? 'cursor-not-allowed' : ''}`}
               disabled={!user.is_staff}
             >
               <option value="ADMIN">Administrador</option>
@@ -397,7 +481,7 @@ function AdminProfile() {
                 value={user.cellphone}
                 onChange={handleChange}
                 className={`w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 ${fieldErrors.cellphone ? 'border-red-300' : 'border-gray-300'}`}
-                placeholder="(00) 00000-0000"
+                placeholder="(99) 99999-9999"
               />
               {fieldErrors.cellphone && user.cellphone && (
                 <p className="text-red-500 text-xs mt-1">Telefone inválido</p>

@@ -38,10 +38,10 @@ function AdminReservations() {
 
             setReservations({ pendentes, aprovadas, arquivadas });
         } catch (error) {
-            setError("Não foi possível carregar as reservas");
+            setError("Não foi possível carregar as reservas. Verifique sua conexão com a internet e tente novamente.");
 
             if (error.message.includes("401")) {
-                setError("Sua sessão expirou. Faça login novamente.");
+                setError("Sua sessão expirou por inatividade. Faça login novamente para continuar.");
             }
         } finally {
             setLoading(false);
@@ -62,10 +62,10 @@ function AdminReservations() {
 
             fetchReservations();
         } catch (error) {
-            setError("Erro ao atualizar o status da reserva");
+            setError("Erro ao atualizar o status da reserva. Verifique sua conexão com a internet e tente novamente.");
 
             if (error.message.includes("401")) {
-                setError("Sua sessão expirou. Faça login novamente.");
+                setError("Sua sessão expirou por inatividade. Faça login novamente para continuar.");
             }
         }
     };

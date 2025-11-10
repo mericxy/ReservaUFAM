@@ -59,7 +59,7 @@ const Login = () => {
 
         } catch (error) {
             if (error.message.includes('401') || error.message.includes('400')) {
-                setError("Credenciais inválidas ou usuário não encontrado.");
+                setError("Credenciais incorretas. Verifique seu e-mail e senha e tente novamente.");
             } else {
                 setError("Não foi possível conectar ao servidor. Verifique sua conexão e tente novamente.");
             }
@@ -70,7 +70,7 @@ const Login = () => {
 
     return (
         <section className="flex items-center justify-center flex-col gap-6 py-8 min-h-screen">
-            <img src={logo} alt="logo" className="w-17 h-12" />
+            <img src={logo} alt="logo" className="w-60 h-20" />
             
             <div className="border border-gray-300 rounded-xl p-8 w-full max-w-2xl shadow-lg bg-white px-12">
                 <h2 className="text-2xl font-bold bg-gradient-to-r from-green-500 to-blue-500 text-transparent bg-clip-text mb-4">

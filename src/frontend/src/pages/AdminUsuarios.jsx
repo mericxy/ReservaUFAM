@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import MessagePopup from '../components/MessagePopup';
 import { apiFetch } from '../../api';
+import { formatCPF, formatPhone } from '../utils/formatters';
 
 function AdminUsuarios() {
   const [message, setMessage] = useState({ text: "", type: "" });
@@ -37,10 +38,10 @@ function AdminUsuarios() {
         arquivados
       });
     } catch (error) {
-      handleError("Erro ao carregar usuários. Por favor, tente novamente mais tarde.");
+      handleError("Erro ao carregar usuários. Verifique sua conexão com a internet e tente novamente.");
 
       if (error.message.includes("401")) {
-        handleError("Sua sessão expirou. Faça login novamente.");
+        handleError("Sua sessão expirou por inatividade. Faça login novamente para continuar.");
       }
     }
   };
@@ -72,10 +73,10 @@ function AdminUsuarios() {
       handleSuccess(`Usuário ${newStatus.toLowerCase()} com sucesso!`);
       fetchUsuarios();
     } catch (error) {
-      handleError("Erro ao atualizar status do usuário");
+      handleError("Erro ao atualizar status do usuário. Verifique sua conexão com a internet e tente novamente.");
 
       if (error.message.includes("401")) {
-        handleError("Sua sessão expirou. Faça login novamente.");
+        handleError("Sua sessão expirou por inatividade. Faça login novamente para continuar.");
       }
     }
   };
@@ -88,8 +89,8 @@ function AdminUsuarios() {
           <div className="mt-2 space-y-1 text-sm">
             <p><span className="font-medium text-gray-700">Email:</span> {usuario.email}</p>
             <p><span className="font-medium text-gray-700">SIAPE:</span> {usuario.siape}</p>
-            <p><span className="font-medium text-gray-700">CPF:</span> {usuario.cpf}</p>
-            <p><span className="font-medium text-gray-700">Telefone:</span> {usuario.cellphone}</p>
+            <p><span className="font-medium text-gray-700">CPF:</span> {usuario.cpf ? formatCPF(usuario.cpf) : '-'}</p>
+            <p><span className="font-medium text-gray-700">Telefone:</span> {usuario.cellphone ? formatPhone(usuario.cellphone) : '-'}</p>
             <p>
               <span className="font-medium text-gray-700">Status:</span>
               <span className={`ml-1 px-2 py-1 rounded-full text-xs ${

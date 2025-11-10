@@ -77,7 +77,7 @@ const CreateReservation = () => {
         try {
         const token = localStorage.getItem("accessToken");
         if (!token) {
-            handleError("Sessão expirada. Por favor, faça login novamente.");
+            handleError("Sua sessão expirou por inatividade. Faça login novamente para continuar.");
             navigate("/");
             return;
         }
@@ -124,11 +124,11 @@ const CreateReservation = () => {
         try {
             data = JSON.parse(text);
         } catch {
-            throw new Error("Erro ao processar resposta do servidor");
+            throw new Error("Erro ao processar resposta do servidor. Verifique sua conexão com a internet e tente novamente.");
         }
 
         if (!response.ok) {
-            let errorMessage = "Erro na resposta do servidor";
+            let errorMessage = "Erro na resposta do servidor. Verifique sua conexão com a internet e tente novamente.";
             if (data.detail) {
             errorMessage = data.detail;
             } else if (typeof data === "object") {
@@ -146,7 +146,11 @@ const CreateReservation = () => {
         setSelectedResource(null);
         } catch (error) {
         console.error("Erro completo:", error);
-        handleError(`Erro ao criar reserva: ${error.message}`);
+         handleError(
+            `Não foi possível concluir a criação da reserva. ${error.message.includes("conexão") 
+                ? "Verifique sua conexão com a internet e tente novamente." 
+                : "Tente novamente em alguns instantes ou entre em contato com o suporte se o erro persistir."}`
+            );
         }
     };
     return (
@@ -210,36 +214,37 @@ const CreateReservation = () => {
                             <>
                                 <div className="bg-white p-6 rounded-xl shadow-lg">
                                     <h3 className="text-xl font-semibold mb-4 text-gray-800">
-                                        Detalhes do Recurso
+                                        Detalhes do Recurso  
+                                        <span className="text-red-500">*</span>
                                     </h3>
                                     <div className="space-y-3">
                                         {formData.resource_type === 'vehicle' ? (
                                             <>
                                                 <div className="flex items-center p-3 bg-gray-50 rounded-lg">
-                                                    <span className="font-medium w-24">Modelo:</span>
+                                                    <span className="font-medium w-24">Modelo:<span className="text-red-500">*</span></span>
                                                     <span>{selectedResource.model}</span>
                                                 </div>
                                                 <div className="flex items-center p-3 bg-gray-50 rounded-lg">
-                                                    <span className="font-medium w-24">Placa:</span>
+                                                    <span className="font-medium w-24">Placa:<span className="text-red-500">*</span></span>
                                                     <span>{selectedResource.plate_number}</span>
                                                 </div>
                                                 <div className="flex items-center p-3 bg-gray-50 rounded-lg">
-                                                    <span className="font-medium w-24">Capacidade:</span>
+                                                    <span className="font-medium w-24">Capacidade:<span className="text-red-500">*</span></span>
                                                     <span>{selectedResource.capacity} pessoas</span>
                                                 </div>
                                             </>
                                         ) : (
                                             <>
                                                 <div className="flex items-center p-3 bg-gray-50 rounded-lg">
-                                                    <span className="font-medium w-24">Nome:</span>
+                                                    <span className="font-medium w-24">Nome:<span className="text-red-500">*</span></span>
                                                     <span>{selectedResource.name}</span>
                                                 </div>
                                                 <div className="flex items-center p-3 bg-gray-50 rounded-lg">
-                                                    <span className="font-medium w-24">Local:</span>
+                                                    <span className="font-medium w-24">Local:<span className="text-red-500">*</span></span>
                                                     <span>{selectedResource.location}</span>
                                                 </div>
                                                 <div className="flex items-center p-3 bg-gray-50 rounded-lg">
-                                                    <span className="font-medium w-24">Capacidade:</span>
+                                                    <span className="font-medium w-24">Capacidade:<span className="text-red-500">*</span></span>
                                                     <span>{selectedResource.capacity} pessoas</span>
                                                 </div>
                                             </>
