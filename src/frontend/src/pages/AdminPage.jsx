@@ -17,7 +17,7 @@ function AdminPage() {
         });
         setUsername(userData.username);
       } catch (error) {
-        setError("Não foi possível carregar os dados do administrador");
+        setError("Não foi possível carregar os dados do administrador. Verifique sua conexão com a internet e tente novamente.");
       } finally {
         setLoading(false);
       }

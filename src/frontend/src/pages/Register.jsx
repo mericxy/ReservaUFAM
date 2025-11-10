@@ -194,9 +194,7 @@ const Register = () => {
         navigate("/");
       }, 5000);
     } catch (error) {
-      console.error('Erro no cadastro:', error);
-      
-      let errorMessage = "Erro ao realizar cadastro. Por favor, tente novamente.";
+      let errorMessage = "Erro ao realizar cadastro. Verifique sua conexão e tente novamente.";
       
       if (error.message.includes('400')) {
         try {
@@ -223,7 +221,7 @@ const Register = () => {
         } catch (parseError) {
         }
       } else if (error.message.includes('409')) {
-        errorMessage = "Usuário ou email já cadastrado no sistema.";
+        errorMessage = "Já existe uma conta com este e-mail ou nome de usuário. Faça login ou cadastre-se com dados diferentes.";
       }
 
       setMessage({
