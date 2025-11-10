@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext"; 
 import BackButton from "../components/BackButton";
 import { apiFetch } from "../../api";
+import { formatCPF, formatPhone, removeFormatting } from "../utils/formatters";
 
 function UserProfile() {
   const navigate = useNavigate();
@@ -51,11 +52,11 @@ useEffect(() => {
           const userData = {
             username: data.username || "",
             email: data.email || "",
-            cellphone: data.cellphone || "",
+            cellphone: data.cellphone ? formatPhone(data.cellphone) : "",
             password: "",
             confirmPassword: "",
             siape: data.siape || "",
-            cpf: data.cpf || "",
+            cpf: data.cpf ? formatCPF(data.cpf) : "",
             first_name: data.first_name || "",
             last_name: data.last_name || "",
             role: data.role || "",
@@ -86,24 +87,26 @@ useEffect(() => {
   };
 
   const formatCPF = (value) => {
-    const numbers = value.replace(/\D/g, '').slice(0, 11);
-    
-    if (numbers.length <= 3) return numbers;
-    if (numbers.length <= 6) return `${numbers.slice(0, 3)}.${numbers.slice(3)}`;
-    if (numbers.length <= 9) return `${numbers.slice(0, 3)}.${numbers.slice(3, 6)}.${numbers.slice(6)}`;
-    return `${numbers.slice(0, 3)}.${numbers.slice(3, 6)}.${numbers.slice(6, 9)}-${numbers.slice(9, 11)}`;
+    const cleanValue = value.replace(/\D/g, "");
+    return cleanValue
+      .replace(/(\d{3})(\d)/, "$1.$2")
+      .replace(/(\d{3})(\d)/, "$1.$2")
+      .replace(/(\d{3})(\d{1,2})/, "$1-$2")
+      .replace(/(-\d{2})\d+?$/, "$1")
+      .slice(0, 14); // Limita o tamanho para 000.000.000-00
   };
 
   const formatPhone = (value) => {
-    const numbers = value.replace(/\D/g, '').slice(0, 11);
-    
-    if (numbers.length <= 2) return numbers;
-    if (numbers.length <= 7) return `(${numbers.slice(0, 2)}) ${numbers.slice(2)}`;
-    return `(${numbers.slice(0, 2)}) ${numbers.slice(2, 7)}-${numbers.slice(7)}`;
+    const cleanValue = value.replace(/\D/g, "");
+    return cleanValue
+      .replace(/(\d{2})(\d)/, "($1) $2")
+      .replace(/(\d{5})(\d)/, "$1-$2")
+      .replace(/(-\d{4})\d+?$/, "$1")
+      .slice(0, 15); // Limita o tamanho para (99) 99999-9999
   };
 
   const formatSIAPE = (value) => {
-    return value.replace(/\D/g, '').slice(0, 7);
+    return value.replace(/\D/g, "").slice(0, 7);
   };
 
   const unformatValue = (value) => {
@@ -214,6 +217,9 @@ const handleSubmit = async (e) => {
         },
         body: JSON.stringify({
           ...user,
+          cpf: removeFormatting(user.cpf),
+          cellphone: removeFormatting(user.cellphone),
+          siape: removeFormatting(user.siape),
           password: showPasswordFields ? user.password : undefined
         }),
       });
@@ -351,7 +357,7 @@ const handleSendEmailConfirmation = async () => {
                 onChange={handleChange}
                 className={`w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 ${fieldErrors.siape ? 'border-red-300' : 'border-gray-300'}`}
                 disabled={!user.is_staff}
-                placeholder="0000000"
+                placeholder="1234567"
               />
               {fieldErrors.siape && (
                 <p className="text-red-500 text-xs mt-1">SIAPE deve ter exatamente 7 dígitos</p>
@@ -417,7 +423,7 @@ const handleSendEmailConfirmation = async () => {
                 value={user.cellphone}
                 onChange={handleChange}
                 className={`w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 ${fieldErrors.cellphone ? 'border-red-300' : 'border-gray-300'}`}
-                placeholder="(00) 00000-0000"
+                placeholder="(99) 99999-9999"
               />
               {fieldErrors.cellphone && user.cellphone && (
                 <p className="text-red-500 text-xs mt-1">Telefone inválido</p>
