@@ -101,19 +101,21 @@ const Register = () => {
 
   const formatters = {
     cpf: (value) => {
-      return value
-        .replace(/\D/g, "")
+      const cleanValue = value.replace(/\D/g, "");
+      return cleanValue
         .replace(/(\d{3})(\d)/, "$1.$2")
         .replace(/(\d{3})(\d)/, "$1.$2")
         .replace(/(\d{3})(\d{1,2})/, "$1-$2")
-        .replace(/(-\d{2})\d+?$/, "$1");
+        .replace(/(-\d{2})\d+?$/, "$1")
+        .slice(0, 14); // Limita o tamanho para 000.000.000-00
     },
     cellphone: (value) => {
-      return value
-        .replace(/\D/g, "")
+      const cleanValue = value.replace(/\D/g, "");
+      return cleanValue
         .replace(/(\d{2})(\d)/, "($1) $2")
         .replace(/(\d{5})(\d)/, "$1-$2")
-        .replace(/(-\d{4})\d+?$/, "$1");
+        .replace(/(-\d{4})\d+?$/, "$1")
+        .slice(0, 15); // Limita o tamanho para (99) 99999-9999
     },
     siape: (value) => {
       return value.replace(/\D/g, "").slice(0, 7);
@@ -351,6 +353,7 @@ const Register = () => {
               name="siape"
               value={formData.siape}
               onChange={handleChange}
+              placeholder="1234567"
               className={`w-full border p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 ${
                 errors.siape ? "border-red-500" : ""
               }`}
@@ -367,6 +370,7 @@ const Register = () => {
               name="cpf"
               value={formData.cpf}
               onChange={handleChange}
+              placeholder="000.000.000-00"
               className={`w-full border p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 ${
                 errors.cpf ? "border-red-500" : ""
               }`}
@@ -383,6 +387,7 @@ const Register = () => {
               name="cellphone"
               value={formData.cellphone}
               onChange={handleChange}
+              placeholder="(99) 99999-9999"
               className={`w-full border p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 ${
                 errors.cellphone ? "border-red-500" : ""
               }`}
