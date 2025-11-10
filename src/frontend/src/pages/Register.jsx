@@ -101,19 +101,21 @@ const Register = () => {
 
   const formatters = {
     cpf: (value) => {
-      return value
-        .replace(/\D/g, "")
+      const cleanValue = value.replace(/\D/g, "");
+      return cleanValue
         .replace(/(\d{3})(\d)/, "$1.$2")
         .replace(/(\d{3})(\d)/, "$1.$2")
         .replace(/(\d{3})(\d{1,2})/, "$1-$2")
-        .replace(/(-\d{2})\d+?$/, "$1");
+        .replace(/(-\d{2})\d+?$/, "$1")
+        .slice(0, 14); // Limita o tamanho para 000.000.000-00
     },
     cellphone: (value) => {
-      return value
-        .replace(/\D/g, "")
+      const cleanValue = value.replace(/\D/g, "");
+      return cleanValue
         .replace(/(\d{2})(\d)/, "($1) $2")
         .replace(/(\d{5})(\d)/, "$1-$2")
-        .replace(/(-\d{4})\d+?$/, "$1");
+        .replace(/(-\d{4})\d+?$/, "$1")
+        .slice(0, 15); // Limita o tamanho para (99) 99999-9999
     },
     siape: (value) => {
       return value.replace(/\D/g, "").slice(0, 7);
@@ -255,7 +257,7 @@ const Register = () => {
         </a>
       </div>
 
-      <img src={logo} alt="logo" className="w-17 h-12" />
+      <img src={logo} alt="logo" className="h-12" />
 
       <div className="border border-gray-300 rounded-xl p-8 w-full max-w-2xl shadow-lg bg-white">
         <h2 className="text-2xl font-bold bg-gradient-to-r from-green-500 to-blue-500 text-transparent bg-clip-text mb-2">
@@ -336,7 +338,7 @@ const Register = () => {
               name="role"
               value={formData.role}
               onChange={handleChange}
-              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+              className="w-full border p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
             >
               <option value="PROFESSOR">Professor</option>
               <option value="TECHNICIAN">Técnico</option>
@@ -351,6 +353,7 @@ const Register = () => {
               name="siape"
               value={formData.siape}
               onChange={handleChange}
+              placeholder="1234567"
               className={`w-full border p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 ${
                 errors.siape ? "border-red-500" : ""
               }`}
@@ -367,6 +370,7 @@ const Register = () => {
               name="cpf"
               value={formData.cpf}
               onChange={handleChange}
+              placeholder="000.000.000-00"
               className={`w-full border p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 ${
                 errors.cpf ? "border-red-500" : ""
               }`}
@@ -383,6 +387,7 @@ const Register = () => {
               name="cellphone"
               value={formData.cellphone}
               onChange={handleChange}
+              placeholder="(99) 99999-9999"
               className={`w-full border p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 ${
                 errors.cellphone ? "border-red-500" : ""
               }`}
@@ -411,7 +416,7 @@ const Register = () => {
               <button
                 type="button"
                 onClick={() => togglePasswordVisibility("password")}
-                className="absolute right-3 top-1/2 transform -translate-y-1/2"
+                className="absolute right-3 top-1/2 -translate-y-1/2 bg-white p-1 pointer-events-auto"
               >
                 {showPassword.password ? (
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-500" viewBox="0 0 20 20" fill="currentColor">
@@ -519,21 +524,28 @@ const Register = () => {
             </div>
           </div>
 
-          {/* Botão de Cadastrar */}
-          <button
-            type="submit"
-            disabled={loading}
-            className="col-span-3 bg-green-600 text-white p-3 rounded-lg font-semibold w-full hover:bg-green-700 transition disabled:bg-green-400 disabled:cursor-not-allowed"
-          >
-            {loading ? (
-              <div className="flex items-center justify-center">
-                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
-                Cadastrando...
-              </div>
-            ) : (
-              "Cadastrar"
-            )}
-          </button>
+          {/* Conteinar para os botões */}
+          <div className="col-span-3 grid grid-cols-2 gap-3">
+          {/* Botão de Cancelar */}
+              <button
+                type="button"
+                onClick={() => navigate("/")}
+                className="bg-white-500 text-red-600 border-2 border-red-600 p-3 rounded-lg font-semibold w-full hover:bg-red-600 hover:text-white transition "
+              >
+                Cancelar
+              </button>
+
+
+              {/* Botão de Cadastrar */}
+              <button
+                type="submit"
+                disabled={loading}
+                className="bg-green-600 text-white p-3 rounded-lg font-semibold w-full hover:bg-green-700 transition disabled:bg-green-400 disabled:cursor-not-allowed"
+              >
+                {loading ? "Cadastrando..." : "Cadastrar"}
+              </button>
+          </div>
+          
         </form>
       </div>
 
