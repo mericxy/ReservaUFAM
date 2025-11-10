@@ -210,36 +210,37 @@ const CreateReservation = () => {
                             <>
                                 <div className="bg-white p-6 rounded-xl shadow-lg">
                                     <h3 className="text-xl font-semibold mb-4 text-gray-800">
-                                        Detalhes do Recurso
+                                        Detalhes do Recurso  
+                                        <span className="text-red-500">*</span>
                                     </h3>
                                     <div className="space-y-3">
                                         {formData.resource_type === 'vehicle' ? (
                                             <>
                                                 <div className="flex items-center p-3 bg-gray-50 rounded-lg">
-                                                    <span className="font-medium w-24">Modelo:</span>
+                                                    <span className="font-medium w-24">Modelo:<span className="text-red-500">*</span></span>
                                                     <span>{selectedResource.model}</span>
                                                 </div>
                                                 <div className="flex items-center p-3 bg-gray-50 rounded-lg">
-                                                    <span className="font-medium w-24">Placa:</span>
+                                                    <span className="font-medium w-24">Placa:<span className="text-red-500">*</span></span>
                                                     <span>{selectedResource.plate_number}</span>
                                                 </div>
                                                 <div className="flex items-center p-3 bg-gray-50 rounded-lg">
-                                                    <span className="font-medium w-24">Capacidade:</span>
+                                                    <span className="font-medium w-24">Capacidade:<span className="text-red-500">*</span></span>
                                                     <span>{selectedResource.capacity} pessoas</span>
                                                 </div>
                                             </>
                                         ) : (
                                             <>
                                                 <div className="flex items-center p-3 bg-gray-50 rounded-lg">
-                                                    <span className="font-medium w-24">Nome:</span>
+                                                    <span className="font-medium w-24">Nome:<span className="text-red-500">*</span></span>
                                                     <span>{selectedResource.name}</span>
                                                 </div>
                                                 <div className="flex items-center p-3 bg-gray-50 rounded-lg">
-                                                    <span className="font-medium w-24">Local:</span>
+                                                    <span className="font-medium w-24">Local:<span className="text-red-500">*</span></span>
                                                     <span>{selectedResource.location}</span>
                                                 </div>
                                                 <div className="flex items-center p-3 bg-gray-50 rounded-lg">
-                                                    <span className="font-medium w-24">Capacidade:</span>
+                                                    <span className="font-medium w-24">Capacidade:<span className="text-red-500">*</span></span>
                                                     <span>{selectedResource.capacity} pessoas</span>
                                                 </div>
                                             </>

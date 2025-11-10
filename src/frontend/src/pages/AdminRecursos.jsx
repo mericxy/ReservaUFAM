@@ -177,6 +177,7 @@ function AdminRecursos() {
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Tipo de Recurso
+                <span className="text-red-500">*</span>
               </label>
               <select
                 value={selectedType}
@@ -194,6 +195,7 @@ function AdminRecursos() {
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Nome
+                    <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
@@ -207,6 +209,7 @@ function AdminRecursos() {
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Localização
+                    <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
@@ -223,6 +226,7 @@ function AdminRecursos() {
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Modelo
+                    <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
@@ -236,6 +240,7 @@ function AdminRecursos() {
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Placa
+                    <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
@@ -253,6 +258,7 @@ function AdminRecursos() {
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Capacidade
+              <span className="text-red-500">*</span>
             </label>
             <input
               type="number"
