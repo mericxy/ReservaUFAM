@@ -11,6 +11,7 @@ const ResourceSelector = ({ formData, handleChange, resourceTranslations, resour
         <div>
           <label className="block text-gray-700 text-sm font-bold mb-2">
             Tipo de Recurso
+            <span className="text-red-500">*</span>
           </label>
           <select
             name="resource_type"
@@ -32,6 +33,7 @@ const ResourceSelector = ({ formData, handleChange, resourceTranslations, resour
           <div>
             <label className="block text-gray-700 text-sm font-bold mb-2">
               Recurso Específico
+              <span className="text-red-500">*</span>
             </label>
             <select
               name="resource_id"
@@ -40,7 +42,7 @@ const ResourceSelector = ({ formData, handleChange, resourceTranslations, resour
               className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 transition-all duration-200 hover:border-green-400"
               required
             >
-              <option value="">Selecione um recurso</option>
+              <option value="">Selecione um recurso </option>
               {resources[formData.resource_type]?.map((resource) => (
                 <option key={resource.id} value={resource.id}>
                   {resource.name || resource.model || resource.plate_number}

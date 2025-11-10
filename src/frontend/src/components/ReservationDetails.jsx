@@ -6,6 +6,7 @@ const ReservationDetails = ({ formData, handleChange }) => (
     <div>
       <label className="block text-gray-700 text-sm font-bold mb-2">
         Descrição
+        <span className="text-red-500">*</span>
       </label>
       <textarea
         name="description"

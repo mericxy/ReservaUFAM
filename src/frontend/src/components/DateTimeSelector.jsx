@@ -11,6 +11,7 @@ const DateTimeSelector = ({ formData, handleChange, timeOptions, getMinDate }) =
           <div>
             <label className="block text-gray-700 text-sm font-bold mb-2">
               Data Inicial
+              <span className="text-red-500">*</span>
             </label>
             <input
               type="date"
@@ -25,6 +26,7 @@ const DateTimeSelector = ({ formData, handleChange, timeOptions, getMinDate }) =
           <div>
             <label className="block text-gray-700 text-sm font-bold mb-2">
               Horário Inicial
+              <span className="text-red-500">*</span>
             </label>
             <select
               name="initial_time"
@@ -48,6 +50,7 @@ const DateTimeSelector = ({ formData, handleChange, timeOptions, getMinDate }) =
           <div>
             <label className="block text-gray-700 text-sm font-bold mb-2">
               Data Final
+              <span className="text-red-500">*</span>
             </label>
             <input
               type="date"
@@ -62,6 +65,7 @@ const DateTimeSelector = ({ formData, handleChange, timeOptions, getMinDate }) =
           <div>
             <label className="block text-gray-700 text-sm font-bold mb-2">
               Horário Final
+              <span className="text-red-500">*</span>
             </label>
             <select
               name="final_time"
