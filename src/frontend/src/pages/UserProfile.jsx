@@ -66,7 +66,7 @@ useEffect(() => {
           setOriginalUser(userData);
         }
       } catch (error) {
-        setMessage("Erro ao carregar perfil");
+        setMessage("Erro ao carregar perfil. Verifique sua conexão e tente novamente.");
       } finally {
         setLoading(false);
       }
@@ -227,7 +227,7 @@ const handleSubmit = async (e) => {
       setOriginalUser({...user, password: "", confirmPassword: ""});
     
     } catch (error) {
-      setMessage("Erro ao salvar alterações");
+      setMessage("Erro ao salvar alterações. Verifique sua conexão e tente novamente.");
     }
   };
 
@@ -250,7 +250,7 @@ const handleDeleteAccount = async () => {
             navigate("/");
 
         } catch (error) {
-            setMessage("Não foi possível excluir sua conta. Tente novamente mais tarde.");
+            setMessage("Não foi possível excluir sua conta. Verifique sua conexão e tente novamente.");
         }
     }
   };

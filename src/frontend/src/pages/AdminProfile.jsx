@@ -65,7 +65,7 @@ function AdminProfile() {
         setUser(userData);
         setOriginalUser(userData);
       } catch (error) {
-        setMessage("Erro ao carregar perfil");
+        setMessage("Erro ao carregar perfil. Verifique sua conexão com a internet e tente novamente.");
       } finally {
         setLoading(false);
       }
@@ -219,7 +219,7 @@ function AdminProfile() {
         }),
       });
 
-      if (!response.ok) throw new Error("Erro ao atualizar perfil");
+      if (!response.ok) throw new Error("Erro ao atualizar perfil. Verifique sua conexão com a internet e tente novamente.");
       setMessage("Perfil atualizado com sucesso!");
       
       if (showPasswordFields) {
@@ -229,7 +229,7 @@ function AdminProfile() {
       
       setOriginalUser({...user, password: "", confirmPassword: ""});
     } catch (error) {
-      setMessage("Erro ao salvar alterações");
+      setMessage("Erro ao salvar alterações. Verifique sua conexão com a internet e tente novamente.");
     }
   };
 
@@ -242,10 +242,10 @@ function AdminProfile() {
         },
       });
 
-      if (!response.ok) throw new Error("Erro ao enviar email");
+      if (!response.ok) throw new Error("Erro ao enviar email. Verifique sua conexão com a internet e tente novamente.");
       setMessage("Email de confirmação enviado com sucesso!");
     } catch (error) {
-      setMessage("Erro ao enviar email de confirmação");
+      setMessage("Erro ao enviar email de confirmação. Verifique sua conexão com a internet e tente novamente.");
     }
   };
 

@@ -30,7 +30,7 @@ function UpdateReservationStatus() {
                 setReservation(data);
 
             } catch (error) {
-                setError("Não foi possível carregar os dados da reserva");
+                setError("Não foi possível carregar os dados da reserva. Verifique sua conexão e tente novamente.");
             } finally {
                 setLoading(false);
             }
@@ -54,7 +54,7 @@ function UpdateReservationStatus() {
             navigate('/admin/reservations');
 
         } catch (error) {
-            setError("Erro ao atualizar o status da reserva");
+            setError("Erro ao atualizar o status da reserva. Verifique sua conexão e tente novamente.");
         }
     };
 

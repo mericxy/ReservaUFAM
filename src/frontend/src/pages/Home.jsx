@@ -18,7 +18,7 @@ function Home() {
         });
         setUsername(userData.username);
       } catch (error) {
-        setError("Erro ao carregar dados do usuário");
+        setError("Erro ao carregar dados do usuário. Verifique sua conexão com a internet e tente novamente.");
       }
     };
 
@@ -31,7 +31,7 @@ function Home() {
         });
         setReservations(data);
       } catch (error) {
-        setError("Erro ao carregar suas reservas");
+        setError("Erro ao carregar suas reservas. Verifique sua conexão com a internet e tente novamente.");
       } finally {
         setLoading(false);
       }

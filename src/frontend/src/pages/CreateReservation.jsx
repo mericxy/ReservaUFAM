@@ -77,7 +77,7 @@ const CreateReservation = () => {
         try {
         const token = localStorage.getItem("accessToken");
         if (!token) {
-            handleError("Sessão expirada. Por favor, faça login novamente.");
+            handleError("Sua sessão expirou por inatividade. Faça login novamente para continuar.");
             navigate("/");
             return;
         }
@@ -124,11 +124,11 @@ const CreateReservation = () => {
         try {
             data = JSON.parse(text);
         } catch {
-            throw new Error("Erro ao processar resposta do servidor");
+            throw new Error("Erro ao processar resposta do servidor. Verifique sua conexão com a internet e tente novamente.");
         }
 
         if (!response.ok) {
-            let errorMessage = "Erro na resposta do servidor";
+            let errorMessage = "Erro na resposta do servidor. Verifique sua conexão com a internet e tente novamente.";
             if (data.detail) {
             errorMessage = data.detail;
             } else if (typeof data === "object") {
@@ -146,7 +146,11 @@ const CreateReservation = () => {
         setSelectedResource(null);
         } catch (error) {
         console.error("Erro completo:", error);
-        handleError(`Erro ao criar reserva: ${error.message}`);
+         handleError(
+            `Não foi possível concluir a criação da reserva. ${error.message.includes("conexão") 
+                ? "Verifique sua conexão com a internet e tente novamente." 
+                : "Tente novamente em alguns instantes ou entre em contato com o suporte se o erro persistir."}`
+            );
         }
     };
     return (

@@ -48,7 +48,7 @@ function AdminRecursos() {
       if (
         results.every((r) => r.status === "rejected")
       ) {
-        throw new Error("Nenhum recurso pôde ser carregado.");
+        throw new Error("Nenhum recurso pôde ser carregado. Verifique sua conexão com a internet e tente novamente.");
       }
 
       setResources({
@@ -57,7 +57,7 @@ function AdminRecursos() {
         vehicle: vehicleData
       });
     } catch (error) {
-      handleError("Erro ao carregar recursos. Por favor, tente novamente mais tarde.");
+      handleError("Erro ao carregar recursos. Verifique sua conexão com a internet e tente novamente.");
     }
   };
 
@@ -116,13 +116,13 @@ function AdminRecursos() {
 
       // Detecção específica de token expirado
       if (error.message.includes("401")) {
-        handleError("Sua sessão expirou. Faça login novamente.");
+        handleError("Sua sessão expirou por inatividade. Faça login novamente para continuar.");
         setTimeout(() => {
           window.location.href = "/";
         }, 1500);
         return;
       }
-      handleError("Erro ao adicionar recurso");
+      handleError("Erro ao adicionar recurso. Verifique sua conexão com a internet e tente novamente.");
     }
   };
 
@@ -145,14 +145,14 @@ function AdminRecursos() {
     } catch (error) {
 
       if (error.message.includes("401")) {
-        handleError("Sua sessão expirou. Faça login novamente.");
+        handleError("Sua sessão expirou por inatividade. Faça login novamente para continuar.");
         setTimeout(() => {
           window.location.href = "/";
         }, 1500);
         return;
       }
 
-      handleError("Erro ao remover recurso");
+      handleError("Erro ao remover recurso. Verifique sua conexão com a internet e tente novamente.");
     }
   };
 
