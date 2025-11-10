@@ -1,10 +1,15 @@
 import { useEffect, useState } from "react";
 import { apiFetch } from "../../api";
+import NotificationButton from "../components/NotificationButton";
+import RecentReservations from "../components/RecentReservations";
+import ReservationSummaryCard from "../components/ReservationSummaryCard";
+import ActivityIndicator from "../components/ActivityIndicator";
 
 function AdminPage() {
   const [username, setUsername] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [showRecentReservations, setShowRecentReservations] = useState(false);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -36,12 +41,28 @@ function AdminPage() {
 
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-bold bg-gradient-to-r from-green-500 to-blue-500 text-transparent bg-clip-text mb-6">
-        Painel Administrativo
-      </h1>
-      <h2 className="text-xl mb-4">Bem-vindo, {username}!</h2>
+      <div className="flex justify-between items-center mb-6">
+        <div>
+          <h1 className="text-2xl font-bold bg-gradient-to-r from-green-500 to-blue-500 text-transparent bg-clip-text">
+            Painel Administrativo
+          </h1>
+          <h2 className="text-xl mt-2">Bem-vindo, {username}!</h2>
+          <div className="mt-3">
+            <ActivityIndicator />
+          </div>
+        </div>
+        
+        <div className="flex items-center space-x-4">
+          <NotificationButton 
+            onClick={() => setShowRecentReservations(true)}
+            className="shadow-lg"
+          />
+        </div>
+      </div>
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <ReservationSummaryCard />
+        
         <div className="p-4 bg-white rounded-lg shadow hover:shadow-md transition-shadow">
           <h3 className="font-semibold mb-2">Gerenciar Reservas</h3>
           <p className="text-gray-600">Visualize e gerencie todas as reservas</p>
@@ -66,6 +87,11 @@ function AdminPage() {
           </a>
         </div>
       </div>
+      
+      <RecentReservations
+        isOpen={showRecentReservations}
+        onClose={() => setShowRecentReservations(false)}
+      />
     </div>
   );
 }
