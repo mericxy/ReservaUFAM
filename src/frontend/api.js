@@ -23,16 +23,18 @@ export async function apiFetch(endpoint, options = {}) {
   if (response.status === 401) {
     localStorage.removeItem("accessToken");
 
-    alert("Sua sessão expirou. Faça login novamente.");
+    alert("Sua sessão expirou por inatividade. Por segurança, faça login novamente para continuar.");
     window.location.href = "/";
     throw new Error("401: Unauthorized");
   }
 
   if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(
-      `${response.status}: ${errorText || `Erro ao acessar ${endpoint}`}`
-    );
+    const mensagemErro = `
+    Ocorreu um erro ao acessar ${endpoint}.
+    Verifique sua conexão com a internet e tente novamente.
+    Se o problema persistir, entre em contato com o suporte técnico.
+    `;
+    throw new Error(`${response.status}: ${mensagemErro}`);
   }
 
   if (response.status === 204) return null;

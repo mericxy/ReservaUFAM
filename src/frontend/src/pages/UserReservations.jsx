@@ -29,7 +29,7 @@ function UserReservations() {
                 setReservations(data);
 
             } catch (error) {
-                setError("Não foi possível carregar suas reservas");
+                setError("Não foi possível carregar suas reservas. Verifique sua conexão e tente novamente.");
             } finally {
                 setLoading(false);
             }

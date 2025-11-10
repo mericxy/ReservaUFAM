@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext"; 
 import BackButton from "../components/BackButton";
 import { apiFetch } from "../../api";
+import { formatCPF, formatPhone, removeFormatting } from "../utils/formatters";
 
 function UserProfile() {
   const navigate = useNavigate();
@@ -37,6 +38,11 @@ function UserProfile() {
     cpf: false,
     cellphone: false
   });
+  const [blockedFieldClicked, setBlockedFieldClicked] = useState({
+    siape: false,
+    cpf: false,
+    role: false
+  });
 
 useEffect(() => {
     const fetchUser = async () => {
@@ -51,11 +57,11 @@ useEffect(() => {
           const userData = {
             username: data.username || "",
             email: data.email || "",
-            cellphone: data.cellphone || "",
+            cellphone: data.cellphone ? formatPhone(data.cellphone) : "",
             password: "",
             confirmPassword: "",
             siape: data.siape || "",
-            cpf: data.cpf || "",
+            cpf: data.cpf ? formatCPF(data.cpf) : "",
             first_name: data.first_name || "",
             last_name: data.last_name || "",
             role: data.role || "",
@@ -66,7 +72,7 @@ useEffect(() => {
           setOriginalUser(userData);
         }
       } catch (error) {
-        setMessage("Erro ao carregar perfil");
+        setMessage("Erro ao carregar perfil. Verifique sua conexão e tente novamente.");
       } finally {
         setLoading(false);
       }
@@ -86,24 +92,26 @@ useEffect(() => {
   };
 
   const formatCPF = (value) => {
-    const numbers = value.replace(/\D/g, '').slice(0, 11);
-    
-    if (numbers.length <= 3) return numbers;
-    if (numbers.length <= 6) return `${numbers.slice(0, 3)}.${numbers.slice(3)}`;
-    if (numbers.length <= 9) return `${numbers.slice(0, 3)}.${numbers.slice(3, 6)}.${numbers.slice(6)}`;
-    return `${numbers.slice(0, 3)}.${numbers.slice(3, 6)}.${numbers.slice(6, 9)}-${numbers.slice(9, 11)}`;
+    const cleanValue = value.replace(/\D/g, "");
+    return cleanValue
+      .replace(/(\d{3})(\d)/, "$1.$2")
+      .replace(/(\d{3})(\d)/, "$1.$2")
+      .replace(/(\d{3})(\d{1,2})/, "$1-$2")
+      .replace(/(-\d{2})\d+?$/, "$1")
+      .slice(0, 14); // Limita o tamanho para 000.000.000-00
   };
 
   const formatPhone = (value) => {
-    const numbers = value.replace(/\D/g, '').slice(0, 11);
-    
-    if (numbers.length <= 2) return numbers;
-    if (numbers.length <= 7) return `(${numbers.slice(0, 2)}) ${numbers.slice(2)}`;
-    return `(${numbers.slice(0, 2)}) ${numbers.slice(2, 7)}-${numbers.slice(7)}`;
+    const cleanValue = value.replace(/\D/g, "");
+    return cleanValue
+      .replace(/(\d{2})(\d)/, "($1) $2")
+      .replace(/(\d{5})(\d)/, "$1-$2")
+      .replace(/(-\d{4})\d+?$/, "$1")
+      .slice(0, 15); // Limita o tamanho para (99) 99999-9999
   };
 
   const formatSIAPE = (value) => {
-    return value.replace(/\D/g, '').slice(0, 7);
+    return value.replace(/\D/g, "").slice(0, 7);
   };
 
   const unformatValue = (value) => {
@@ -195,6 +203,23 @@ useEffect(() => {
     return bothPasswordFieldsFilled && allPasswordRequirementsMet;
   };
 
+  const handleBlockedFieldClick = (fieldName) => {
+    if (!user.is_staff) {
+      setBlockedFieldClicked(prev => ({
+        ...prev,
+        [fieldName]: true
+      }));
+      
+      // Remove o efeito após 2 segundos
+      setTimeout(() => {
+        setBlockedFieldClicked(prev => ({
+          ...prev,
+          [fieldName]: false
+        }));
+      }, 2000);
+    }
+  };
+
 const handleSubmit = async (e) => {
     e.preventDefault();
     setMessage("");
@@ -214,6 +239,9 @@ const handleSubmit = async (e) => {
         },
         body: JSON.stringify({
           ...user,
+          cpf: removeFormatting(user.cpf),
+          cellphone: removeFormatting(user.cellphone),
+          siape: removeFormatting(user.siape),
           password: showPasswordFields ? user.password : undefined
         }),
       });
@@ -227,7 +255,7 @@ const handleSubmit = async (e) => {
       setOriginalUser({...user, password: "", confirmPassword: ""});
     
     } catch (error) {
-      setMessage("Erro ao salvar alterações");
+      setMessage("Erro ao salvar alterações. Verifique sua conexão e tente novamente.");
     }
   };
 
@@ -250,10 +278,17 @@ const handleDeleteAccount = async () => {
             navigate("/");
 
         } catch (error) {
-            setMessage("Não foi possível excluir sua conta. Tente novamente mais tarde.");
+            setMessage("Não foi possível excluir sua conta. Verifique sua conexão e tente novamente.");
         }
     }
   };
+
+  const [showPassword, setShowPassword] = useState(false);
+
+  const togglePasswordVisibility = () => {
+      setShowPassword(prev => !prev);
+  };
+  
 
 const handleSendEmailConfirmation = async () => {
     try {
@@ -334,32 +369,70 @@ const handleSendEmailConfirmation = async () => {
 
           <div className="grid grid-cols-2 gap-4">
             <div className="mb-4">
-              <label className="block text-gray-700 text-sm font-bold mb-2">
+              <label className="block text-gray-700 text-sm font-bold mb-2 flex items-center gap-2">
                 SIAPE
+                {!user.is_staff && (
+                  <svg 
+                    className="w-4 h-4 text-gray-500" 
+                    fill="currentColor" 
+                    viewBox="0 0 20 20"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path 
+                      fillRule="evenodd" 
+                      d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" 
+                      clipRule="evenodd" 
+                    />
+                  </svg>
+                )}
               </label>
               <input
                 type="text"
                 name="siape"
                 value={user.siape}
                 onChange={handleChange}
-                className={`w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 ${fieldErrors.siape ? 'border-red-300' : 'border-gray-300'}`}
+                onClick={() => handleBlockedFieldClick('siape')}
+                className={`w-full p-3 border rounded-lg focus:outline-none focus:ring-2 ${
+                  fieldErrors.siape ? 'border-red-300 focus:ring-red-500' : 
+                  blockedFieldClicked.siape && !user.is_staff ? 'border-red-500 focus:ring-red-500' :
+                  'border-gray-300 focus:ring-green-500'
+                } ${!user.is_staff ? 'cursor-not-allowed' : ''}`}
                 disabled={!user.is_staff}
-                placeholder="0000000"
+                placeholder="1234567"
               />
               {fieldErrors.siape && (
                 <p className="text-red-500 text-xs mt-1">SIAPE deve ter exatamente 7 dígitos</p>
               )}
             </div>
             <div>
-              <label className="block text-gray-700 text-sm font-bold mb-2">
+              <label className="block text-gray-700 text-sm font-bold mb-2 flex items-center gap-2">
                 CPF
+                {!user.is_staff && (
+                  <svg 
+                    className="w-4 h-4 text-gray-500" 
+                    fill="currentColor" 
+                    viewBox="0 0 20 20"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path 
+                      fillRule="evenodd" 
+                      d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" 
+                      clipRule="evenodd" 
+                    />
+                  </svg>
+                )}
               </label>
               <input
                 type="text"
                 name="cpf"
                 value={user.cpf}
                 onChange={handleChange}
-                className={`w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 ${fieldErrors.cpf ? 'border-red-300' : 'border-gray-300'}`}
+                onClick={() => handleBlockedFieldClick('cpf')}
+                className={`w-full p-3 border rounded-lg focus:outline-none focus:ring-2 ${
+                  fieldErrors.cpf ? 'border-red-300 focus:ring-red-500' : 
+                  blockedFieldClicked.cpf && !user.is_staff ? 'border-red-500 focus:ring-red-500' :
+                  'border-gray-300 focus:ring-green-500'
+                } ${!user.is_staff ? 'cursor-not-allowed' : ''}`}
                 disabled={!user.is_staff}
                 placeholder="000.000.000-00"
               />
@@ -370,14 +443,32 @@ const handleSendEmailConfirmation = async () => {
           </div>
 
           <div className="mb-2">
-            <label className="block text-gray-700 text-sm font-bold mb-2">
+            <label className="block text-gray-700 text-sm font-bold mb-2 flex items-center gap-2">
               Cargo
+              {!user.is_staff && (
+                <svg 
+                  className="w-4 h-4 text-gray-500" 
+                  fill="currentColor" 
+                  viewBox="0 0 20 20"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path 
+                    fillRule="evenodd" 
+                    d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" 
+                    clipRule="evenodd" 
+                  />
+                </svg>
+              )}
             </label>
             <select
               name="role"
               value={user.role}
               onChange={handleChange}
-              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+              onClick={() => handleBlockedFieldClick('role')}
+              className={`w-full p-3 border rounded-lg focus:outline-none focus:ring-2 ${
+                blockedFieldClicked.role && !user.is_staff ? 'border-red-500 focus:ring-red-500' :
+                'border-gray-300 focus:ring-green-500'
+              } ${!user.is_staff ? 'cursor-not-allowed' : ''}`}
               disabled={!user.is_staff}
             >
               <option value="ADMIN">Administrador</option>
@@ -410,7 +501,7 @@ const handleSendEmailConfirmation = async () => {
                 value={user.cellphone}
                 onChange={handleChange}
                 className={`w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 ${fieldErrors.cellphone ? 'border-red-300' : 'border-gray-300'}`}
-                placeholder="(00) 00000-0000"
+                placeholder="(99) 99999-9999"
               />
               {fieldErrors.cellphone && user.cellphone && (
                 <p className="text-red-500 text-xs mt-1">Telefone inválido</p>
@@ -427,68 +518,118 @@ const handleSendEmailConfirmation = async () => {
               {showPasswordFields ? "Cancelar alteração de senha" : "Alterar senha"}
             </button>
 
-            {showPasswordFields && (
-              <div className="space-y-4 mt-4">
-                <div>
-                  <label className="block text-gray-700 text-sm font-bold mb-2">
-                    Nova Senha
-                  </label>
+          {showPasswordFields && (
+            <div className="space-y-4 mt-4">
+              <div>
+                <label className="block text-gray-700 text-sm font-bold mb-2">
+                  Nova Senha
+                </label>
+                <div className="relative">
                   <input
-                    type="password"
+                    type={showPassword ? "text" : "password"}
                     name="password"
                     value={user.password}
                     onChange={handleChange}
-                    className={`w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 ${Object.values(passwordErrors).includes(false) ? 'border-red-300' : 'border-gray-300'}`}
+                    className={`w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 ${
+                      Object.values(passwordErrors).includes(false)
+                        ? 'border-red-300'
+                        : 'border-gray-300'
+                    }`}
                     minLength={6}
                   />
-                </div>
-                <div>
-                  <label className="block text-gray-700 text-sm font-bold mb-2">
-                    Confirmar Nova Senha
-                  </label>
-                  <input
-                    type="password"
-                    name="confirmPassword"
-                    value={user.confirmPassword}
-                    onChange={handleChange}
-                    className={`w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 ${!passwordErrors.match && user.confirmPassword ? 'border-red-300' : 'border-gray-300'}`}
-                    minLength={6}
-                  />
-                </div>
-
-                <div className="text-sm space-y-1">
-                  <p className={passwordErrors.length ? 'text-green-600' : 'text-red-600'}>
-                    ✓ Mínimo de 6 caracteres
-                  </p>
-                  <p className={passwordErrors.hasUpper ? 'text-green-600' : 'text-red-600'}>
-                    ✓ Pelo menos uma letra maiúscula
-                  </p>
-                  <p className={passwordErrors.hasLower ? 'text-green-600' : 'text-red-600'}>
-                    ✓ Pelo menos uma letra minúscula
-                  </p>
-                  <p className={passwordErrors.hasNumber ? 'text-green-600' : 'text-red-600'}>
-                    ✓ Pelo menos um número
-                  </p>
-                  <p className={passwordErrors.match ? 'text-green-600' : 'text-red-600'}>
-                    ✓ Senhas coincidem
-                  </p>
-                </div>
-
-                <div className="flex gap-4 pt-2">
                   <button
                     type="button"
-                    onClick={handleSendEmailConfirmation}
-                    disabled={!canSendCode()}
-                    className={`w-full font-bold py-2 px-4 rounded-lg transition-colors duration-300
-                      ${canSendCode() 
-                        ? 'bg-blue-500 hover:bg-blue-600 text-white' 
-                        : 'bg-gray-300 text-gray-500 cursor-not-allowed'}`}
+                    onClick={togglePasswordVisibility}
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2"
                   >
-                    Enviar Código de Confirmação
+                    {showPassword ? (
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-500" viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
+                        <path fillRule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd" />
+                      </svg>
+                    ) : (
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-500" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M3.707 2.293a1 1 0 00-1.414 1.414l14 14a1 1 0 001.414-1.414l-1.473-1.473A10.014 10.014 0 0019.542 10C18.268 5.943 14.478 3 10 3a9.958 9.958 0 00-4.512 1.074l-1.78-1.781zm4.261 4.26l1.514 1.515a2.003 2.003 0 012.45 2.45l1.514 1.514a4 4 0 00-5.478-5.478z" clipRule="evenodd" />
+                        <path d="M12.454 16.697L9.75 13.992a4 4 0 01-3.742-3.741L2.335 6.578A9.98 9.98 0 00.458 10c1.274 4.057 5.065 7 9.542 7 .847 0 1.669-.105 2.454-.303z" />
+                      </svg>
+                    )}
                   </button>
                 </div>
               </div>
-            )}
+
+              <div>
+                <label className="block text-gray-700 text-sm font-bold mb-2">
+                  Confirmar Nova Senha
+                </label>
+                <div className="relative">
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    name="confirmPassword"
+                    value={user.confirmPassword}
+                    onChange={handleChange}
+                    className={`w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 ${
+                      !passwordErrors.match && user.confirmPassword
+                        ? 'border-red-300'
+                        : 'border-gray-300'
+                    }`}
+                    minLength={6}
+                  />
+                  <button
+                    type="button"
+                    onClick={togglePasswordVisibility}
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2"
+                  >
+                    {showPassword ? (
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-500" viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
+                        <path fillRule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd" />
+                      </svg>
+                    ) : (
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-500" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M3.707 2.293a1 1 0 00-1.414 1.414l14 14a1 1 0 001.414-1.414l-1.473-1.473A10.014 10.014 0 0019.542 10C18.268 5.943 14.478 3 10 3a9.958 9.958 0 00-4.512 1.074l-1.78-1.781zm4.261 4.26l1.514 1.515a2.003 2.003 0 012.45 2.45l1.514 1.514a4 4 0 00-5.478-5.478z" clipRule="evenodd" />
+                        <path d="M12.454 16.697L9.75 13.992a4 4 0 01-3.742-3.741L2.335 6.578A9.98 9.98 0 00.458 10c1.274 4.057 5.065 7 9.542 7 .847 0 1.669-.105 2.454-.303z" />
+                      </svg>
+                    )}
+                  </button>
+                </div>
+              </div>
+
+              <div className="text-sm space-y-1">
+                <p className={passwordErrors.length ? 'text-green-600' : 'text-red-600'}>
+                  ✓ Mínimo de 6 caracteres
+                </p>
+                <p className={passwordErrors.hasUpper ? 'text-green-600' : 'text-red-600'}>
+                  ✓ Pelo menos uma letra maiúscula
+                </p>
+                <p className={passwordErrors.hasLower ? 'text-green-600' : 'text-red-600'}>
+                  ✓ Pelo menos uma letra minúscula
+                </p>
+                <p className={passwordErrors.hasNumber ? 'text-green-600' : 'text-red-600'}>
+                  ✓ Pelo menos um número
+                </p>
+                <p className={passwordErrors.match ? 'text-green-600' : 'text-red-600'}>
+                  ✓ Senhas coincidem
+                </p>
+              </div>
+
+              <div className="flex gap-4 pt-2">
+                <button
+                  type="button"
+                  onClick={handleSendEmailConfirmation}
+                  disabled={!canSendCode()}
+                  className={`w-full font-bold py-2 px-4 rounded-lg transition-colors duration-300
+                    ${
+                      canSendCode()
+                        ? 'bg-blue-500 hover:bg-blue-600 text-white'
+                        : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                    }`}
+                >
+                  Enviar Código de Confirmação
+                </button>
+              </div>
+            </div>
+          )}
+
           </div>
 
           <div className="pt-4">
