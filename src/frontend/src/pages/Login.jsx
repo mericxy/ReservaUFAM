@@ -59,7 +59,7 @@ const Login = () => {
 
         } catch (error) {
             if (error.message.includes('401') || error.message.includes('400')) {
-                setError("Credenciais inválidas ou usuário não encontrado.");
+                setError("Credenciais incorretas. Verifique seu e-mail e senha e tente novamente.");
             } else {
                 setError("Não foi possível conectar ao servidor. Verifique sua conexão e tente novamente.");
             }

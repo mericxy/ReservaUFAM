@@ -38,10 +38,10 @@ function AdminUsuarios() {
         arquivados
       });
     } catch (error) {
-      handleError("Erro ao carregar usuários. Por favor, tente novamente mais tarde.");
+      handleError("Erro ao carregar usuários. Verifique sua conexão com a internet e tente novamente.");
 
       if (error.message.includes("401")) {
-        handleError("Sua sessão expirou. Faça login novamente.");
+        handleError("Sua sessão expirou por inatividade. Faça login novamente para continuar.");
       }
     }
   };
@@ -73,10 +73,10 @@ function AdminUsuarios() {
       handleSuccess(`Usuário ${newStatus.toLowerCase()} com sucesso!`);
       fetchUsuarios();
     } catch (error) {
-      handleError("Erro ao atualizar status do usuário");
+      handleError("Erro ao atualizar status do usuário. Verifique sua conexão com a internet e tente novamente.");
 
       if (error.message.includes("401")) {
-        handleError("Sua sessão expirou. Faça login novamente.");
+        handleError("Sua sessão expirou por inatividade. Faça login novamente para continuar.");
       }
     }
   };
