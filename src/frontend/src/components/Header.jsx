@@ -24,6 +24,11 @@ const Header = () => {
             </a>
             <nav>
                 <ul className="flex items-center flex-row">
+                    <a href="/home" className={`p-4 hover:text-green-600 hover:border-b-2 border-green-600 transition-colors duration-300 ${isActive('/home')}`}>
+                        <li>
+                            Home
+                        </li>
+                    </a>
                     <a href="/reservations/create" className={`p-4 hover:text-green-600 hover:border-b-2 border-green-600 transition-colors duration-300 ${isActive('/reservations/create')}`}>
                         <li>
                             Solicitar Reserva
