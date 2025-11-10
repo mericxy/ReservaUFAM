@@ -255,7 +255,7 @@ const Register = () => {
         </a>
       </div>
 
-      <img src={logo} alt="logo" className="w-17 h-12" />
+      <img src={logo} alt="logo" className="h-12" />
 
       <div className="border border-gray-300 rounded-xl p-8 w-full max-w-2xl shadow-lg bg-white">
         <h2 className="text-2xl font-bold bg-gradient-to-r from-green-500 to-blue-500 text-transparent bg-clip-text mb-2">
