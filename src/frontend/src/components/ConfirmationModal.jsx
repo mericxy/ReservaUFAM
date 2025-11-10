@@ -17,7 +17,9 @@ const ConfirmationModal = ({ isOpen, onClose, onConfirm, title, message }) => {
 
   return (
     // Backdrop
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+    // MUDANÇA AQUI: Alterado de bg-opacity-50 para bg-opacity-5
+    <div className="fixed inset-0 bg-opacity-5 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+      
       {/* Conteúdo do Modal */}
       <div className="bg-white p-6 rounded-lg shadow-xl max-w-sm w-full">
         <h2 className="text-xl font-bold mb-4 text-gray-800">{title}</h2>
