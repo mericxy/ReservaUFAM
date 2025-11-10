@@ -159,20 +159,31 @@ Não havia botão para cancelar para que o usuário tivesse o controle de cancel
 
 ---
 
-### 11) ❌ Admin não pode aprovar reservas em lote — Issue #41
+### 11) ❌ Falta de sugestões de recuperação nas mensagens de erro — Issue #41
 - **Severidade:** 🟡 Média
 - **Heurística violada:** 7. Flexibilidade e eficiência
 
-✅ Em desenvolvimento: selecionar múltiplas reservas e aprovar de uma só vez  
-→ Otimiza fluxo e reduz repetição
+**📸 Evidências pré ajustes:**
+<img width="2015" height="688" alt="Image" src="https://github.com/user-attachments/assets/db23cde3-c43d-463c-99f5-ab95304d9e1f" />
 
----
+**✅ Solução aplicada:**
+As mensagens de erro passaram a oferecer instruções de recuperação, como:
 
-### 12) 🚫 Sistema não possui ajuda — Issue #41
-- **Severidade:** 🟡 Média
-- **Heurística violada:** 10. Ajuda e documentação
+- “Verifique seus dados e tente novamente”
+- “Se o problema persistir, contate o suporte”
+- Sugestões com ação concreta
 
-✅ Planejada implementação de ajuda contextual e onboarding interativo
+Links e botões de retry quando aplicável
+
+**📸 Evidências pós ajustes:**
+<img width="2026" height="679" alt="Image" src="https://github.com/user-attachments/assets/811da540-4c4f-49c4-8e46-60a2652f5b48" />
+
+**✅ Impacto esperado:**
+
+- Aumenta autonomia dos usuários
+- Reduz necessidade de suporte
+- Comunicação mais clara e empática
+- Diminui frustração e abandono do sistema
 
 ---
 
