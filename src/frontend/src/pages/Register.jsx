@@ -411,7 +411,7 @@ const Register = () => {
               <button
                 type="button"
                 onClick={() => togglePasswordVisibility("password")}
-                className="absolute right-3 top-1/2 transform -translate-y-1/2"
+                className="absolute right-3 top-1/2 -translate-y-1/2 bg-white p-1 pointer-events-auto"
               >
                 {showPassword.password ? (
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-500" viewBox="0 0 20 20" fill="currentColor">
