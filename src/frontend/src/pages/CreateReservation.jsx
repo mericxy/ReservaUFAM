@@ -11,7 +11,7 @@ import ResourceSelector from "../components/ResourceSelector";
 import DateTimeSelector from "../components/DateTimeSelector";
 import ReservationDetails from "../components/ReservationDetails";
 import { apiFetch } from "../../api";
-
+import { getOccupiedTimesSet } from "../utils/timeUtils";
 
 const CreateReservation = () => {
     const navigate = useNavigate();
@@ -48,6 +48,7 @@ const CreateReservation = () => {
         if (name === "initial_date" && newFormData.final_date < value) {
         newFormData.final_date = value;
         newFormData.final_time = "";
+        newFormData.initial_time = "";
         }
 
         setFormData(newFormData);
@@ -146,7 +147,7 @@ const CreateReservation = () => {
         setSelectedResource(null);
         } catch (error) {
         console.error("Erro completo:", error);
-         handleError(
+        handleError(
             `Não foi possível concluir a criação da reserva. ${error.message.includes("conexão") 
                 ? "Verifique sua conexão com a internet e tente novamente." 
                 : "Tente novamente em alguns instantes ou entre em contato com o suporte se o erro persistir."}`
@@ -164,12 +165,11 @@ const CreateReservation = () => {
             )}
             <BackButton />
             <div className="max-w-6xl mx-auto">
-                <h1 className="text-3xl font-bold mb-4 bg-gradient-to-r from-green-500 to-blue-500 text-transparent bg-clip-text">
+                <h1 className="text-3xl font-bold mb-4 bg-linear-to-r from-green-500 to-blue-500 text-transparent bg-clip-text">
                     Solicitar Reserva
                 </h1>
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    {/* Formulário de Reserva */}
                     <div className="lg:col-span-2">
                         <div className="bg-white p-2 rounded-xl shadow-lg">
                             <form onSubmit={handleSubmit} className="space-y-6">
@@ -185,6 +185,7 @@ const CreateReservation = () => {
                                     handleChange={handleChange}
                                     timeOptions={timeOptions}
                                     getMinDate={getMinDate}
+                                    occupiedDates={occupiedDates} 
                                 />
 
                                 <ReservationDetails
@@ -197,9 +198,9 @@ const CreateReservation = () => {
                                         type="submit"
                                         disabled={!formModified}
                                         className={`font-bold py-3 px-6 rounded-lg transition-all duration-300 shadow-md
-                                            ${formModified 
-                                                ? 'bg-green-500 hover:bg-green-600 text-white hover:shadow-lg cursor-pointer' 
-                                                : 'bg-gray-300 text-gray-500 cursor-not-allowed'}`}
+                                        ${formModified 
+                                            ? 'bg-green-500 hover:bg-green-600 text-white hover:shadow-lg cursor-pointer' 
+                                            : 'bg-gray-300 text-gray-500 cursor-not-allowed'}`}
                                     >
                                         Solicitar Reserva
                                     </button>
@@ -208,43 +209,41 @@ const CreateReservation = () => {
                         </div>
                     </div>
 
-                    {/* Painel Lateral */}
                     <div className="lg:col-span-1 space-y-6">
                         {selectedResource ? (
                             <>
                                 <div className="bg-white p-6 rounded-xl shadow-lg">
                                     <h3 className="text-xl font-semibold mb-4 text-gray-800">
-                                        Detalhes do Recurso  
-                                        <span className="text-red-500">*</span>
+                                        Detalhes do Recurso
                                     </h3>
                                     <div className="space-y-3">
                                         {formData.resource_type === 'vehicle' ? (
                                             <>
                                                 <div className="flex items-center p-3 bg-gray-50 rounded-lg">
-                                                    <span className="font-medium w-24">Modelo:<span className="text-red-500">*</span></span>
+                                                    <span className="font-medium w-24">Modelo:</span>
                                                     <span>{selectedResource.model}</span>
                                                 </div>
                                                 <div className="flex items-center p-3 bg-gray-50 rounded-lg">
-                                                    <span className="font-medium w-24">Placa:<span className="text-red-500">*</span></span>
+                                                    <span className="font-medium w-24">Placa:</span>
                                                     <span>{selectedResource.plate_number}</span>
                                                 </div>
                                                 <div className="flex items-center p-3 bg-gray-50 rounded-lg">
-                                                    <span className="font-medium w-24">Capacidade:<span className="text-red-500">*</span></span>
+                                                    <span className="font-medium w-24">Capacidade:</span>
                                                     <span>{selectedResource.capacity} pessoas</span>
                                                 </div>
                                             </>
                                         ) : (
                                             <>
                                                 <div className="flex items-center p-3 bg-gray-50 rounded-lg">
-                                                    <span className="font-medium w-24">Nome:<span className="text-red-500">*</span></span>
+                                                    <span className="font-medium w-24">Nome:</span>
                                                     <span>{selectedResource.name}</span>
                                                 </div>
                                                 <div className="flex items-center p-3 bg-gray-50 rounded-lg">
-                                                    <span className="font-medium w-24">Local:<span className="text-red-500">*</span></span>
+                                                    <span className="font-medium w-24">Local:</span>
                                                     <span>{selectedResource.location}</span>
                                                 </div>
                                                 <div className="flex items-center p-3 bg-gray-50 rounded-lg">
-                                                    <span className="font-medium w-24">Capacidade:<span className="text-red-500">*</span></span>
+                                                    <span className="font-medium w-24">Capacidade:</span>
                                                     <span>{selectedResource.capacity} pessoas</span>
                                                 </div>
                                             </>
