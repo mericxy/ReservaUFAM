@@ -1,1 +1,14 @@
 @import "tailwindcss";
+@import "./themes.css";
+
+body {
+    background-color: rgb(var(--color-bg));
+}
+
+.border-theme {
+  border: var(--border-default);
+}
+
+.border-theme-strong {
+  border: var(--border-strong);
+}

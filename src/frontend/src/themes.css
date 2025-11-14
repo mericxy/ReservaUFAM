@@ -1,0 +1,36 @@
+/* ----- TEMA CLARO ----- */
+:root[data-theme="light"] {
+  --color-bg: 255 255 255;
+  --color-text: 15 23 42;
+  --color-text-gray: 100 116 139; /* Cinza slate-500 */
+  --color-primary: 37 99 235;
+  --border-default: 1px solid transparent;
+  --border-strong: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+/* ----- TEMA ESCURO ----- */
+:root[data-theme="dark"] {
+  --color-bg: 15 23 42;
+  --color-text: 255 255 255;
+  --color-text-gray: 148 163 184; /* Cinza slate-400 - mais claro no escuro */
+  --color-primary: 96 165 250;
+  --border-default: 1px solid rgba(255, 255, 255, 0.12);
+  --border-strong: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* ----- TEMA ALTO CONTRASTE (WCAG AA) ----- */
+:root[data-theme="hc"] {
+  --color-bg: 0 0 0;
+  --color-text: 255 255 0;
+  --color-text-gray: 255 255 255; /* Branco puro para máximo contraste */
+  --color-primary: 255 255 0;
+  --outline: 2px solid rgb(255, 255, 255);
+  --border-default: 2px solid #ffffff;
+  --border-strong: 2px solid #ffffff;
+}
+
+/* Exemplo de focus universal para HC */
+:root[data-theme="hc"] *:focus {
+  outline: var(--outline);
+  outline-offset: 3px;
+}
