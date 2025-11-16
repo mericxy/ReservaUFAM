@@ -40,26 +40,26 @@ function ReservationSummaryCard() {
 
   if (loading) {
     return (
-      <div className="p-4 bg-white rounded-lg shadow hover:shadow-md transition-shadow">
-        <h3 className="font-semibold mb-2">Resumo de Reservas</h3>
-        <p className="text-gray-600">Carregando estatísticas...</p>
+      <div className="p-4 bg-rgb(var(--color-bg)) rounded-lg shadow hover:shadow-md transition-shadow">
+        <h3 className="font-semibold mb-2 text-[rgb(var(--color-text))]">Resumo de Reservas</h3>
+        <p className="text-[rgb(var(--color-text-gray))]">Carregando estatísticas...</p>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="p-4 bg-white rounded-lg shadow hover:shadow-md transition-shadow">
-        <h3 className="font-semibold mb-2">Resumo de Reservas</h3>
+      <div className="p-4 bg-rgb(var(--color-bg)) rounded-lg shadow hover:shadow-md transition-shadow">
+        <h3 className="font-semibold mb-2 text-[rgb(var(--color-text))]">Resumo de Reservas</h3>
         <p className="text-red-600 text-sm">{error}</p>
       </div>
     );
   }
 
   return (
-    <div className="p-4 bg-white rounded-lg shadow hover:shadow-md transition-shadow">
+    <div className="p-4 bg-rgb(var(--color-bg)) border-theme rounded-lg shadow hover:shadow-md transition-shadow">
       <div className="flex items-center justify-between mb-3">
-        <h3 className="font-semibold">Resumo de Reservas</h3>
+        <h3 className="font-semibold text-[rgb(var(--color-text))]">Resumo de Reservas</h3>
         
       </div>
       
@@ -67,7 +67,7 @@ function ReservationSummaryCard() {
         <div className="flex justify-between items-center">
           <div className="flex items-center space-x-2">
             <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
-            <span className="text-sm text-gray-700">Pendentes</span>
+            <span className="text-sm text-[rgb(var(--color-text))]">Pendentes</span>
           </div>
           <span className="font-semibold text-yellow-600">{stats.pending}</span>
         </div>
@@ -75,7 +75,7 @@ function ReservationSummaryCard() {
         <div className="flex justify-between items-center">
           <div className="flex items-center space-x-2">
             <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-            <span className="text-sm text-gray-700">Aprovadas</span>
+            <span className="text-sm text-[rgb(var(--color-text))]">Aprovadas</span>
           </div>
           <span className="font-semibold text-green-600">{stats.approved}</span>
         </div>
@@ -83,16 +83,16 @@ function ReservationSummaryCard() {
         <div className="flex justify-between items-center">
           <div className="flex items-center space-x-2">
             <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-            <span className="text-sm text-gray-700">Reprovadas</span>
+            <span className="text-sm text-[rgb(var(--color-text))]">Reprovadas</span>
           </div>
           <span className="font-semibold text-red-600">{stats.rejected}</span>
         </div>
 
-        <hr className="my-2" />
+        <hr className="my-2 text-[rgb(var(--color-text))]" />
 
         <div className="flex justify-between items-center">
-          <span className="font-medium text-gray-700">Total</span>
-          <span className="font-bold text-gray-800">{stats.total}</span>
+          <span className="font-medium text-[rgb(var(--color-text))]">Total</span>
+          <span className="font-bold text-[rgb(var(--color-text))]">{stats.total}</span>
         </div>
       </div>
 

@@ -5,7 +5,7 @@
   --color-text-gray: 100 116 139; /* Cinza slate-500 */
   --color-primary: 37 99 235;
   --border-default: 1px solid transparent;
-  --border-strong: 1px solid rgba(0, 0, 0, 0.05);
+  --border-strong: 1px solid rgba(0, 0, 0, 0.15);
 }
 
 /* ----- TEMA ESCURO ----- */

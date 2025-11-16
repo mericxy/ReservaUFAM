@@ -80,12 +80,12 @@ function RecentReservations({ onClose, isOpen }) {
           <div className="p-4 overflow-y-auto max-h-[calc(85vh-120px)]">
             {loading ? (
               <div className="flex items-center justify-center py-8">
-                <div className="text-gray-600">Carregando reservas recentes...</div>
+                <div className="text-[rgb(var(--color-text-gray))]">Carregando reservas recentes...</div>
               </div>
             ) : error ? (
               <div className="text-red-600 text-center py-8">{error}</div>
             ) : recentReservations.length === 0 ? (
-              <div className="text-gray-600 text-center py-8">
+              <div className="text-[rgb(var(--color-text-gray))] text-center py-8">
                 Nenhuma reserva encontrada
               </div>
             ) : (
@@ -97,7 +97,7 @@ function RecentReservations({ onClose, isOpen }) {
                   >
                     <div className="flex justify-between items-start mb-2">
                       <div className="flex items-center space-x-2">
-                        <span className="font-semibold text-gray-800">
+                        <span className="font-semibold text-[rgb(var(--color-text))]">
                           Reserva #{reservation.id}
                         </span>
                         <span
@@ -106,7 +106,7 @@ function RecentReservations({ onClose, isOpen }) {
                           {reservation.status}
                         </span>
                       </div>
-                      <span className="text-xs text-gray-500">
+                      <span className="text-xs text-[rgb(var(--color-text-gray))]">
                         {formatDateTime(reservation.created_at || reservation.initial_date)}
                       </span>
                     </div>
@@ -114,31 +114,31 @@ function RecentReservations({ onClose, isOpen }) {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                       <div className="space-y-1">
                         <p>
-                          <span className="font-medium text-gray-700">Recurso:</span>{" "}
+                          <span className="font-medium text-[rgb(var(--color-text-gray))]">Recurso:</span>{" "}
                           {reservation.auditorium?.name || 
                            reservation.meeting_room?.name || 
                            reservation.vehicle?.model || "Não especificado"}
                         </p>
                         <p>
-                          <span className="font-medium text-gray-700">Solicitante:</span>{" "}
+                          <span className="font-medium text-[rgb(var(--color-text-gray))]">Solicitante:</span>{" "}
                           {reservation.user?.username || "Não informado"}
                         </p>
                         <p>
-                          <span className="font-medium text-gray-700">Email:</span>{" "}
+                          <span className="font-medium text-[rgb(var(--color-text-gray))]">Email:</span>{" "}
                           {reservation.user?.email || "Não informado"}
                         </p>
                       </div>
                       <div className="space-y-1">
                         <p>
-                          <span className="font-medium text-gray-700">Data Inicial:</span>{" "}
+                          <span className="font-medium text-[rgb(var(--color-text-gray))]">Data Inicial:</span>{" "}
                           {new Date(reservation.initial_date).toLocaleDateString('pt-BR')}
                         </p>
                         <p>
-                          <span className="font-medium text-gray-700">Data Final:</span>{" "}
+                          <span className="font-medium text-[rgb(var(--color-text-gray))]">Data Final:</span>{" "}
                           {new Date(reservation.final_date).toLocaleDateString('pt-BR')}
                         </p>
                         <p>
-                          <span className="font-medium text-gray-700">Horário:</span>{" "}
+                          <span className="font-medium text-[rgb(var(--color-text-gray))]">Horário:</span>{" "}
                           {reservation.initial_time} - {reservation.final_time}
                         </p>
                       </div>
@@ -147,7 +147,7 @@ function RecentReservations({ onClose, isOpen }) {
                     {reservation.purpose && (
                       <div className="mt-3 pt-3 border-t border-gray-200">
                         <p className="text-sm">
-                          <span className="font-medium text-gray-700">Finalidade:</span>{" "}
+                          <span className="font-medium text-[rgb(var(--color-text-gray))]">Finalidade:</span>{" "}
                           {reservation.purpose}
                         </p>
                       </div>

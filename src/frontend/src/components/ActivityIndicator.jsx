@@ -60,7 +60,7 @@ function ActivityIndicator() {
 
   if (loading || !lastActivity) {
     return (
-      <div className="flex items-center space-x-2 text-sm text-gray-500">
+      <div className="flex items-center space-x-2 text-sm text-[rgb(var(--color-text-gray))]">
         <div className="w-2 h-2 bg-gray-300 rounded-full"></div>
         <span>Carregando atividade...</span>
       </div>
