@@ -3,6 +3,13 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { apiFetch } from "../../api";
 
+const formatDateToLocal = (dateString) => {
+    if (!dateString) return '';
+    const parts = dateString.split('-');
+    const date = new Date(parts[0], parts[1] - 1, parts[2]);
+    return date.toLocaleDateString('pt-BR');
+};
+
 function AdminReservations() {
     const [reservations, setReservations] = useState({
         pendentes: [],
@@ -23,7 +30,7 @@ function AdminReservations() {
     }, [isAuthenticated, isAdmin, navigate]);
 
     const fetchReservations = async () => {
-        setLoading(true); 
+        setLoading(true);
         try {
             const token = localStorage.getItem("accessToken");
             const headers = { 
@@ -56,7 +63,7 @@ function AdminReservations() {
     const handleStatusUpdate = async (reservationId, newStatus) => {
         try {
             const token = localStorage.getItem("accessToken");
-            const response = await apiFetch(`/api/admin/reservations/${reservationId}/status/`, {
+            await apiFetch(`/api/admin/reservations/${reservationId}/status/`, {
                 method: 'PATCH',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -64,8 +71,7 @@ function AdminReservations() {
                 },
                 body: JSON.stringify({ status: newStatus })
             });
-
-            fetchReservations(); 
+            fetchReservations();
         } catch (error) {
             setError("Erro ao atualizar o status da reserva. Verifique sua conexão com a internet e tente novamente.");
             if (error.message.includes("401")) {
@@ -82,8 +88,8 @@ function AdminReservations() {
                     <div className="mt-2 space-y-1 text-sm">
                         <p className='text-[rgb(var(--color-text-grays))]'><span className="font-medium text-[rgb(var(--color-text))]">Recurso:</span> {reservation.auditorium?.name || reservation.meeting_room?.name || reservation.vehicle?.model}</p>
                         <p className='text-[rgb(var(--color-text-grays))]'><span className="font-medium text-[rgb(var(--color-text))]">Solicitante:</span> {reservation.user?.username}</p>
-                        <p className='text-[rgb(var(--color-text-grays))]'><span className="font-medium text-[rgb(var(--color-text))]">Data Inicial:</span> {new Date(reservation.initial_date).toLocaleDateString()}</p>
-                        <p className='text-[rgb(var(--color-text-grays))]'><span className="font-medium text-[rgb(var(--color-text))]">Data Final:</span> {new Date(reservation.final_date).toLocaleDateString()}</p>
+                        <p className='text-[rgb(var(--color-text-grays))]'><span className="font-medium text-[rgb(var(--color-text))]">Data Inicial:</span> {formatDateToLocal(reservation.initial_date)}</p>
+                        <p className='text-[rgb(var(--color-text-grays))]'><span className="font-medium text-[rgb(var(--color-text))]">Data Final:</span> {formatDateToLocal(reservation.final_date)}</p>
                         <p className='text-[rgb(var(--color-text-grays))]'><span className="font-medium text-[rgb(var(--color-text))]">Horário:</span> {reservation.initial_time} - {reservation.final_time}</p>
                         <p className='text-[rgb(var(--color-text-grays))]'>
                             <span className="font-medium text-[rgb(var(--color-text))]">Status:</span>
@@ -127,7 +133,6 @@ function AdminReservations() {
             </h1>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {/* Reservas Pendentes */}
                 <div className="bg-[rgb(var(--color-bg))] p-6 rounded-xl shadow-lg border-theme">
                     <h2 className="text-xl font-semibold mb-4 text-[rgb(var(--color-text))]">Reservas Pendentes</h2>
                     <div className="space-y-4">
@@ -152,7 +157,6 @@ function AdminReservations() {
                     </div>
                 </div>
 
-                {/* Reservas Aprovadas */}
                 <div className="bg-[rgb(var(--color-bg))] p-6 rounded-xl shadow-lg border-theme">
                     <h2 className="text-xl font-semibold mb-4 text-[rgb(var(--color-text))]">Reservas Aprovadas</h2>
                     <div className="space-y-4">
@@ -171,7 +175,6 @@ function AdminReservations() {
                     </div>
                 </div>
 
-                {/* Reservas Arquivadas */}
                 <div className="bg-[rgb(var(--color-bg))] p-6 rounded-xl shadow-lg border-theme">
                     <h2 className="text-xl font-semibold mb-4 text-[rgb(var(--color-text))]">Reservas Arquivadas</h2>
                     <div className="space-y-4">
