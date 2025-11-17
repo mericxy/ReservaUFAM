@@ -16,9 +16,9 @@ const ConfirmationModal = ({ isOpen, onClose, onConfirm, title, message }) => {
   return (
     <div className="fixed inset-0 bg-opacity-5 backdrop-blur-sm flex items-center justify-center z-50 p-4">
       
-      <div className="bg-white p-6 rounded-lg shadow-xl max-w-sm w-full">
-        <h2 className="text-xl font-bold mb-4 text-gray-800">{title}</h2>
-        <p className="text-gray-700 mb-6">{message}</p>
+      <div className="bg-[rgb(var(--color-bg))] p-6 rounded-lg shadow-xl max-w-sm w-full">
+        <h2 className="text-xl font-bold mb-4 text-[rgb(var(--color-text))]">{title}</h2>
+        <p className="text-[rgb(var(--color-text))] mb-6">{message}</p>
         
         <div className="flex justify-end gap-4">
           <button

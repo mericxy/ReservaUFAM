@@ -1,10 +1,18 @@
 # views.py
 # Bibliotecas padrão do Django
 from django.contrib.auth import login, authenticate
+from django.contrib.sessions.models import Session
 from django.shortcuts import get_object_or_404
 from django.utils.timezone import now
+from django.utils import timezone
 from django.db.models import Q
 from django.utils.translation import gettext_lazy as _
+from django.conf import settings
+
+# Bibliotecas padrão de utilidades
+import hashlib
+import secrets
+from datetime import timedelta
 
 # Bibliotecas do Django REST Framework
 from rest_framework import generics, permissions, status
@@ -13,36 +21,182 @@ from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.permissions import IsAuthenticated
 
-# Serializers do projeto
 from .serializers import (
     AuditoriumSerializer, MeetingRoomSerializer, VehicleSerializer,
-    CustomUserSerializer, ReservationSerializer, LoginSerializer
+    CustomUserSerializer, LoginSerializer,
+    PasswordResetRequestSerializer, PasswordResetConfirmSerializer,
+    PasswordResetValidateSerializer,
+    ReservationListSerializer, 
+    ReservationCreateSerializer
 )
 
 from .services import EmailService
+from .models import PasswordResetToken, CustomUser
+
+
+class PasswordResetTokenMixin:
+    @staticmethod
+    def _hash_token(raw_token):
+        return hashlib.sha256(raw_token.encode("utf-8")).hexdigest()
+
+    def _get_active_token(self, raw_token):
+        token_hash = self._hash_token(raw_token)
+        token = PasswordResetToken.objects.filter(
+            token_hash=token_hash,
+            used_at__isnull=True
+        ).first()
+
+        if not token:
+            return None
+
+        if token.expires_at < timezone.now():
+            return None
+
+        return token
+
+
+class PasswordResetRequestView(PasswordResetTokenMixin, APIView):
+    permission_classes = [permissions.AllowAny]
+
+    def post(self, request):
+        serializer = PasswordResetRequestSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        email = serializer.validated_data["email"].strip().lower()
+        user = CustomUser.objects.filter(
+            email__iexact=email,
+            is_active=True,
+            is_anonymized=False
+        ).first()
+
+        if user and not self._is_rate_limited(user):
+            raw_token = self._create_reset_token(user, request)
+            reset_link = self._build_reset_link(raw_token)
+            EmailService.send_password_reset_email(
+                user_email=user.email,
+                user_name=user.get_full_name() or user.username,
+                reset_link=reset_link,
+                expires_minutes=settings.PASSWORD_RESET_TOKEN_EXPIRATION_MINUTES,
+            )
+
+        return Response(
+            {"detail": "Se o e-mail estiver cadastrado, enviaremos instruções para redefinir sua senha."},
+            status=status.HTTP_200_OK
+        )
+
+    def _create_reset_token(self, user, request):
+        raw_token = secrets.token_urlsafe(48)
+        PasswordResetToken.objects.create(
+            user=user,
+            token_hash=self._hash_token(raw_token),
+            requested_email=user.email,
+            request_ip=self._get_client_ip(request),
+            user_agent=(request.META.get("HTTP_USER_AGENT") or "")[:255],
+            expires_at=timezone.now() + timedelta(
+                minutes=settings.PASSWORD_RESET_TOKEN_EXPIRATION_MINUTES
+            ),
+        )
+        return raw_token
+
+    def _get_client_ip(self, request):
+        forwarded = request.META.get("HTTP_X_FORWARDED_FOR")
+        if forwarded:
+            return forwarded.split(",")[0].strip()
+        return request.META.get("REMOTE_ADDR")
+
+    def _is_rate_limited(self, user):
+        window_start = timezone.now() - timedelta(
+            minutes=settings.PASSWORD_RESET_RATE_LIMIT_WINDOW_MINUTES
+        )
+        recent_requests = PasswordResetToken.objects.filter(
+            user=user,
+            created_at__gte=window_start
+        ).count()
+        return recent_requests >= settings.PASSWORD_RESET_RATE_LIMIT
+
+    def _build_reset_link(self, raw_token):
+        base_url = getattr(settings, "FRONTEND_BASE_URL", "http://localhost:5173").rstrip("/")
+        return f"{base_url}/reset-password?token={raw_token}"
+
+
+class PasswordResetValidateView(PasswordResetTokenMixin, APIView):
+    permission_classes = [permissions.AllowAny]
+
+    def get(self, request):
+        serializer = PasswordResetValidateSerializer(data=request.query_params)
+        serializer.is_valid(raise_exception=True)
+
+        token = serializer.validated_data["token"]
+        reset_token = self._get_active_token(token)
+
+        if not reset_token:
+            return Response(
+                {"detail": "Token inválido ou expirado."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        return Response({"detail": "Token válido."}, status=status.HTTP_200_OK)
+
+
+class PasswordResetConfirmView(PasswordResetTokenMixin, APIView):
+    permission_classes = [permissions.AllowAny]
+
+    def post(self, request):
+        serializer = PasswordResetConfirmSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        token = serializer.validated_data["token"]
+        reset_token = self._get_active_token(token)
+
+        if not reset_token:
+            return Response(
+                {"detail": "Token inválido ou expirado."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        user = reset_token.user
+        user.set_password(serializer.validated_data["password"])
+        user.save()
+
+        reset_token.mark_used()
+        PasswordResetToken.objects.filter(
+            user=user,
+            used_at__isnull=True
+        ).exclude(pk=reset_token.pk).update(used_at=timezone.now())
+
+        self._revoke_user_sessions(user)
+
+        return Response({"detail": "Senha atualizada com sucesso."})
+
+    def _revoke_user_sessions(self, user):
+        auth_token_set = getattr(user, "auth_token_set", None)
+        if auth_token_set is not None:
+            auth_token_set.all().delete()
+
+        auth_token = getattr(user, "auth_token", None)
+        if auth_token is not None:
+            try:
+                auth_token.delete()
+            except Exception:
+                pass
+
+        for session in Session.objects.filter(expire_date__gte=timezone.now()):
+            data = session.get_decoded()
+            if str(data.get("_auth_user_id")) == str(user.pk):
+                session.delete()
+
+
 class AdminOrAuthenticatedReadOnlyPermissionMixin:
-    """
-    Mixin de permissão que permite acesso de leitura para qualquer usuário autenticado
-    e acesso de escrita (POST, PUT, PATCH, DELETE) apenas para administradores.
-    """
     def get_permissions(self):
-        """
-        Define permissões dinâmicas baseadas no método HTTP.
-        """
-        if self.request.method in permissions.SAFE_METHODS:  # GET, HEAD, OPTIONS
+        if self.request.method in permissions.SAFE_METHODS:
             return [permissions.IsAuthenticated()]
         return [permissions.IsAdminUser()]
 
+
 class UpdateUserStatusView(APIView):
-    """
-    View para administradores atualizarem o status de um usuário.
-    """
     permission_classes = [permissions.IsAdminUser]
 
     def patch(self, request, pk):
-        """
-        Altera o status de um usuário específico (ex: aprovar, bloquear).
-        """
         from .models import CustomUser
         user = get_object_or_404(CustomUser, pk=pk)
         new_status = request.data.get('status')
@@ -64,18 +218,11 @@ class UpdateUserStatusView(APIView):
         return Response({"message": message})
 
     def _is_valid_status(self, new_status):
-        """
-        Valida se o status fornecido é válido.
-        """
         from .models import CustomUser
         valid_statuses = [s[0] for s in CustomUser.STATUS_CHOICES]
         return new_status in valid_statuses
 
     def _handle_status_change_notification(self, user, old_status, new_status, data):
-        """
-        Envia notificações apropriadas baseadas na mudança de status.
-        Retorna uma mensagem descrevendo o resultado da operação.
-        """
         if old_status != 'Aprovado' and new_status == 'Aprovado':
             return self._send_approval_notification(user)
         
@@ -85,9 +232,6 @@ class UpdateUserStatusView(APIView):
         return f"Status do usuário alterado para {new_status}"
 
     def _send_approval_notification(self, user):
-        """
-        Envia e-mail de aprovação e retorna mensagem de status.
-        """
         success = EmailService.send_approval_email(
             user_email=user.email,
             user_name=user.get_full_name() or user.username,
@@ -97,9 +241,6 @@ class UpdateUserStatusView(APIView):
         return f"Status do usuário alterado para Aprovado. Email: {email_status}"
 
     def _send_rejection_notification(self, user, reason):
-        """
-        Envia e-mail de rejeição e retorna mensagem de status.
-        """
         success = EmailService.send_rejection_email(
             user_email=user.email,
             user_name=user.get_full_name() or user.username,
@@ -108,98 +249,62 @@ class UpdateUserStatusView(APIView):
         email_status = "enviado" if success else "falha no envio"
         return f"Status do usuário alterado para Reprovado. Email: {email_status}"
 
+
 class AuditoriumAdminView(AdminOrAuthenticatedReadOnlyPermissionMixin, generics.ListCreateAPIView):
-    """
-    View para listar (GET) e criar (POST) Auditórios.
-    """
     serializer_class = AuditoriumSerializer
 
     def get_queryset(self):
-        """
-        Retorna a lista de todos os auditórios.
-        """
         from .models import Auditorium
         return Auditorium.objects.all()
 
+
 class AuditoriumDetailAdminView(generics.RetrieveUpdateDestroyAPIView):
-    """
-    View para ver detalhes, atualizar e deletar um Auditório específico.
-    Apenas administradores têm acesso.
-    """
     serializer_class = AuditoriumSerializer
     permission_classes = [permissions.IsAdminUser]
     
     def get_queryset(self):
-        """
-        Retorna o queryset para buscar um auditório.
-        """
         from .models import Auditorium
         return Auditorium.objects.all()
 
+
 class MeetingRoomAdminView(AdminOrAuthenticatedReadOnlyPermissionMixin, generics.ListCreateAPIView):
-    """
-    View para listar (GET) e criar (POST) Salas de Reunião.
-    """
     serializer_class = MeetingRoomSerializer
 
     def get_queryset(self):
-        """
-        Retorna a lista de todas as salas de reunião.
-        """
         from .models import MeetingRoom
         return MeetingRoom.objects.all()
+
 
 class MeetingRoomDetailAdminView(generics.RetrieveUpdateDestroyAPIView):
-    """
-    View para ver detalhes, atualizar e deletar uma Sala de Reunião específica.
-    """
     serializer_class = MeetingRoomSerializer
     permission_classes = [permissions.IsAdminUser]
 
     def get_queryset(self):
-        """
-        Retorna o queryset para buscar uma sala de reunião.
-        """
         from .models import MeetingRoom
         return MeetingRoom.objects.all()
 
+
 class VehicleAdminView(AdminOrAuthenticatedReadOnlyPermissionMixin, generics.ListCreateAPIView):
-    """
-    View para listar (GET) e criar (POST) Veículos.
-    """
     serializer_class = VehicleSerializer
 
     def get_queryset(self):
-        """
-        Retorna a lista de todos os veículos.
-        """
         from .models import Vehicle
         return Vehicle.objects.all()
 
+
 class VehicleDetailAdminView(generics.RetrieveUpdateDestroyAPIView):
-    """
-    View para ver detalhes, atualizar e deletar um Veículo específico.
-    """
     serializer_class = VehicleSerializer
     permission_classes = [permissions.IsAdminUser]
 
     def get_queryset(self):
-        """
-        Retorna o queryset para buscar um veículo.
-        """
         from .models import Vehicle
         return Vehicle.objects.all()
 
+
 class RegisterView(APIView):
-    """
-    View para registrar novos usuários. O acesso é público.
-    """
     permission_classes = [permissions.AllowAny]
 
     def post(self, request):
-        """
-        Cria um novo usuário com os dados fornecidos.
-        """
         serializer = CustomUserSerializer(data=request.data, context={'request': request})
         if serializer.is_valid():
             user = serializer.save()
@@ -209,16 +314,11 @@ class RegisterView(APIView):
             )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
 class LoginView(APIView):
-    """
-    View de login que retorna tokens de acesso/refresh e os dados do usuário.
-    """
     permission_classes = [permissions.AllowAny]
 
     def post(self, request, *args, **kwargs):
-        """
-        Autentica o usuário e retorna os tokens e dados do perfil.
-        """
         serializer = LoginSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         
@@ -230,7 +330,6 @@ class LoginView(APIView):
                 status=status.HTTP_401_UNAUTHORIZED
             )
         
-        # Verifica se o usuário pode fazer login
         error_response = self._check_user_can_login(user)
         if error_response:
             return error_response
@@ -238,9 +337,6 @@ class LoginView(APIView):
         return self._create_login_response(request, user)
 
     def _authenticate_user(self, request, validated_data):
-        """
-        Autentica o usuário usando as credenciais fornecidas.
-        """
         return authenticate(
             request,
             username=validated_data['identifier'],
@@ -248,10 +344,6 @@ class LoginView(APIView):
         )
 
     def _check_user_can_login(self, user):
-        """
-        Verifica se o usuário está em um estado válido para login.
-        Retorna None se o usuário pode fazer login, ou um Response com erro.
-        """
         if user.status == 'Bloqueado':
             return Response(
                 {"detail": "Esta conta de usuário está bloqueada."},
@@ -267,9 +359,6 @@ class LoginView(APIView):
         return None
 
     def _create_login_response(self, request, user):
-        """
-        Cria a resposta de login com tokens e dados do usuário.
-        """
         login(request, user)
         refresh = RefreshToken.for_user(user)
         
@@ -279,36 +368,23 @@ class LoginView(APIView):
             'user': CustomUserSerializer(user, context={'request': request}).data
         }, status=status.HTTP_200_OK)
 
+
 class UserDetailView(APIView):
-    """
-    View que retorna os detalhes do usuário atualmente autenticado.
-    """
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        """
-        Retorna os dados do usuário que está fazendo a requisição.
-        """
         serializer = CustomUserSerializer(request.user, context={'request': request})
         return Response(serializer.data)
 
+
 class UserProfileView(APIView):
-    """
-    View para um usuário ver e editar seu próprio perfil.
-    """
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        """
-        Retorna os dados do perfil do usuário logado.
-        """
         serializer = CustomUserSerializer(request.user, context={'request': request})
         return Response(serializer.data)
 
     def patch(self, request):
-        """
-        Atualiza os dados do perfil do usuário logado.
-        """
         user = request.user
         serializer = CustomUserSerializer(
             user, 
@@ -325,53 +401,35 @@ class UserProfileView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def _update_password_if_provided(self, user, data):
-        """
-        Atualiza a senha do usuário se fornecida nos dados da requisição.
-        """
         if "password" in data and data["password"]:
             user.set_password(data["password"])
             user.save()
 
+
 class DeleteAccountView(APIView):
-    """
-    View para um usuário solicitar a exclusão (anonimização) de sua própria conta.
-    """
     permission_classes = [IsAuthenticated]
 
     def delete(self, request):
-        """
-        Aciona o processo de anonimização para o usuário autenticado.
-        """
         user = request.user
         user.anonymize()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
+
 class AdminUserListView(APIView):
-    """
-    View para administradores listarem todos os usuários do sistema.
-    """
     permission_classes = [permissions.IsAdminUser]
 
     def get(self, request):
-        """
-        Retorna uma lista de todos os usuários, ordenados pela data de criação.
-        """
         from .models import CustomUser
         users = CustomUser.objects.all().order_by('-date_joined')
         serializer = CustomUserSerializer(users, many=True, context={'request': request})
         return Response(serializer.data)
 
+
 class AdminReservationListView(generics.ListAPIView):
-    """
-    View para administradores listarem as reservas, com filtros por status e categoria.
-    """
-    serializer_class = ReservationSerializer
+    serializer_class = ReservationListSerializer
     permission_classes = [permissions.IsAdminUser]
 
     def get_queryset(self):
-        """
-        Retorna reservas filtradas por status e categoria.
-        """
         status_filter = self.request.query_params.get('status', 'Pendente')
         category_filter = self.request.query_params.get('category', '').lower()
         
@@ -381,9 +439,6 @@ class AdminReservationListView(generics.ListAPIView):
         return queryset.select_related('auditorium', 'vehicle', 'meeting_room')
 
     def _get_base_queryset(self, status_filter):
-        """
-        Cria o queryset base com filtros comuns (status, data futura, não deletadas).
-        """
         from .models import Reservation
         return Reservation.objects.filter(
             status=status_filter,
@@ -392,9 +447,6 @@ class AdminReservationListView(generics.ListAPIView):
         ).order_by('initial_date')
 
     def _apply_category_filter(self, queryset, category):
-        """
-        Aplica filtro de categoria ao queryset baseado no tipo de recurso.
-        """
         category_filters = {
             'auditorio': {'auditorium__isnull': False},
             'veiculo': {'vehicle__isnull': False},
@@ -409,15 +461,9 @@ class AdminReservationListView(generics.ListAPIView):
 
 
 class UpdateReservationStatusView(APIView):
-    """
-    View para um admin confirmar ou cancelar uma reserva.
-    """
     permission_classes = [permissions.IsAdminUser]
 
     def patch(self, request, pk):
-        """
-        Altera o status de uma reserva específica.
-        """
         from .models import Reservation
         reservation = get_object_or_404(Reservation, pk=pk)
         status_action = request.data.get('status')
@@ -438,10 +484,6 @@ class UpdateReservationStatusView(APIView):
         )
 
     def _map_status_action(self, status_action):
-        """
-        Mapeia a ação de status recebida para o status final da reserva.
-        Retorna None se a ação for inválida.
-        """
         from .models import Reservation
         
         status_mapping = {
@@ -451,17 +493,12 @@ class UpdateReservationStatusView(APIView):
         
         return status_mapping.get(status_action)
 
+
 class UserReservationListView(generics.ListAPIView):
-    """
-    View para um usuário listar apenas as suas próprias reservas.
-    """
-    serializer_class = ReservationSerializer
+    serializer_class = ReservationListSerializer
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        """
-        Retorna as reservas ativas do usuário logado.
-        """
         from .models import Reservation
         return Reservation.objects.filter(
             user=self.request.user,
@@ -469,55 +506,21 @@ class UserReservationListView(generics.ListAPIView):
             is_deleted=False
         ).order_by('-initial_date')
 
+
 class CreateReservationView(generics.CreateAPIView):
-    """
-    View para um usuário criar uma nova reserva.
-    """
-    serializer_class = ReservationSerializer
+    serializer_class = ReservationCreateSerializer
     permission_classes = [permissions.IsAuthenticated]
 
-    def get_queryset(self):
-        """
-        Retorna o queryset base para a criação.
-        """
-        from .models import Reservation
-        return Reservation.objects.all()
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context['request'] = self.request
+        return context
 
-    def perform_create(self, serializer):
-        """
-        Define o usuário e o status inicial da reserva antes de salvar.
-        """
-        from .models import Reservation
-        resource_type = serializer.validated_data['resource_type']
-        initial_status = self._determine_initial_status(resource_type)
-        
-        serializer.save(
-            user=self.request.user,
-            status=initial_status
-        )
-
-    def _determine_initial_status(self, resource_type):
-        """
-        Determina o status inicial baseado no tipo de recurso.
-        Salas de reunião são confirmadas automaticamente, outros recursos ficam pendentes.
-        """
-        from .models import Reservation
-        
-        if resource_type == 'meeting_room':
-            return Reservation.Status.CONFIRMED
-        
-        return Reservation.Status.PENDING
 
 class CancelReservationView(APIView):
-    """
-    View para um usuário cancelar (soft delete) uma de suas reservas.
-    """
     permission_classes = [permissions.IsAuthenticated]
 
     def delete(self, request, pk):
-        """
-        Marca uma reserva como deletada (is_deleted=True).
-        """
         from .models import Reservation
         reservation = get_object_or_404(
             Reservation, 
@@ -529,17 +532,11 @@ class CancelReservationView(APIView):
         reservation.save()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
+
 class OccupiedDatesView(APIView):
-    """
-    View que retorna uma lista de datas e horários já ocupados
-    para um recurso específico.
-    """
     permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request, resource_type, resource_id):
-        """
-        Busca no banco as reservas confirmadas para o recurso.
-        """
         from .models import Reservation
         
         if not self._is_valid_resource_type(resource_type):
@@ -554,16 +551,10 @@ class OccupiedDatesView(APIView):
         return Response(occupied_dates)
 
     def _is_valid_resource_type(self, resource_type):
-        """
-        Valida se o tipo de recurso fornecido é válido.
-        """
         from .models import Reservation
         return resource_type in Reservation.ResourceType.values
 
     def _get_occupied_reservations(self, resource_type, resource_id):
-        """
-        Busca as reservas confirmadas e futuras para o recurso especificado.
-        """
         from .models import Reservation
         return Reservation.objects.filter(
             resource_type=resource_type,
@@ -574,9 +565,6 @@ class OccupiedDatesView(APIView):
         ).values('initial_date', 'final_date', 'initial_time', 'final_time')
 
     def _format_occupied_dates(self, reservations):
-        """
-        Formata as reservas para o formato esperado pelo frontend.
-        """
         occupied_dates = []
         for r in reservations:
             occupied_dates.append({

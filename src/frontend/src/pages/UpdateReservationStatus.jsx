@@ -85,7 +85,7 @@ function UpdateReservationStatus() {
                     {error}
                 </div>
             ) : reservation ? (
-                <div className="bg-white shadow-lg rounded-lg p-6">
+                <div className="bg-[rgb(var(--color-bg))] shadow-lg rounded-lg p-6">
                     <div className="grid grid-cols-1 gap-6">
                         <div className="space-y-4">
                             <h2 className="text-xl font-semibold">Detalhes da Reserva #{reservation.id}</h2>
@@ -99,7 +99,7 @@ function UpdateReservationStatus() {
                             </div>
                             <div className="mt-4">
                                 <p className="font-medium">Descrição:</p>
-                                <p className="mt-2 text-gray-600">{reservation.description}</p>
+                                <p className="mt-2 text-[rgb(var(--color-text-grays))]">{reservation.description}</p>
                             </div>
                         </div>
 
@@ -118,7 +118,7 @@ function UpdateReservationStatus() {
                     </div>
                 </div>
             ) : (
-                <p className="text-gray-600">Reserva não encontrada.</p>
+                <p className="text-[rgb(var(--color-text-grays))]">Reserva não encontrada.</p>
             )}
         </div>
     );

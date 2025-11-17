@@ -1,5 +1,6 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
+import { ThemeProvider } from "./context/ThemeContext";
 import ProtectedPage from "./components/ProtectedPage";
 import Main from "./components/Main";
 import Header from "./components/Header";
@@ -19,6 +20,8 @@ import AdminUsuarios from "./pages/AdminUsuarios";
 import AdminRecursos from "./pages/AdminRecursos";
 import UserProfile from "./pages/UserProfile";
 import AdminProfile from "./pages/AdminProfile";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 
 import ErrorPopup from "./components/ErrorPopup";
 import {ErrorBoundary} from "react-error-boundary";
@@ -45,6 +48,8 @@ const protectedElementAdmin = (Component) => (
 const router = createBrowserRouter([
   { path: "/", element: <Main><Login /></Main> },
   { path: "/register", element: <Main><Register /></Main> },
+  { path: "/forgot-password", element: <Main><ForgotPassword /></Main> },
+  { path: "/reset-password", element: <Main><ResetPassword /></Main> },
   { path: "/privacy-policy", element: <Main><PrivacyPolicy /></Main> },
   { path: "/admin/page", element: protectedElementAdmin(AdminPage)},
   { path: "/admin/reservations", element: protectedElementAdmin(AdminReservations) },
@@ -77,7 +82,9 @@ const App = () => {
       )}
       <ErrorBoundary FallbackComponent={() => null} onError={handleError}>
         <AuthProvider>
-          <RouterProvider router={router} />
+          <ThemeProvider>
+            <RouterProvider router={router} />
+          </ThemeProvider>
         </AuthProvider>
       </ErrorBoundary>
     </div>

@@ -156,8 +156,19 @@ function AdminRecursos() {
     }
   };
 
+  const labelClasses =
+    "block text-sm font-medium mb-2 text-[rgb(var(--color-text))]";
+
+  const inputClasses =
+    "w-full p-2 rounded-lg border-theme-strong bg-[rgb(var(--color-bg))] text-[rgb(var(--color-text))] focus:ring-2 focus:ring-green-500 focus:outline-none";
+
+  const cardClasses =
+    "p-6 bg-[rgb(var(--color-bg))] border-theme rounded-xl shadow-lg text-[rgb(var(--color-text))]";
+
+  const mutedTextClasses = "text-sm text-[rgb(var(--color-text-grays))]";
+
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto px-4 py-8 text-[rgb(var(--color-text))]">
       {message.text && (
         <MessagePopup
           message={message.text}
@@ -170,19 +181,19 @@ function AdminRecursos() {
         Gerenciar Recursos
       </h1>
 
-      <div className="bg-white p-6 rounded-xl shadow-lg mb-8">
+      <div className={`${cardClasses} mb-8`}>
         <h2 className="text-xl font-semibold mb-4">Adicionar Novo Recurso</h2>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className={labelClasses}>
                 Tipo de Recurso
                 <span className="text-red-500">*</span>
               </label>
               <select
                 value={selectedType}
                 onChange={(e) => setSelectedType(e.target.value)}
-                className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+                className={`${inputClasses}`}
               >
                 <option value="auditorium">Auditório</option>
                 <option value="meeting_room">Sala de Reunião</option>
@@ -193,7 +204,7 @@ function AdminRecursos() {
             {selectedType !== 'vehicle' ? (
               <>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className={labelClasses}>
                     Nome
                     <span className="text-red-500">*</span>
                   </label>
@@ -202,12 +213,12 @@ function AdminRecursos() {
                     name="name"
                     value={newResource.name}
                     onChange={handleInputChange}
-                    className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+                    className={inputClasses}
                     required
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className={labelClasses}>
                     Localização
                     <span className="text-red-500">*</span>
                   </label>
@@ -216,7 +227,7 @@ function AdminRecursos() {
                     name="location"
                     value={newResource.location}
                     onChange={handleInputChange}
-                    className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+                    className={inputClasses}
                     required
                   />
                 </div>
@@ -224,7 +235,7 @@ function AdminRecursos() {
             ) : (
               <>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className={labelClasses}>
                     Modelo
                     <span className="text-red-500">*</span>
                   </label>
@@ -233,12 +244,12 @@ function AdminRecursos() {
                     name="model"
                     value={newResource.model}
                     onChange={handleInputChange}
-                    className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+                    className={inputClasses}
                     required
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className={labelClasses}>
                     Placa
                     <span className="text-red-500">*</span>
                   </label>
@@ -247,7 +258,7 @@ function AdminRecursos() {
                     name="plate_number"
                     value={newResource.plate_number}
                     onChange={handleInputChange}
-                    className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+                    className={inputClasses}
                     required
                   />
                 </div>
@@ -256,7 +267,7 @@ function AdminRecursos() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className={labelClasses}>
               Capacidade
               <span className="text-red-500">*</span>
             </label>
@@ -265,7 +276,7 @@ function AdminRecursos() {
               name="capacity"
               value={newResource.capacity}
               onChange={handleInputChange}
-              className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+              className={inputClasses}
               required
             />
           </div>
@@ -277,7 +288,7 @@ function AdminRecursos() {
               className={`font-bold py-2 px-4 rounded-lg transition-all duration-300 shadow-md
                 ${formModified 
                   ? 'bg-green-500 hover:bg-green-600 text-white hover:shadow-lg cursor-pointer' 
-                  : 'bg-gray-300 text-gray-500 cursor-not-allowed'}`}
+                  : 'bg-gray-300 text-[rgb(var(--color-text-grays))] cursor-not-allowed'}`}
             >
               Adicionar Recurso
             </button>
@@ -288,17 +299,17 @@ function AdminRecursos() {
       {/* Lista de Recursos */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Auditórios */}
-        <div className="bg-white p-6 rounded-xl shadow-lg">
-          <h2 className="text-xl font-semibold mb-4 text-gray-800">Auditórios</h2>
+        <div className={`${cardClasses}`}>
+          <h2 className="text-xl font-semibold mb-4">Auditórios</h2>
           <div className="space-y-3">
             {resources.auditorium.length > 0 ? (
               resources.auditorium.map(resource => (
-                <div key={resource.id} className="p-4 bg-gray-50 rounded-lg">
+                <div key={resource.id} className="p-4 rounded-lg border-theme">
                   <div className="flex justify-between items-start">
                     <div>
                       <h3 className="font-medium">{resource.name}</h3>
-                      <p className="text-sm text-gray-600">Local: {resource.location}</p>
-                      <p className="text-sm text-gray-600">Capacidade: {resource.capacity} pessoas</p>
+                      <p className={mutedTextClasses}>Local: {resource.location}</p>
+                      <p className={mutedTextClasses}>Capacidade: {resource.capacity} pessoas</p>
                     </div>
                     <button
                       onClick={() => handleDelete(resource.id, 'auditorium')}
@@ -312,23 +323,23 @@ function AdminRecursos() {
                 </div>
               ))
             ) : (
-              <p className="text-gray-500 text-center py-4">Nenhum auditório cadastrado</p>
+              <p className="text-center py-4 text-[rgb(var(--color-text-grays))]">Nenhum auditório cadastrado</p>
             )}
           </div>
         </div>
 
         {/* Salas de Reunião */}
-        <div className="bg-white p-6 rounded-xl shadow-lg">
-          <h2 className="text-xl font-semibold mb-4 text-gray-800">Salas de Reunião</h2>
+        <div className={`${cardClasses}`}>
+          <h2 className="text-xl font-semibold mb-4">Salas de Reunião</h2>
           <div className="space-y-3">
             {resources.meeting_room.length > 0 ? (
               resources.meeting_room.map(resource => (
-                <div key={resource.id} className="p-4 bg-gray-50 rounded-lg">
+                <div key={resource.id} className="p-4 rounded-lg border-theme">
                   <div className="flex justify-between items-start">
                     <div>
                       <h3 className="font-medium">{resource.name}</h3>
-                      <p className="text-sm text-gray-600">Local: {resource.location}</p>
-                      <p className="text-sm text-gray-600">Capacidade: {resource.capacity} pessoas</p>
+                      <p className={mutedTextClasses}>Local: {resource.location}</p>
+                      <p className={mutedTextClasses}>Capacidade: {resource.capacity} pessoas</p>
                     </div>
                     <button
                       onClick={() => handleDelete(resource.id, 'meeting_room')}
@@ -342,23 +353,23 @@ function AdminRecursos() {
                 </div>
               ))
             ) : (
-              <p className="text-gray-500 text-center py-4">Nenhuma sala de reunião cadastrada</p>
+              <p className="text-center py-4 text-[rgb(var(--color-text-grays))]">Nenhuma sala de reunião cadastrada</p>
             )}
           </div>
         </div>
 
         {/* Veículos */}
-        <div className="bg-white p-6 rounded-xl shadow-lg">
-          <h2 className="text-xl font-semibold mb-4 text-gray-800">Veículos</h2>
+        <div className={`${cardClasses}`}>
+          <h2 className="text-xl font-semibold mb-4">Veículos</h2>
           <div className="space-y-3">
             {resources.vehicle.length > 0 ? (
               resources.vehicle.map(resource => (
-                <div key={resource.id} className="p-4 bg-gray-50 rounded-lg">
+                <div key={resource.id} className="p-4 rounded-lg border-theme">
                   <div className="flex justify-between items-start">
                     <div>
                       <h3 className="font-medium">{resource.model}</h3>
-                      <p className="text-sm text-gray-600">Placa: {resource.plate_number}</p>
-                      <p className="text-sm text-gray-600">Capacidade: {resource.capacity} pessoas</p>
+                      <p className={mutedTextClasses}>Placa: {resource.plate_number}</p>
+                      <p className={mutedTextClasses}>Capacidade: {resource.capacity} pessoas</p>
                     </div>
                     <button
                       onClick={() => handleDelete(resource.id, 'vehicle')}
@@ -372,7 +383,7 @@ function AdminRecursos() {
                 </div>
               ))
             ) : (
-              <p className="text-gray-500 text-center py-4">Nenhum veículo cadastrado</p>
+              <p className="text-center py-4 text-[rgb(var(--color-text-grays))]">Nenhum veículo cadastrado</p>
             )}
           </div>
         </div>

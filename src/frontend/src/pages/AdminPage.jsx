@@ -43,11 +43,11 @@ function AdminPage() {
     <div className="p-6">
       <div className="flex justify-between items-center mb-6">
         <div>
-          <h1 className="text-2xl font-bold bg-gradient-to-r from-green-500 to-blue-500 text-transparent bg-clip-text">
+          <h1 className="text-2xl font-bold bg-linear-to-r from-green-500 to-blue-500 text-transparent bg-clip-text">
             Painel Administrativo
           </h1>
-          <h2 className="text-xl mt-2">Bem-vindo, {username}!</h2>
-          <div className="mt-3">
+          <h2 className="text-xl text-[rgb(var(--color-text))] mt-2">Bem-vindo, {username}!</h2>
+          <div className="mt-3 rgb(var(--color-bg))">
             <ActivityIndicator />
           </div>
         </div>
@@ -63,25 +63,25 @@ function AdminPage() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         <ReservationSummaryCard />
         
-        <div className="p-4 bg-white rounded-lg shadow hover:shadow-md transition-shadow">
-          <h3 className="font-semibold mb-2">Gerenciar Reservas</h3>
-          <p className="text-gray-600">Visualize e gerencie todas as reservas</p>
+        <div className="p-4 bg-[rgb(var(--color-bg))] border-theme rounded-lg shadow hover:shadow-md transition-shadow">
+          <h3 className="font-semibold mb-2 text-[rgb(var(--color-text))]">Gerenciar Reservas</h3>
+          <p className="text-[rgb(var(--color-text-grays))]">Visualize e gerencie todas as reservas</p>
           <a href="/admin/reservations" className="text-blue-600 hover:underline mt-2 inline-block">
             Acessar →
           </a>
         </div>
 
-        <div className="p-4 bg-white rounded-lg shadow hover:shadow-md transition-shadow">
-          <h3 className="font-semibold mb-2">Gerenciar Usuários</h3>
-          <p className="text-gray-600">Administre os usuários do sistema</p>
+        <div className="p-4 bg-[rgb(var(--color-bg))] border-theme rounded-lg shadow hover:shadow-md transition-shadow">
+          <h3 className="font-semibold mb-2 text-[rgb(var(--color-text))]">Gerenciar Usuários</h3>
+          <p className="text-[rgb(var(--color-text-grays))]">Administre os usuários do sistema</p>
           <a href="/admin/users" className="text-blue-600 hover:underline mt-2 inline-block">
             Acessar →
           </a>
         </div>
 
-        <div className="p-4 bg-white rounded-lg shadow hover:shadow-md transition-shadow">
-          <h3 className="font-semibold mb-2">Gerenciar Recursos</h3>
-          <p className="text-gray-600">Configure os recursos disponíveis</p>
+        <div className="p-4 bg-[rgb(var(--color-bg))] border-theme rounded-lg shadow hover:shadow-md transition-shadow">
+          <h3 className="font-semibold mb-2 text-[rgb(var(--color-text))]">Gerenciar Recursos</h3>
+          <p className="text-[rgb(var(--color-text-grays))]">Configure os recursos disponíveis</p>
           <a href="/admin/resources" className="text-blue-600 hover:underline mt-2 inline-block">
             Acessar →
           </a>

@@ -4,16 +4,16 @@ import BackButton from "../components/BackButton";
 
 const PrivacyPolicy = () => {
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-[rgb(var(--color-bg))] py-8">
       <div className="container mx-auto px-4 max-w-4xl">
         <BackButton />
         
-        <div className="bg-white rounded-lg shadow-lg p-8 mt-8">
+        <div className="bg-[rgb(var(--color-bg))] rounded-lg shadow-lg p-8 mt-8">
           <header className="mb-8 text-center border-b pb-6">
-            <h1 className="text-3xl font-bold text-gray-800 mb-2">
+            <h1 className="text-3xl font-bold text-[rgb(var(--color-text))] mb-2">
               {privacyPolicyContent.title}
             </h1>
-            <p className="text-gray-600">
+            <p className="text-[rgb(var(--color-text-grays))]">
               Última atualização: {privacyPolicyContent.lastUpdated}
             </p>
           </header>
@@ -21,10 +21,10 @@ const PrivacyPolicy = () => {
           <div className="prose prose-lg max-w-none">
             {privacyPolicyContent.sections.map((section, index) => (
               <section key={index} className="mb-8">
-                <h2 className="text-xl font-semibold text-gray-800 mb-4 border-l-4 border-blue-500 pl-4">
+                <h2 className="text-xl font-semibold text-[rgb(var(--color-text))] mb-4 border-l-4 border-blue-500 pl-4">
                   {section.title}
                 </h2>
-                <div className="text-gray-700 leading-relaxed whitespace-pre-line">
+                <div className="text-[rgb(var(--color-text))] leading-relaxed whitespace-pre-line">
                   {section.content}
                 </div>
               </section>

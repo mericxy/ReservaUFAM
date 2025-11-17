@@ -3,6 +3,13 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { apiFetch } from "../../api";
 
+const formatDateToLocal = (dateString) => {
+    if (!dateString) return '';
+    const parts = dateString.split('-');
+    const date = new Date(parts[0], parts[1] - 1, parts[2]);
+    return date.toLocaleDateString('pt-BR');
+};
+
 function AdminReservations() {
     const [reservations, setReservations] = useState({
         pendentes: [],
@@ -23,23 +30,28 @@ function AdminReservations() {
     }, [isAuthenticated, isAdmin, navigate]);
 
     const fetchReservations = async () => {
+        setLoading(true);
         try {
             const token = localStorage.getItem("accessToken");
-            const data = await apiFetch("/api/admin/reservations/", {
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                }
-            });
+            const headers = { 
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            };
 
-            const pendentes = data.filter(res => res.status === 'Pendente');
-            const aprovadas = data.filter(res => res.status === 'Aprovado');
-            const arquivadas = data.filter(res => res.status === 'Reprovado');
+            const [pendentesRes, aprovadasRes, arquivadasRes] = await Promise.allSettled([
+                apiFetch("/api/admin/reservations/?status=Pendente", { headers }),
+                apiFetch("/api/admin/reservations/?status=Aprovado", { headers }),
+                apiFetch("/api/admin/reservations/?status=Reprovado", { headers })
+            ]);
+
+            const pendentes = pendentesRes.status === 'fulfilled' ? pendentesRes.value : [];
+            const aprovadas = aprovadasRes.status === 'fulfilled' ? aprovadasRes.value : [];
+            const arquivadas = arquivadasRes.status === 'fulfilled' ? arquivadasRes.value : [];
 
             setReservations({ pendentes, aprovadas, arquivadas });
+
         } catch (error) {
             setError("Não foi possível carregar as reservas. Verifique sua conexão com a internet e tente novamente.");
-
             if (error.message.includes("401")) {
                 setError("Sua sessão expirou por inatividade. Faça login novamente para continuar.");
             }
@@ -51,7 +63,7 @@ function AdminReservations() {
     const handleStatusUpdate = async (reservationId, newStatus) => {
         try {
             const token = localStorage.getItem("accessToken");
-            const response = await apiFetch(`/api/admin/reservations/${reservationId}/status/`, {
+            await apiFetch(`/api/admin/reservations/${reservationId}/status/`, {
                 method: 'PATCH',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -59,11 +71,9 @@ function AdminReservations() {
                 },
                 body: JSON.stringify({ status: newStatus })
             });
-
             fetchReservations();
         } catch (error) {
             setError("Erro ao atualizar o status da reserva. Verifique sua conexão com a internet e tente novamente.");
-
             if (error.message.includes("401")) {
                 setError("Sua sessão expirou por inatividade. Faça login novamente para continuar.");
             }
@@ -71,24 +81,24 @@ function AdminReservations() {
     };
 
     const renderReservationCard = (reservation, actions) => (
-        <div key={reservation.id} className="bg-white p-4 rounded-lg shadow-md mb-4">
+        <div key={reservation.id} className="bg-[rgb(var(--color-bg))] p-4 rounded-lg shadow-md border-theme mb-4">
             <div className="flex justify-between">
                 <div className="flex-1">
-                    <h3 className="font-semibold text-lg text-gray-800">Reserva #{reservation.id}</h3>
+                    <h3 className="font-semibold text-lg text-[rgb(var(--color-text))]">Reserva #{reservation.id}</h3>
                     <div className="mt-2 space-y-1 text-sm">
-                        <p><span className="font-medium text-gray-700">Recurso:</span> {reservation.auditorium?.name || reservation.meeting_room?.name || reservation.vehicle?.model}</p>
-                        <p><span className="font-medium text-gray-700">Solicitante:</span> {reservation.user?.username}</p>
-                        <p><span className="font-medium text-gray-700">Data Inicial:</span> {new Date(reservation.initial_date).toLocaleDateString()}</p>
-                        <p><span className="font-medium text-gray-700">Data Final:</span> {new Date(reservation.final_date).toLocaleDateString()}</p>
-                        <p><span className="font-medium text-gray-700">Horário:</span> {reservation.initial_time} - {reservation.final_time}</p>
-                        <p>
-                            <span className="font-medium text-gray-700">Status:</span>
+                        <p className='text-[rgb(var(--color-text-grays))]'><span className="font-medium text-[rgb(var(--color-text))]">Recurso:</span> {reservation.auditorium?.name || reservation.meeting_room?.name || reservation.vehicle?.model}</p>
+                        <p className='text-[rgb(var(--color-text-grays))]'><span className="font-medium text-[rgb(var(--color-text))]">Solicitante:</span> {reservation.user?.username}</p>
+                        <p className='text-[rgb(var(--color-text-grays))]'><span className="font-medium text-[rgb(var(--color-text))]">Data Inicial:</span> {formatDateToLocal(reservation.initial_date)}</p>
+                        <p className='text-[rgb(var(--color-text-grays))]'><span className="font-medium text-[rgb(var(--color-text))]">Data Final:</span> {formatDateToLocal(reservation.final_date)}</p>
+                        <p className='text-[rgb(var(--color-text-grays))]'><span className="font-medium text-[rgb(var(--color-text))]">Horário:</span> {reservation.initial_time} - {reservation.final_time}</p>
+                        <p className='text-[rgb(var(--color-text-grays))]'>
+                            <span className="font-medium text-[rgb(var(--color-text))]">Status:</span>
                             <span className={`ml-1 px-2 py-1 rounded-full text-xs ${
                                 reservation.status === 'Aprovado' 
                                     ? 'bg-green-100 text-green-800' 
                                     : reservation.status === 'Pendente'
                                         ? 'bg-yellow-100 text-yellow-800'
-                                        : 'bg-gray-100 text-gray-800'
+                                        : 'bg-red-100 text-red-800'
                             }`}>
                                 {reservation.status}
                             </span>
@@ -123,9 +133,8 @@ function AdminReservations() {
             </h1>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {/* Reservas Pendentes */}
-                <div className="bg-white p-6 rounded-xl shadow-lg">
-                    <h2 className="text-xl font-semibold mb-4 text-gray-800">Reservas Pendentes</h2>
+                <div className="bg-[rgb(var(--color-bg))] p-6 rounded-xl shadow-lg border-theme">
+                    <h2 className="text-xl font-semibold mb-4 text-[rgb(var(--color-text))]">Reservas Pendentes</h2>
                     <div className="space-y-4">
                         {reservations.pendentes.length > 0 ? (
                             reservations.pendentes.map(reservation =>
@@ -143,40 +152,43 @@ function AdminReservations() {
                                 ))
                             )
                         ) : (
-                            <p className="text-gray-500 text-center py-4">Nenhuma reserva pendente</p>
+                            <p className="text-[rgb(var(--color-text-grays))] text-center py-4">Nenhuma reserva pendente</p>
                         )}
                     </div>
                 </div>
 
-                {/* Reservas Aprovadas */}
-                <div className="bg-white p-6 rounded-xl shadow-lg">
-                    <h2 className="text-xl font-semibold mb-4 text-gray-800">Reservas Aprovadas</h2>
+                <div className="bg-[rgb(var(--color-bg))] p-6 rounded-xl shadow-lg border-theme">
+                    <h2 className="text-xl font-semibold mb-4 text-[rgb(var(--color-text))]">Reservas Aprovadas</h2>
                     <div className="space-y-4">
                         {reservations.aprovadas.length > 0 ? (
                             reservations.aprovadas.map(reservation =>
-                                renderReservationCard(reservation, null)
+                                renderReservationCard(reservation, (
+                                    <button onClick={() => handleStatusUpdate(reservation.id, 'Reprovado')}
+                                        className="bg-red-500 hover:bg-red-600 text-white py-1 px-3 rounded-lg">
+                                        Cancelar
+                                    </button>
+                                ))
                             )
                         ) : (
-                            <p className="text-gray-500 text-center py-4">Nenhuma reserva aprovada</p>
+                            <p className="text-[rgb(var(--color-text-grays))] text-center py-4">Nenhuma reserva aprovada</p>
                         )}
                     </div>
                 </div>
 
-                {/* Reservas Arquivadas */}
-                <div className="bg-white p-6 rounded-xl shadow-lg">
-                    <h2 className="text-xl font-semibold mb-4 text-gray-800">Reservas Arquivadas</h2>
+                <div className="bg-[rgb(var(--color-bg))] p-6 rounded-xl shadow-lg border-theme">
+                    <h2 className="text-xl font-semibold mb-4 text-[rgb(var(--color-text))]">Reservas Arquivadas</h2>
                     <div className="space-y-4">
                         {reservations.arquivadas.length > 0 ? (
                             reservations.arquivadas.map(reservation =>
                                 renderReservationCard(reservation, (
                                     <button onClick={() => handleStatusUpdate(reservation.id, 'Aprovado')}
                                         className="bg-blue-500 hover:bg-blue-600 text-white py-1 px-3 rounded-lg">
-                                        Restaurar
+                                        Restaurar (Aprovar)
                                     </button>
                                 ))
                             )
                         ) : (
-                            <p className="text-gray-500 text-center py-4">Nenhuma reserva arquivada</p>
+                            <p className="text-[rgb(var(--color-text-grays))] text-center py-4">Nenhuma reserva arquivada</p>
                         )}
                     </div>
                 </div>

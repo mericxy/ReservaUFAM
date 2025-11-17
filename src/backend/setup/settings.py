@@ -9,6 +9,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get('SECRET_KEY')
 DEBUG = bool(os.environ.get("DEBUG", False))
 ALLOWED_HOSTS = environ.get('ALLOWED_HOSTS', '').split(',')
+FRONTEND_BASE_URL = os.environ.get("FRONTEND_BASE_URL", "http://localhost:5173")
+PASSWORD_RESET_TOKEN_EXPIRATION_MINUTES = int(os.environ.get("PASSWORD_RESET_TOKEN_EXPIRATION_MINUTES", "15"))
+PASSWORD_RESET_RATE_LIMIT = int(os.environ.get("PASSWORD_RESET_RATE_LIMIT", "5"))
+PASSWORD_RESET_RATE_LIMIT_WINDOW_MINUTES = int(os.environ.get("PASSWORD_RESET_RATE_LIMIT_WINDOW_MINUTES", "60"))
 
 # Configurações do SendGrid
 SENDGRID_API_KEY = os.environ.get('SENDGRID_API_KEY')
@@ -120,3 +124,39 @@ USE_TZ = True
 STATIC_URL = "static/"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+LOG_LEVEL = os.environ.get("LOG_LEVEL", "INFO")
+EMAIL_LOG_LEVEL = os.environ.get("EMAIL_LOG_LEVEL", "INFO")
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "verbose": {
+            "format": "%(asctime)s [%(levelname)s] %(name)s: %(message)s"
+        },
+        "simple": {"format": "[%(levelname)s] %(name)s: %(message)s"},
+    },
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+            "formatter": "verbose",
+        },
+    },
+    "root": {
+        "handlers": ["console"],
+        "level": LOG_LEVEL,
+    },
+    "loggers": {
+        "reserve.services": {
+            "handlers": ["console"],
+            "level": EMAIL_LOG_LEVEL,
+            "propagate": False,
+        },
+        "sendgrid": {
+            "handlers": ["console"],
+            "level": EMAIL_LOG_LEVEL,
+            "propagate": False,
+        },
+    },
+}

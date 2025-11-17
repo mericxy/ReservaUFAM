@@ -315,7 +315,7 @@ const handleSendEmailConfirmation = async () => {
   return (
     <div className="container mx-auto px-4 py-8">
       <BackButton />
-      <div className="max-w-2xl mx-auto bg-white rounded-lg shadow-md p-6">
+      <div className="max-w-2xl mx-auto bg-[rgb(var(--color-bg))] rounded-lg shadow-md p-6">
         <h1 className="text-2xl font-bold mb-6 bg-gradient-to-r from-green-500 to-blue-500 text-transparent bg-clip-text">
           {user.is_staff ? "Perfil do Administrador" : "Meu Perfil"}
         </h1>
@@ -327,7 +327,7 @@ const handleSendEmailConfirmation = async () => {
         <form onSubmit={handleSubmit} className="">
           <div className="grid grid-cols-3 gap-4 mb-2">
             <div>
-              <label className="block text-gray-700 text-sm font-bold mb-2">
+              <label className="block text-[rgb(var(--color-text))] text-sm font-bold mb-2">
                 Nome
               </label>
               <input
@@ -335,12 +335,12 @@ const handleSendEmailConfirmation = async () => {
                 name="first_name"
                 value={user.first_name}
                 onChange={handleChange}
-                className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                className="w-full p-3 border-theme-strong rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
                 maxLength={150}
               />
             </div>
             <div>
-              <label className="block text-gray-700 text-sm font-bold mb-2">
+              <label className="block text-[rgb(var(--color-text))] text-sm font-bold mb-2">
                 Sobrenome
               </label>
               <input
@@ -348,12 +348,12 @@ const handleSendEmailConfirmation = async () => {
                 name="last_name"
                 value={user.last_name}
                 onChange={handleChange}
-                className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                className="w-full p-3 border-theme-strong rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
                 maxLength={150}
               />
             </div>
             <div>
-              <label className="block text-gray-700 text-sm font-bold mb-2">
+              <label className="block text-[rgb(var(--color-text))] text-sm font-bold mb-2">
                 Nome de Usuário
               </label>
               <input
@@ -361,7 +361,7 @@ const handleSendEmailConfirmation = async () => {
                 name="username"
                 value={user.username}
                 onChange={handleChange}
-                className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                className="w-full p-3 border-theme-strong rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
                 maxLength={150}
               />
             </div>
@@ -369,11 +369,11 @@ const handleSendEmailConfirmation = async () => {
 
           <div className="grid grid-cols-2 gap-4">
             <div className="mb-4">
-              <label className="block text-gray-700 text-sm font-bold mb-2 flex items-center gap-2">
+              <label className="block text-[rgb(var(--color-text))] text-sm font-bold mb-2 flex items-center gap-2">
                 SIAPE
                 {!user.is_staff && (
                   <svg 
-                    className="w-4 h-4 text-gray-500" 
+                    className="w-4 h-4 text-[rgb(var(--color-text-grays))]" 
                     fill="currentColor" 
                     viewBox="0 0 20 20"
                     xmlns="http://www.w3.org/2000/svg"
@@ -395,7 +395,7 @@ const handleSendEmailConfirmation = async () => {
                 className={`w-full p-3 border rounded-lg focus:outline-none focus:ring-2 ${
                   fieldErrors.siape ? 'border-red-300 focus:ring-red-500' : 
                   blockedFieldClicked.siape && !user.is_staff ? 'border-red-500 focus:ring-red-500' :
-                  'border-gray-300 focus:ring-green-500'
+                  'border-theme-strong focus:ring-green-500'
                 } ${!user.is_staff ? 'cursor-not-allowed' : ''}`}
                 disabled={!user.is_staff}
                 placeholder="1234567"
@@ -405,11 +405,11 @@ const handleSendEmailConfirmation = async () => {
               )}
             </div>
             <div>
-              <label className="block text-gray-700 text-sm font-bold mb-2 flex items-center gap-2">
+              <label className="block text-[rgb(var(--color-text))] text-sm font-bold mb-2 flex items-center gap-2">
                 CPF
                 {!user.is_staff && (
                   <svg 
-                    className="w-4 h-4 text-gray-500" 
+                    className="w-4 h-4 text-[rgb(var(--color-text-grays))]" 
                     fill="currentColor" 
                     viewBox="0 0 20 20"
                     xmlns="http://www.w3.org/2000/svg"
@@ -431,7 +431,7 @@ const handleSendEmailConfirmation = async () => {
                 className={`w-full p-3 border rounded-lg focus:outline-none focus:ring-2 ${
                   fieldErrors.cpf ? 'border-red-300 focus:ring-red-500' : 
                   blockedFieldClicked.cpf && !user.is_staff ? 'border-red-500 focus:ring-red-500' :
-                  'border-gray-300 focus:ring-green-500'
+                  'border-theme-strong focus:ring-green-500'
                 } ${!user.is_staff ? 'cursor-not-allowed' : ''}`}
                 disabled={!user.is_staff}
                 placeholder="000.000.000-00"
@@ -443,11 +443,11 @@ const handleSendEmailConfirmation = async () => {
           </div>
 
           <div className="mb-2">
-            <label className="block text-gray-700 text-sm font-bold mb-2 flex items-center gap-2">
+            <label className="block text-[rgb(var(--color-text))] text-sm font-bold mb-2 flex items-center gap-2">
               Cargo
               {!user.is_staff && (
                 <svg 
-                  className="w-4 h-4 text-gray-500" 
+                  className="w-4 h-4 text-[rgb(var(--color-text-grays))]" 
                   fill="currentColor" 
                   viewBox="0 0 20 20"
                   xmlns="http://www.w3.org/2000/svg"
@@ -467,7 +467,7 @@ const handleSendEmailConfirmation = async () => {
               onClick={() => handleBlockedFieldClick('role')}
               className={`w-full p-3 border rounded-lg focus:outline-none focus:ring-2 ${
                 blockedFieldClicked.role && !user.is_staff ? 'border-red-500 focus:ring-red-500' :
-                'border-gray-300 focus:ring-green-500'
+                'border-theme-strong focus:ring-green-500'
               } ${!user.is_staff ? 'cursor-not-allowed' : ''}`}
               disabled={!user.is_staff}
             >
@@ -479,7 +479,7 @@ const handleSendEmailConfirmation = async () => {
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-gray-700 text-sm font-bold mb-2">
+              <label className="block text-[rgb(var(--color-text))] text-sm font-bold mb-2">
                 E-mail
               </label>
               <input
@@ -487,12 +487,12 @@ const handleSendEmailConfirmation = async () => {
                 name="email"
                 value={user.email}
                 onChange={handleChange}
-                className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                className="w-full p-3 border-theme-strong rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
                 maxLength={254}
               />
             </div>
             <div>
-              <label className="block text-gray-700 text-sm font-bold mb-2">
+              <label className="block text-[rgb(var(--color-text))] text-sm font-bold mb-2">
                 Telefone
               </label>
               <input
@@ -500,7 +500,7 @@ const handleSendEmailConfirmation = async () => {
                 name="cellphone"
                 value={user.cellphone}
                 onChange={handleChange}
-                className={`w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 ${fieldErrors.cellphone ? 'border-red-300' : 'border-gray-300'}`}
+                className={`w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 ${fieldErrors.cellphone ? 'border-red-300' : 'border-theme-strong'}`}
                 placeholder="(99) 99999-9999"
               />
               {fieldErrors.cellphone && user.cellphone && (
@@ -521,7 +521,7 @@ const handleSendEmailConfirmation = async () => {
           {showPasswordFields && (
             <div className="space-y-4 mt-4">
               <div>
-                <label className="block text-gray-700 text-sm font-bold mb-2">
+                <label className="block text-[rgb(var(--color-text))] text-sm font-bold mb-2">
                   Nova Senha
                 </label>
                 <div className="relative">
@@ -533,7 +533,7 @@ const handleSendEmailConfirmation = async () => {
                     className={`w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 ${
                       Object.values(passwordErrors).includes(false)
                         ? 'border-red-300'
-                        : 'border-gray-300'
+                        : 'border-theme-strong'
                     }`}
                     minLength={6}
                   />
@@ -543,12 +543,12 @@ const handleSendEmailConfirmation = async () => {
                     className="absolute right-3 top-1/2 transform -translate-y-1/2"
                   >
                     {showPassword ? (
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-500" viewBox="0 0 20 20" fill="currentColor">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-[rgb(var(--color-text-grays))]" viewBox="0 0 20 20" fill="currentColor">
                         <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
                         <path fillRule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd" />
                       </svg>
                     ) : (
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-500" viewBox="0 0 20 20" fill="currentColor">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-[rgb(var(--color-text-grays))]" viewBox="0 0 20 20" fill="currentColor">
                         <path fillRule="evenodd" d="M3.707 2.293a1 1 0 00-1.414 1.414l14 14a1 1 0 001.414-1.414l-1.473-1.473A10.014 10.014 0 0019.542 10C18.268 5.943 14.478 3 10 3a9.958 9.958 0 00-4.512 1.074l-1.78-1.781zm4.261 4.26l1.514 1.515a2.003 2.003 0 012.45 2.45l1.514 1.514a4 4 0 00-5.478-5.478z" clipRule="evenodd" />
                         <path d="M12.454 16.697L9.75 13.992a4 4 0 01-3.742-3.741L2.335 6.578A9.98 9.98 0 00.458 10c1.274 4.057 5.065 7 9.542 7 .847 0 1.669-.105 2.454-.303z" />
                       </svg>
@@ -558,7 +558,7 @@ const handleSendEmailConfirmation = async () => {
               </div>
 
               <div>
-                <label className="block text-gray-700 text-sm font-bold mb-2">
+                <label className="block text-[rgb(var(--color-text))] text-sm font-bold mb-2">
                   Confirmar Nova Senha
                 </label>
                 <div className="relative">
@@ -570,7 +570,7 @@ const handleSendEmailConfirmation = async () => {
                     className={`w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 ${
                       !passwordErrors.match && user.confirmPassword
                         ? 'border-red-300'
-                        : 'border-gray-300'
+                        : 'border-theme-strong'
                     }`}
                     minLength={6}
                   />
@@ -580,12 +580,12 @@ const handleSendEmailConfirmation = async () => {
                     className="absolute right-3 top-1/2 transform -translate-y-1/2"
                   >
                     {showPassword ? (
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-500" viewBox="0 0 20 20" fill="currentColor">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-[rgb(var(--color-text-grays))]" viewBox="0 0 20 20" fill="currentColor">
                         <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
                         <path fillRule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd" />
                       </svg>
                     ) : (
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-500" viewBox="0 0 20 20" fill="currentColor">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-[rgb(var(--color-text-grays))]" viewBox="0 0 20 20" fill="currentColor">
                         <path fillRule="evenodd" d="M3.707 2.293a1 1 0 00-1.414 1.414l14 14a1 1 0 001.414-1.414l-1.473-1.473A10.014 10.014 0 0019.542 10C18.268 5.943 14.478 3 10 3a9.958 9.958 0 00-4.512 1.074l-1.78-1.781zm4.261 4.26l1.514 1.515a2.003 2.003 0 012.45 2.45l1.514 1.514a4 4 0 00-5.478-5.478z" clipRule="evenodd" />
                         <path d="M12.454 16.697L9.75 13.992a4 4 0 01-3.742-3.741L2.335 6.578A9.98 9.98 0 00.458 10c1.274 4.057 5.065 7 9.542 7 .847 0 1.669-.105 2.454-.303z" />
                       </svg>
@@ -621,7 +621,7 @@ const handleSendEmailConfirmation = async () => {
                     ${
                       canSendCode()
                         ? 'bg-blue-500 hover:bg-blue-600 text-white'
-                        : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                        : 'bg-gray-300 text-[rgb(var(--color-text-grays))] cursor-not-allowed'
                     }`}
                 >
                   Enviar Código de Confirmação
@@ -636,10 +636,7 @@ const handleSendEmailConfirmation = async () => {
             <button
               type="submit"
               disabled={!hasChanges()}
-              className={`w-full font-bold py-3 px-4 rounded-lg transition-colors duration-300
-                ${hasChanges() 
-                  ? 'bg-green-500 hover:bg-green-600 text-white' 
-                  : 'bg-gray-300 text-gray-500 cursor-not-allowed'}`}
+              className="btn btn-primary w-full"
             >
               Salvar Alterações
             </button>
@@ -647,7 +644,7 @@ const handleSendEmailConfirmation = async () => {
         </form>
         <div className="border-t mt-6 pt-6">
           <h3 className="text-lg font-bold text-red-700">Zona de Perigo</h3>
-          <p className="text-sm text-gray-600 my-2">
+          <p className="text-sm text-[rgb(var(--color-text-grays))] my-2">
             A exclusão da sua conta removerá permanentemente todos os seus dados pessoais. Esta ação não pode ser desfeita.
           </p>
           <button
