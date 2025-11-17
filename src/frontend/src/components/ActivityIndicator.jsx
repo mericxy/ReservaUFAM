@@ -54,13 +54,13 @@ function ActivityIndicator() {
       case 'Aprovado': return 'text-green-600';
       case 'Pendente': return 'text-yellow-600';
       case 'Reprovado': return 'text-red-600';
-      default: return 'text-gray-600';
+      default: return 'text-[rgb(var(--color-text-grays))]';
     }
   };
 
   if (loading || !lastActivity) {
     return (
-      <div className="flex items-center space-x-2 text-sm text-[rgb(var(--color-text-gray))]">
+      <div className="flex items-center space-x-2 text-sm text-[rgb(var(--color-text-grays))]">
         <div className="w-2 h-2 bg-gray-300 rounded-full"></div>
         <span>Carregando atividade...</span>
       </div>
@@ -70,12 +70,12 @@ function ActivityIndicator() {
   return (
     <div className="flex items-center space-x-2 text-sm">
       <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
-      <span className="text-gray-700">
+      <span className="text-[rgb(var(--color-text))]">
         Última reserva: 
         <span className={`ml-1 font-medium ${getStatusColor(lastActivity.status)}`}>
           {lastActivity.status}
         </span>
-        <span className="text-gray-500 ml-1">
+        <span className="text-[rgb(var(--color-text-grays))] ml-1">
           • {getTimeAgo(lastActivity.created_at || lastActivity.initial_date)}
         </span>
       </span>

@@ -8,7 +8,7 @@ export function ThemeToggle({ isActive, onToggle, label, activeColor = "bg-blue-
       aria-label={label}
     >
       <span
-        className={`absolute top-0.5 left-0.5 w-6 h-6 bg-white rounded-full shadow-md transform transition-transform duration-300 ${
+        className={`absolute top-0.5 left-0.5 w-6 h-6 bg-[rgb(var(--color-bg))] rounded-full shadow-md transform transition-transform duration-300 ${
           isActive ? "translate-x-7" : "translate-x-0"
         }`}
       />

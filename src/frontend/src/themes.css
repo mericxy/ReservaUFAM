@@ -2,31 +2,50 @@
 :root[data-theme="light"] {
   --color-bg: 255 255 255;
   --color-text: 15 23 42;
-  --color-text-gray: 100 116 139; /* Cinza slate-500 */
-  --color-primary: 37 99 235;
-  --border-default: 1px solid transparent;
-  --border-strong: 1px solid rgba(0, 0, 0, 0.15);
+  --color-text-grays: 100 116 139; /* Cinza slate-500 */
+  --color-primary: 22 163 74; /* Tailwind green-600 */
+  --border-default: 1px solid rgb(209 213 219); /* gray-300 */
+  --border-strong: 1px solid rgb(148 163 184); /* slate-400 */
+  --btn-primary-bg: 37 99 235;
+  --btn-primary-text: 255 255 255;
+  --btn-primary-border: none;
+  --btn-danger-bg: 220 38 38;
+  --btn-danger-text: 255 255 255;
+  --btn-danger-border: none;
 }
+
 
 /* ----- TEMA ESCURO ----- */
 :root[data-theme="dark"] {
   --color-bg: 15 23 42;
   --color-text: 255 255 255;
-  --color-text-gray: 148 163 184; /* Cinza slate-400 - mais claro no escuro */
-  --color-primary: 96 165 250;
-  --border-default: 1px solid rgba(255, 255, 255, 0.12);
-  --border-strong: 1px solid rgba(255, 255, 255, 0.2);
+  --color-text-grays: 148 163 184; /* Cinza slate-400 - mais claro no escuro */
+  --color-primary: 34 197 94; /* Tailwind green-500 */
+  --border-default: 1px solid rgba(255, 255, 255, 0.18);
+  --border-strong: 1px solid rgba(255, 255, 255, 0.32);
+  --btn-primary-bg: 96 165 250;
+  --btn-primary-text: 15 23 42;
+  --btn-primary-border: none;
+  --btn-danger-bg: 248 113 113;
+  --btn-danger-text: 15 23 42;
+  --btn-danger-border: none;
 }
 
 /* ----- TEMA ALTO CONTRASTE (WCAG AA) ----- */
 :root[data-theme="hc"] {
-  --color-bg: 0 0 0;
+  --color-bg: 12 12 12;
   --color-text: 255 255 0;
-  --color-text-gray: 255 255 255; /* Branco puro para máximo contraste */
+  --color-text-grays: 255 255 255;
   --color-primary: 255 255 0;
   --outline: 2px solid rgb(255, 255, 255);
   --border-default: 2px solid #ffffff;
   --border-strong: 2px solid #ffffff;
+  --btn-primary-bg: 0 0 0;
+  --btn-primary-text: 255 255 0;
+  --btn-primary-border: 2px solid #ffffff;
+  --btn-danger-bg: 0 0 0;
+  --btn-danger-text: 255 255 0;
+  --btn-danger-border: 2px solid #ffffff;
 }
 
 /* Exemplo de focus universal para HC */

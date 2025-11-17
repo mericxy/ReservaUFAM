@@ -61,8 +61,8 @@ function UserReservations() {
                 ) : (
                     <div className="space-y-4">
                         {reservations.length === 0 ? (
-                            <div className="bg-white rounded-lg shadow-md p-8 text-center">
-                                <p className="text-gray-600 mb-4">Você ainda não possui reservas.</p>
+                            <div className="bg-[rgb(var(--color-bg))] rounded-lg shadow-md p-8 text-center">
+                                <p className="text-[rgb(var(--color-text-grays))] mb-4">Você ainda não possui reservas.</p>
                                 <a 
                                     href="/reservations/create" 
                                     className="inline-block bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg transition-colors duration-300"
@@ -72,7 +72,7 @@ function UserReservations() {
                             </div>
                         ) : (
                             reservations.map((reservation) => (
-                                <div key={reservation.id} className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
+                                <div key={reservation.id} className="bg-[rgb(var(--color-bg))] p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
                                     <div className="flex justify-between items-center mb-4">
                                         <h3 className="font-semibold text-lg">
                                             {reservation.auditorium?.name || 
@@ -86,7 +86,7 @@ function UserReservations() {
                                             {reservation.status}
                                         </span>
                                     </div>
-                                    <div className="grid grid-cols-2 gap-4 text-sm text-gray-600">
+                                    <div className="grid grid-cols-2 gap-4 text-sm text-[rgb(var(--color-text-grays))]">
                                         <div>
                                             <p><span className="font-medium">Data Inicial:</span> {new Date(reservation.initial_date).toLocaleDateString()}</p>
                                             <p><span className="font-medium">Hora Inicial:</span> {reservation.initial_time}</p>
@@ -97,7 +97,7 @@ function UserReservations() {
                                         </div>
                                     </div>
                                     {reservation.description && (
-                                        <p className="mt-4 text-sm text-gray-600 bg-gray-50 p-3 rounded-lg">
+                                        <p className="mt-4 text-sm text-[rgb(var(--color-text-grays))] bg-[rgb(var(--color-bg))] p-3 rounded-lg">
                                             <span className="font-medium">Descrição:</span> {reservation.description}
                                         </p>
                                     )}

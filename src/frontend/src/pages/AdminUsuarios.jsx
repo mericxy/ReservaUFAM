@@ -82,23 +82,23 @@ function AdminUsuarios() {
   };
 
   const renderUsuarioCard = (usuario, actions) => (
-    <div key={usuario.id} className="bg-rgb(var(--color-bg)) p-4 rounded-lg shadow-md border-theme mb-4">
+    <div key={usuario.id} className="bg-[rgb(var(--color-bg))] p-4 rounded-lg shadow-md border-theme mb-4">
       <div className="flex justify-between">
         <div className="flex-1">
           <h3 className="font-semibold text-lg text-[rgb(var(--color-text))]">{usuario.username}</h3>
           <div className="mt-2 space-y-1 text-sm">
-            <p className='text-[rgb(var(--color-text-gray))]'><span className="font-medium text-[rgb(var(--color-text-gray))]">Email:</span> {usuario.email}</p>
-            <p className='text-[rgb(var(--color-text-gray))]'><span className="font-medium text-[rgb(var(--color-text-gray))]">SIAPE:</span> {usuario.siape}</p>
-            <p className='text-[rgb(var(--color-text-gray))]'><span className="font-medium text-[rgb(var(--color-text-gray))]">CPF:</span> {usuario.cpf ? formatCPF(usuario.cpf) : '-'}</p>
-            <p className='text-[rgb(var(--color-text-gray))]'><span className="font-medium text-[rgb(var(--color-text-gray))]">Telefone:</span> {usuario.cellphone ? formatPhone(usuario.cellphone) : '-'}</p>
-            <p className='text-[rgb(var(--color-text-gray))]'>
-              <span className="font-medium text-[rgb(var(--color-text-gray))]">Status:</span>
+            <p className='text-[rgb(var(--color-text-grays))]'><span className="font-medium text-[rgb(var(--color-text-grays))]">Email:</span> {usuario.email}</p>
+            <p className='text-[rgb(var(--color-text-grays))]'><span className="font-medium text-[rgb(var(--color-text-grays))]">SIAPE:</span> {usuario.siape}</p>
+            <p className='text-[rgb(var(--color-text-grays))]'><span className="font-medium text-[rgb(var(--color-text-grays))]">CPF:</span> {usuario.cpf ? formatCPF(usuario.cpf) : '-'}</p>
+            <p className='text-[rgb(var(--color-text-grays))]'><span className="font-medium text-[rgb(var(--color-text-grays))]">Telefone:</span> {usuario.cellphone ? formatPhone(usuario.cellphone) : '-'}</p>
+            <p className='text-[rgb(var(--color-text-grays))]'>
+              <span className="font-medium text-[rgb(var(--color-text-grays))]">Status:</span>
               <span className={`ml-1 px-2 py-1 rounded-full text-xs ${
                 usuario.status === 'Aprovado' 
                   ? 'bg-green-100 text-green-800' 
                   : usuario.status === 'Pendente'
                     ? 'bg-yellow-100 text-yellow-800'
-                    : 'bg-gray-100 text-gray-800'
+                    : 'bg-gray-100 text-[rgb(var(--color-text))]'
               }`}>
                 {usuario.status}
               </span>
@@ -128,7 +128,7 @@ function AdminUsuarios() {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Usuários Pendentes */}
-        <div className="bg-rgb(var(--color-bg)) p-6 rounded-xl shadow-lg border-theme">
+        <div className="bg-[rgb(var(--color-bg))] p-6 rounded-xl shadow-lg border-theme">
           <h2 className="text-xl font-semibold mb-4 text-[rgb(var(--color-text))]">Usuários Pendentes</h2>
           <div className="space-y-4">
             {usuarios.pendentes.length > 0 ? (
@@ -137,13 +137,13 @@ function AdminUsuarios() {
                   <>
                     <button
                       onClick={() => handleStatusChange(usuario.id, 'Aprovado')}
-                      className="bg-green-500 hover:bg-green-600 text-white py-1 px-3 rounded-lg"
+                      className="btn btn-sm bg-green-500 hover:bg-green-600 text-white"
                     >
                       Aprovar
                     </button>
                     <button
                       onClick={() => handleStatusChange(usuario.id, 'Reprovado')}
-                      className="bg-red-500 hover:bg-red-600 text-white py-1 px-3 rounded-lg"
+                      className="btn btn-danger btn-sm"
                     >
                       Reprovar
                     </button>
@@ -151,13 +151,13 @@ function AdminUsuarios() {
                 ))
               )
             ) : (
-              <p className="text-gray-500 text-center py-4">Nenhum usuário pendente</p>
+              <p className="text-[rgb(var(--color-text-grays))] text-center py-4">Nenhum usuário pendente</p>
             )}
           </div>
         </div>
 
         {/* Usuários Aprovados */}
-        <div className="bg-rgb(var(--color-bg)) p-6 rounded-xl shadow-lg border-theme">
+        <div className="bg-[rgb(var(--color-bg))] p-6 rounded-xl shadow-lg border-theme">
           <h2 className="text-xl font-semibold mb-4 text-[rgb(var(--color-text))]">Usuários Aprovados</h2>
           <div className="space-y-4">
             {usuarios.aprovados.length > 0 ? (
@@ -166,7 +166,7 @@ function AdminUsuarios() {
                   !usuario.is_self && (
                     <button
                       onClick={() => handleStatusChange(usuario.id, 'Bloqueado')}
-                      className="bg-gray-500 hover:bg-gray-600 text-white py-1 px-3 rounded-lg"
+                      className="btn btn-danger btn-sm"
                     >
                       Bloquear
                     </button>
@@ -174,13 +174,13 @@ function AdminUsuarios() {
                 ))
               )
             ) : (
-              <p className="text-[rgb(var(--color-text-gray))] text-center py-4">Nenhum usuário aprovado</p>
+              <p className="text-[rgb(var(--color-text-grays))] text-center py-4">Nenhum usuário aprovado</p>
             )}
           </div>
         </div>
 
         {/* Usuários Arquivados */}
-        <div className="bg-rgb(var(--color-bg)) p-6 rounded-xl shadow-lg border-theme">
+        <div className="bg-[rgb(var(--color-bg))] p-6 rounded-xl shadow-lg border-theme">
           <h2 className="text-xl font-semibold mb-4 text-[rgb(var(--color-text))]">Usuários Arquivados</h2>
           <div className="space-y-4">
             {usuarios.arquivados.length > 0 ? (
@@ -195,7 +195,7 @@ function AdminUsuarios() {
                 ))
               )
             ) : (
-              <p className="text-[rgb(var(--color-text-gray))] text-center py-4">Nenhum usuário arquivado</p>
+              <p className="text-[rgb(var(--color-text-grays))] text-center py-4">Nenhum usuário arquivado</p>
             )}
           </div>
         </div>

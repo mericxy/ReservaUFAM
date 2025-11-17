@@ -71,24 +71,24 @@ function AdminReservations() {
     };
 
     const renderReservationCard = (reservation, actions) => (
-        <div key={reservation.id} className="bg-rgb(var(--color-bg)) p-4 rounded-lg shadow-md border-theme mb-4">
+        <div key={reservation.id} className="bg-[rgb(var(--color-bg))] p-4 rounded-lg shadow-md border-theme mb-4">
             <div className="flex justify-between">
                 <div className="flex-1">
                     <h3 className="font-semibold text-lg text-[rgb(var(--color-text))]">Reserva #{reservation.id}</h3>
                     <div className="mt-2 space-y-1 text-sm">
-                        <p className='text-[rgb(var(--color-text-gray))]'><span className="font-medium text-[rgb(var(--color-text))]">Recurso:</span> {reservation.auditorium?.name || reservation.meeting_room?.name || reservation.vehicle?.model}</p>
-                        <p className='text-[rgb(var(--color-text-gray))]'><span className="font-medium text-[rgb(var(--color-text))]">Solicitante:</span> {reservation.user?.username}</p>
-                        <p className='text-[rgb(var(--color-text-gray))]'><span className="font-medium text-[rgb(var(--color-text))]">Data Inicial:</span> {new Date(reservation.initial_date).toLocaleDateString()}</p>
-                        <p className='text-[rgb(var(--color-text-gray))]'><span className="font-medium text-[rgb(var(--color-text))]">Data Final:</span> {new Date(reservation.final_date).toLocaleDateString()}</p>
-                        <p className='text-[rgb(var(--color-text-gray))]'><span className="font-medium text-[rgb(var(--color-text))]">Horário:</span> {reservation.initial_time} - {reservation.final_time}</p>
-                        <p className='text-[rgb(var(--color-text-gray))]'>
+                        <p className='text-[rgb(var(--color-text-grays))]'><span className="font-medium text-[rgb(var(--color-text))]">Recurso:</span> {reservation.auditorium?.name || reservation.meeting_room?.name || reservation.vehicle?.model}</p>
+                        <p className='text-[rgb(var(--color-text-grays))]'><span className="font-medium text-[rgb(var(--color-text))]">Solicitante:</span> {reservation.user?.username}</p>
+                        <p className='text-[rgb(var(--color-text-grays))]'><span className="font-medium text-[rgb(var(--color-text))]">Data Inicial:</span> {new Date(reservation.initial_date).toLocaleDateString()}</p>
+                        <p className='text-[rgb(var(--color-text-grays))]'><span className="font-medium text-[rgb(var(--color-text))]">Data Final:</span> {new Date(reservation.final_date).toLocaleDateString()}</p>
+                        <p className='text-[rgb(var(--color-text-grays))]'><span className="font-medium text-[rgb(var(--color-text))]">Horário:</span> {reservation.initial_time} - {reservation.final_time}</p>
+                        <p className='text-[rgb(var(--color-text-grays))]'>
                             <span className="font-medium text-[rgb(var(--color-text))]">Status:</span>
                             <span className={`ml-1 px-2 py-1 rounded-full text-xs ${
                                 reservation.status === 'Aprovado' 
                                     ? 'bg-green-100 text-green-800' 
                                     : reservation.status === 'Pendente'
                                         ? 'bg-yellow-100 text-yellow-800'
-                                        : 'bg-gray-100 text-gray-800'
+                                        : 'bg-gray-100 text-[rgb(var(--color-text))]'
                             }`}>
                                 {reservation.status}
                             </span>
@@ -124,7 +124,7 @@ function AdminReservations() {
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {/* Reservas Pendentes */}
-                <div className="bg-rgb(var(--color-bg)) p-6 rounded-xl shadow-lg border-theme">
+                <div className="bg-[rgb(var(--color-bg))] p-6 rounded-xl shadow-lg border-theme">
                     <h2 className="text-xl font-semibold mb-4 text-[rgb(var(--color-text))]">Reservas Pendentes</h2>
                     <div className="space-y-4">
                         {reservations.pendentes.length > 0 ? (
@@ -143,13 +143,13 @@ function AdminReservations() {
                                 ))
                             )
                         ) : (
-                            <p className="text-[rgb(var(--color-text-gray))] text-center py-4">Nenhuma reserva pendente</p>
+                            <p className="text-[rgb(var(--color-text-grays))] text-center py-4">Nenhuma reserva pendente</p>
                         )}
                     </div>
                 </div>
 
                 {/* Reservas Aprovadas */}
-                <div className="bg-rgb(var(--color-bg)) p-6 rounded-xl shadow-lg border-theme">
+                <div className="bg-[rgb(var(--color-bg))] p-6 rounded-xl shadow-lg border-theme">
                     <h2 className="text-xl font-semibold mb-4 text-[rgb(var(--color-text))]">Reservas Aprovadas</h2>
                     <div className="space-y-4">
                         {reservations.aprovadas.length > 0 ? (
@@ -157,13 +157,13 @@ function AdminReservations() {
                                 renderReservationCard(reservation, null)
                             )
                         ) : (
-                            <p className="text-[rgb(var(--color-text-gray))] text-center py-4">Nenhuma reserva aprovada</p>
+                            <p className="text-[rgb(var(--color-text-grays))] text-center py-4">Nenhuma reserva aprovada</p>
                         )}
                     </div>
                 </div>
 
                 {/* Reservas Arquivadas */}
-                <div className="bg-rgb(var(--color-bg)) p-6 rounded-xl shadow-lg border-theme">
+                <div className="bg-[rgb(var(--color-bg))] p-6 rounded-xl shadow-lg border-theme">
                     <h2 className="text-xl font-semibold mb-4 text-[rgb(var(--color-text))]">Reservas Arquivadas</h2>
                     <div className="space-y-4">
                         {reservations.arquivadas.length > 0 ? (
@@ -176,7 +176,7 @@ function AdminReservations() {
                                 ))
                             )
                         ) : (
-                            <p className="text-[rgb(var(--color-text-gray))] text-center py-4">Nenhuma reserva arquivada</p>
+                            <p className="text-[rgb(var(--color-text-grays))] text-center py-4">Nenhuma reserva arquivada</p>
                         )}
                     </div>
                 </div>

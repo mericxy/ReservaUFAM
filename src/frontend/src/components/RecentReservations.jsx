@@ -51,7 +51,7 @@ function RecentReservations({ onClose, isOpen }) {
       case 'Reprovado':
         return 'bg-red-100 text-red-800';
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-gray-100 text-[rgb(var(--color-text))]';
     }
   };
 
@@ -64,14 +64,14 @@ function RecentReservations({ onClose, isOpen }) {
       
       {/* Popup Centralizado */}
       <div className="fixed inset-0 flex items-center justify-center z-50">
-        <div className="bg-white rounded-lg shadow-2xl max-w-4xl w-full mx-4 max-h-[85vh] overflow-hidden border border-gray-200">
+        <div className="bg-[rgb(var(--color-bg))] rounded-lg shadow-2xl max-w-4xl w-full mx-4 max-h-[85vh] overflow-hidden border-theme">
           <div className="flex justify-between items-center p-4 border-b bg-gradient-to-r from-blue-50 to-indigo-50">
-            <h2 className="text-xl font-bold text-gray-800">
+            <h2 className="text-xl font-bold text-[rgb(var(--color-text))]">
               📋 Últimas Reservas
             </h2>
             <button
               onClick={onClose}
-              className="text-gray-500 hover:text-gray-700 text-2xl font-bold transition-colors"
+              className="text-[rgb(var(--color-text-grays))] hover:text-[rgb(var(--color-text))] text-2xl font-bold transition-colors"
             >
               ×
             </button>
@@ -80,12 +80,12 @@ function RecentReservations({ onClose, isOpen }) {
           <div className="p-4 overflow-y-auto max-h-[calc(85vh-120px)]">
             {loading ? (
               <div className="flex items-center justify-center py-8">
-                <div className="text-[rgb(var(--color-text-gray))]">Carregando reservas recentes...</div>
+                <div className="text-[rgb(var(--color-text-grays))]">Carregando reservas recentes...</div>
               </div>
             ) : error ? (
               <div className="text-red-600 text-center py-8">{error}</div>
             ) : recentReservations.length === 0 ? (
-              <div className="text-[rgb(var(--color-text-gray))] text-center py-8">
+              <div className="text-[rgb(var(--color-text-grays))] text-center py-8">
                 Nenhuma reserva encontrada
               </div>
             ) : (
@@ -93,7 +93,7 @@ function RecentReservations({ onClose, isOpen }) {
                 {recentReservations.map((reservation) => (
                   <div
                     key={reservation.id}
-                    className="bg-gray-50 border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow"
+                    className="bg-[rgb(var(--color-bg))] border-theme rounded-lg p-4 hover:shadow-md transition-shadow"
                   >
                     <div className="flex justify-between items-start mb-2">
                       <div className="flex items-center space-x-2">
@@ -106,7 +106,7 @@ function RecentReservations({ onClose, isOpen }) {
                           {reservation.status}
                         </span>
                       </div>
-                      <span className="text-xs text-[rgb(var(--color-text-gray))]">
+                      <span className="text-xs text-[rgb(var(--color-text-grays))]">
                         {formatDateTime(reservation.created_at || reservation.initial_date)}
                       </span>
                     </div>
@@ -114,40 +114,40 @@ function RecentReservations({ onClose, isOpen }) {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                       <div className="space-y-1">
                         <p>
-                          <span className="font-medium text-[rgb(var(--color-text-gray))]">Recurso:</span>{" "}
+                          <span className="font-medium text-[rgb(var(--color-text-grays))]">Recurso:</span>{" "}
                           {reservation.auditorium?.name || 
                            reservation.meeting_room?.name || 
                            reservation.vehicle?.model || "Não especificado"}
                         </p>
                         <p>
-                          <span className="font-medium text-[rgb(var(--color-text-gray))]">Solicitante:</span>{" "}
+                          <span className="font-medium text-[rgb(var(--color-text-grays))]">Solicitante:</span>{" "}
                           {reservation.user?.username || "Não informado"}
                         </p>
                         <p>
-                          <span className="font-medium text-[rgb(var(--color-text-gray))]">Email:</span>{" "}
+                          <span className="font-medium text-[rgb(var(--color-text-grays))]">Email:</span>{" "}
                           {reservation.user?.email || "Não informado"}
                         </p>
                       </div>
                       <div className="space-y-1">
                         <p>
-                          <span className="font-medium text-[rgb(var(--color-text-gray))]">Data Inicial:</span>{" "}
+                          <span className="font-medium text-[rgb(var(--color-text-grays))]">Data Inicial:</span>{" "}
                           {new Date(reservation.initial_date).toLocaleDateString('pt-BR')}
                         </p>
                         <p>
-                          <span className="font-medium text-[rgb(var(--color-text-gray))]">Data Final:</span>{" "}
+                          <span className="font-medium text-[rgb(var(--color-text-grays))]">Data Final:</span>{" "}
                           {new Date(reservation.final_date).toLocaleDateString('pt-BR')}
                         </p>
                         <p>
-                          <span className="font-medium text-[rgb(var(--color-text-gray))]">Horário:</span>{" "}
+                          <span className="font-medium text-[rgb(var(--color-text-grays))]">Horário:</span>{" "}
                           {reservation.initial_time} - {reservation.final_time}
                         </p>
                       </div>
                     </div>
 
                     {reservation.purpose && (
-                      <div className="mt-3 pt-3 border-t border-gray-200">
+                      <div className="mt-3 pt-3 border-t border-theme">
                         <p className="text-sm">
-                          <span className="font-medium text-[rgb(var(--color-text-gray))]">Finalidade:</span>{" "}
+                          <span className="font-medium text-[rgb(var(--color-text-grays))]">Finalidade:</span>{" "}
                           {reservation.purpose}
                         </p>
                       </div>
@@ -158,14 +158,14 @@ function RecentReservations({ onClose, isOpen }) {
             )}
           </div>
 
-          <div className="p-4 border-t bg-gray-50 flex justify-between items-center">
-            <p className="text-sm text-gray-600">
+          <div className="p-4 border-t bg-[rgb(var(--color-bg))] flex justify-between items-center">
+            <p className="text-sm text-[rgb(var(--color-text-grays))]">
               Mostrando as {recentReservations.length} reservas mais recentes
             </p>
             <div className="space-x-2">
               <button
                 onClick={onClose}
-                className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 transition-colors"
+                className="px-4 py-2 bg-[rgb(var(--color-bg))]0 text-white rounded hover:bg-gray-600 transition-colors"
               >
                 Fechar
               </button>

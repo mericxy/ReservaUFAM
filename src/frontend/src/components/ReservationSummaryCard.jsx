@@ -40,16 +40,16 @@ function ReservationSummaryCard() {
 
   if (loading) {
     return (
-      <div className="p-4 bg-rgb(var(--color-bg)) rounded-lg shadow hover:shadow-md transition-shadow">
+      <div className="p-4 bg-[rgb(var(--color-bg))] rounded-lg shadow hover:shadow-md transition-shadow">
         <h3 className="font-semibold mb-2 text-[rgb(var(--color-text))]">Resumo de Reservas</h3>
-        <p className="text-[rgb(var(--color-text-gray))]">Carregando estatísticas...</p>
+        <p className="text-[rgb(var(--color-text-grays))]">Carregando estatísticas...</p>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="p-4 bg-rgb(var(--color-bg)) rounded-lg shadow hover:shadow-md transition-shadow">
+      <div className="p-4 bg-[rgb(var(--color-bg))] rounded-lg shadow hover:shadow-md transition-shadow">
         <h3 className="font-semibold mb-2 text-[rgb(var(--color-text))]">Resumo de Reservas</h3>
         <p className="text-red-600 text-sm">{error}</p>
       </div>
@@ -57,7 +57,7 @@ function ReservationSummaryCard() {
   }
 
   return (
-    <div className="p-4 bg-rgb(var(--color-bg)) border-theme rounded-lg shadow hover:shadow-md transition-shadow">
+    <div className="p-4 bg-[rgb(var(--color-bg))] border-theme rounded-lg shadow hover:shadow-md transition-shadow">
       <div className="flex items-center justify-between mb-3">
         <h3 className="font-semibold text-[rgb(var(--color-text))]">Resumo de Reservas</h3>
         

@@ -63,25 +63,25 @@ function AdminPage() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         <ReservationSummaryCard />
         
-        <div className="p-4 bg-rgb(var(--color-bg)) border-theme rounded-lg shadow hover:shadow-md transition-shadow">
+        <div className="p-4 bg-[rgb(var(--color-bg))] border-theme rounded-lg shadow hover:shadow-md transition-shadow">
           <h3 className="font-semibold mb-2 text-[rgb(var(--color-text))]">Gerenciar Reservas</h3>
-          <p className="text-[rgb(var(--color-text-gray))]">Visualize e gerencie todas as reservas</p>
+          <p className="text-[rgb(var(--color-text-grays))]">Visualize e gerencie todas as reservas</p>
           <a href="/admin/reservations" className="text-blue-600 hover:underline mt-2 inline-block">
             Acessar →
           </a>
         </div>
 
-        <div className="p-4 bg-rgb(var(--color-bg)) border-theme rounded-lg shadow hover:shadow-md transition-shadow">
+        <div className="p-4 bg-[rgb(var(--color-bg))] border-theme rounded-lg shadow hover:shadow-md transition-shadow">
           <h3 className="font-semibold mb-2 text-[rgb(var(--color-text))]">Gerenciar Usuários</h3>
-          <p className="text-[rgb(var(--color-text-gray))]">Administre os usuários do sistema</p>
+          <p className="text-[rgb(var(--color-text-grays))]">Administre os usuários do sistema</p>
           <a href="/admin/users" className="text-blue-600 hover:underline mt-2 inline-block">
             Acessar →
           </a>
         </div>
 
-        <div className="p-4 bg-rgb(var(--color-bg)) border-theme rounded-lg shadow hover:shadow-md transition-shadow">
+        <div className="p-4 bg-[rgb(var(--color-bg))] border-theme rounded-lg shadow hover:shadow-md transition-shadow">
           <h3 className="font-semibold mb-2 text-[rgb(var(--color-text))]">Gerenciar Recursos</h3>
-          <p className="text-[rgb(var(--color-text-gray))]">Configure os recursos disponíveis</p>
+          <p className="text-[rgb(var(--color-text-grays))]">Configure os recursos disponíveis</p>
           <a href="/admin/resources" className="text-blue-600 hover:underline mt-2 inline-block">
             Acessar →
           </a>

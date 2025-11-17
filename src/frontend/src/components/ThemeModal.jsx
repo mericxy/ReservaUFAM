@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { FiSettings } from "react-icons/fi";
 import { useAuth } from "../context/AuthContext";
 import ThemeToggle from "./ThemeToggle";
 import { useTheme } from "../context/ThemeContext";
@@ -9,6 +11,7 @@ export default function ModalButton() {
     const { logout } = useAuth();
     const { theme, toggleDarkMode, toggleHighContrast, THEMES } = useTheme();
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const navigate = useNavigate();
 
     const handleLogoutClick = () => {
         setIsModalOpen(true);
@@ -24,28 +27,31 @@ export default function ModalButton() {
         <div className="relative">
             <button
                 onClick={() => setIsOpen(!isOpen)}
-                className="bg-rgb(var(--color-bg)) text-[rgb(var(--color-text))] border-theme-strong px-4 py-2 rounded-lg hover:text-blue-500 transition-colors font-medium"
+                type="button"
+                aria-expanded={isOpen}
+                className="btn btn-secondary text-sm"
             >
+                <FiSettings className="text-lg" aria-hidden="true" />
                 Configurações
             </button>
 
             {isOpen && (
-                <div className="absolute top-full mt-2 right-0 bg-white rounded-lg shadow-lg p-4 w-80 border border-gray-200 z-50">
+                <div className="absolute top-full mt-2 right-0 bg-[rgb(var(--color-bg))] rounded-lg shadow-lg p-4 w-80 border-theme z-50">
                     <div className="flex justify-between items-center mb-4">
-                        <h3 className="text-lg font-semibold text-gray-800">
+                        <h3 className="text-lg font-semibold text-[rgb(var(--color-text))]">
                             Configurações
                         </h3>
                         <button
                             onClick={() => setIsOpen(false)}
-                            className="text-gray-500 hover:text-gray-700 text-xl leading-none"
+                            className="text-[rgb(var(--color-text-grays))] hover:text-[rgb(var(--color-text))] text-xl leading-none"
                         >
                             ×
                         </button>
                     </div>
 
                     <div className="space-y-3">
-                        <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                            <span className="text-gray-700">
+                        <div className="flex items-center justify-between p-3 bg-[rgb(var(--color-bg))] rounded-lg">
+                            <span className="text-[rgb(var(--color-text))]">
                                 Ativar tema escuro
                             </span>
                             <ThemeToggle
@@ -55,8 +61,8 @@ export default function ModalButton() {
                             />
                         </div>
 
-                        <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                            <span className="text-gray-700">
+                        <div className="flex items-center justify-between p-3 bg-[rgb(var(--color-bg))] rounded-lg">
+                            <span className="text-[rgb(var(--color-text))]">
                                 Ativar alto contraste
                             </span>
                             <ThemeToggle
@@ -66,25 +72,9 @@ export default function ModalButton() {
                                 activeColor="bg-yellow-500"
                             />
                         </div>
-                        <div className="flex items-center justify-end mt-4">
-                            <button
-                                type="button"
-                                className="bg-red-500 hover:bg-red-700 text-white font-semibold px-4 py-2 rounded-md transition-colors duration-300 shadow-md"
-                                onClick={handleLogoutClick}
-                            >
-                                Sair
-                            </button>
-                        </div>
                     </div>
                 </div>
             )}
-            <ConfirmationModal
-                isOpen={isModalOpen}
-                onClose={() => setIsModalOpen(false)}
-                onConfirm={confirmLogout}
-                title="Confirmar Saída"
-                message="Tem certeza que deseja sair do sistema?"
-            />
         </div>
     );
 }
