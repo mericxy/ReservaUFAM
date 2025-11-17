@@ -19,6 +19,8 @@ import AdminUsuarios from "./pages/AdminUsuarios";
 import AdminRecursos from "./pages/AdminRecursos";
 import UserProfile from "./pages/UserProfile";
 import AdminProfile from "./pages/AdminProfile";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 
 import ErrorPopup from "./components/ErrorPopup";
 import {ErrorBoundary} from "react-error-boundary";
@@ -45,6 +47,8 @@ const protectedElementAdmin = (Component) => (
 const router = createBrowserRouter([
   { path: "/", element: <Main><Login /></Main> },
   { path: "/register", element: <Main><Register /></Main> },
+  { path: "/forgot-password", element: <Main><ForgotPassword /></Main> },
+  { path: "/reset-password", element: <Main><ResetPassword /></Main> },
   { path: "/privacy-policy", element: <Main><PrivacyPolicy /></Main> },
   { path: "/admin/page", element: protectedElementAdmin(AdminPage)},
   { path: "/admin/reservations", element: protectedElementAdmin(AdminReservations) },

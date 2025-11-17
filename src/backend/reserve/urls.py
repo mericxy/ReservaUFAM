@@ -22,7 +22,10 @@ from .views import (
     VehicleDetailAdminView,
     OccupiedDatesView,
     AdminUserListView,
-    UpdateUserStatusView
+    UpdateUserStatusView,
+    PasswordResetRequestView,
+    PasswordResetConfirmView,
+    PasswordResetValidateView
 )
 
 urlpatterns = [
@@ -33,6 +36,9 @@ urlpatterns = [
     path("user/", UserDetailView.as_view(), name="user-detail"),
     path("user/profile/", UserProfileView.as_view(), name="user-profile"),
     path("user/delete/", DeleteAccountView.as_view(), name="user-delete-account"),
+    path('auth/password/forgot/', PasswordResetRequestView.as_view(), name='password-reset-request'),
+    path('auth/password/reset/validate/', PasswordResetValidateView.as_view(), name='password-reset-validate'),
+    path('auth/password/reset/', PasswordResetConfirmView.as_view(), name='password-reset-confirm'),
     path('user/reservations/create/', CreateReservationView.as_view(), name='create-reservation'),
     path('admin/reservations/', AdminReservationListView.as_view(), name='admin-reservation-list'),
     path('admin/users/', AdminUserListView.as_view(), name='admin-user-list'),

@@ -1,6 +1,7 @@
 # models.py
 from django.contrib.auth.models import AbstractUser, BaseUserManager, Group, Permission
 from django.db import models
+from django.utils import timezone
 
 class CustomUserManager(BaseUserManager):
     def create_user(self, username, email, password=None, **extra_fields):
@@ -93,6 +94,39 @@ class CustomUser(AbstractUser):
         self.set_unusable_password()
 
         self.save()
+
+
+class PasswordResetToken(models.Model):
+    user = models.ForeignKey(
+        CustomUser,
+        on_delete=models.CASCADE,
+        related_name="password_reset_tokens"
+    )
+    token_hash = models.CharField(max_length=128, unique=True)
+    requested_email = models.EmailField()
+    request_ip = models.GenericIPAddressField(null=True, blank=True)
+    user_agent = models.CharField(max_length=256, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    expires_at = models.DateTimeField()
+    used_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        ordering = ("-created_at",)
+        indexes = [
+            models.Index(fields=("user", "created_at")),
+            models.Index(fields=("token_hash",)),
+        ]
+
+    def is_expired(self):
+        return timezone.now() >= self.expires_at
+
+    def is_active(self):
+        return self.used_at is None and not self.is_expired()
+
+    def mark_used(self):
+        if not self.used_at:
+            self.used_at = timezone.now()
+            self.save(update_fields=["used_at"])
 
 class Auditorium(models.Model):
     name = models.CharField(max_length=100, unique=True)
