@@ -11,7 +11,7 @@ import ResourceSelector from "../components/ResourceSelector";
 import DateTimeSelector from "../components/DateTimeSelector";
 import ReservationDetails from "../components/ReservationDetails";
 import { apiFetch } from "../../api";
-
+import { getOccupiedTimesSet } from "../utils/timeUtils";
 
 const CreateReservation = () => {
     const navigate = useNavigate();
@@ -48,6 +48,7 @@ const CreateReservation = () => {
         if (name === "initial_date" && newFormData.final_date < value) {
         newFormData.final_date = value;
         newFormData.final_time = "";
+        newFormData.initial_time = "";
         }
 
         setFormData(newFormData);
@@ -146,7 +147,7 @@ const CreateReservation = () => {
         setSelectedResource(null);
         } catch (error) {
         console.error("Erro completo:", error);
-         handleError(
+        handleError(
             `Não foi possível concluir a criação da reserva. ${error.message.includes("conexão") 
                 ? "Verifique sua conexão com a internet e tente novamente." 
                 : "Tente novamente em alguns instantes ou entre em contato com o suporte se o erro persistir."}`
@@ -169,7 +170,6 @@ const CreateReservation = () => {
                 </h1>
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    {/* Formulário de Reserva */}
                     <div className="lg:col-span-2">
                         <div className="bg-[rgb(var(--color-bg))] p-2 rounded-xl shadow-lg">
                             <form onSubmit={handleSubmit} className="space-y-6">
@@ -185,6 +185,7 @@ const CreateReservation = () => {
                                     handleChange={handleChange}
                                     timeOptions={timeOptions}
                                     getMinDate={getMinDate}
+                                    occupiedDates={occupiedDates} 
                                 />
 
                                 <ReservationDetails
@@ -208,7 +209,6 @@ const CreateReservation = () => {
                         </div>
                     </div>
 
-                    {/* Painel Lateral */}
                     <div className="lg:col-span-1 space-y-6">
                         {selectedResource ? (
                             <>
