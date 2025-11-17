@@ -6,13 +6,8 @@ from .models import CustomUser, Auditorium, MeetingRoom, Vehicle, Reservation
 
 
 def validate_positive_capacity(value):
-    """
-    Garante que o valor da capacidade seja um número inteiro positivo maior que zero.
-    """
     if value <= 0:
-        raise serializers.ValidationError(
-            "Capacity must be a positive number greater than zero."
-        )
+        raise serializers.ValidationError("Capacity must be a positive number greater than zero.")
     return value
 
 
@@ -32,18 +27,12 @@ class CustomUserSerializer(serializers.ModelSerializer):
         read_only_fields = ['id', 'is_staff', 'privacy_consent_date']
 
     def get_is_self(self, obj):
-        """
-        Verifica se o usuário sendo serializado é o mesmo que fez a requisição.
-        """
         request = self.context.get('request', None)
         if request and hasattr(request, "user"):
             return obj == request.user
         return False
 
     def validate_privacy_consent(self, value):
-        """
-        Valida se o consentimento de privacidade foi dado.
-        """
         if not value:
             raise serializers.ValidationError(
                 "O consentimento para tratamento de dados pessoais é obrigatório conforme a LGPD."
@@ -51,9 +40,6 @@ class CustomUserSerializer(serializers.ModelSerializer):
         return value
 
     def validate_data_processing_consent(self, value):
-        """
-        Valida se o consentimento para processamento de dados foi dado.
-        """
         if not value:
             raise serializers.ValidationError(
                 "O consentimento para processamento de dados é obrigatório para utilizar o sistema."
@@ -62,32 +48,55 @@ class CustomUserSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         from django.utils import timezone
-
-        # Registra data e IP do consentimento
         request = self.context.get('request')
         if request:
             validated_data['privacy_consent_date'] = timezone.now()
-            # Captura o IP do usuário
             x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
             if x_forwarded_for:
                 validated_data['privacy_consent_ip'] = x_forwarded_for.split(',')[0]
             else:
                 validated_data['privacy_consent_ip'] = request.META.get('REMOTE_ADDR')
-
         return CustomUser.objects.create_user(**validated_data)
 
 
 class LoginSerializer(serializers.Serializer):
-    """
-    Valida se os campos 'identifier' e 'password' foram enviados na requisição.
-    A lógica de autenticação foi movida para a view.
-    """
     identifier = serializers.CharField(required=True)
     password = serializers.CharField(required=True, write_only=True)
 
 
-class AuditoriumSerializer(serializers.ModelSerializer):
+# --- NOVOS SERIALIZERS DE RESET DE SENHA (DA BRANCH DEVELOP) ---
+class PasswordResetRequestSerializer(serializers.Serializer):
+    email = serializers.EmailField()
 
+    def validate_email(self, value):
+        return value.strip().lower()
+
+
+class PasswordResetValidateSerializer(serializers.Serializer):
+    token = serializers.CharField()
+
+
+class PasswordResetConfirmSerializer(serializers.Serializer):
+    token = serializers.CharField()
+    password = serializers.CharField(
+        write_only=True,
+        min_length=8,
+        error_messages={
+            "min_length": "A senha deve ter pelo menos 8 caracteres."
+        }
+    )
+    confirm_password = serializers.CharField(write_only=True)
+
+    def validate(self, data):
+        if data["password"] != data["confirm_password"]:
+            raise serializers.ValidationError("As senhas não coincidem.")
+        return data
+
+
+# --- FIM DOS SERIALIZERS DE RESET DE SENHA ---
+
+
+class AuditoriumSerializer(serializers.ModelSerializer):
     capacity = serializers.IntegerField(validators=[validate_positive_capacity])
 
     class Meta:
@@ -101,7 +110,6 @@ class AuditoriumSerializer(serializers.ModelSerializer):
 
 
 class MeetingRoomSerializer(serializers.ModelSerializer):
-
     capacity = serializers.IntegerField(validators=[validate_positive_capacity])
 
     class Meta:
@@ -115,7 +123,6 @@ class MeetingRoomSerializer(serializers.ModelSerializer):
 
 
 class VehicleSerializer(serializers.ModelSerializer):
-
     capacity = serializers.IntegerField(validators=[validate_positive_capacity])
 
     class Meta:
@@ -123,10 +130,8 @@ class VehicleSerializer(serializers.ModelSerializer):
         fields = ['id', 'plate_number', 'model', 'capacity']
 
 
+# --- SERIALIZER DE CRIAÇÃO (TASK #65) ---
 class ReservationCreateSerializer(serializers.ModelSerializer):
-    """
-    Serializer para CRIAR reservas. Aceita um array de 'dates'.
-    """
     dates = serializers.ListField(
         child=serializers.DateField(),
         write_only=True,
@@ -157,9 +162,6 @@ class ReservationCreateSerializer(serializers.ModelSerializer):
         ]
 
     def _determine_initial_status(self, resource_data):
-        """
-        Determina o status inicial baseado no tipo de recurso.
-        """
         if resource_data.get('meeting_room'):
             return Reservation.Status.CONFIRMED
         return Reservation.Status.PENDING
@@ -177,7 +179,6 @@ class ReservationCreateSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(
                 "O horário final deve ser após o horário inicial."
             )
-
         return data
 
     @transaction.atomic
@@ -225,10 +226,8 @@ class ReservationCreateSerializer(serializers.ModelSerializer):
         return new_reservations[0]
 
 
+# --- SERIALIZER DE LISTAGEM (ANTIGO RESERVATIONSERIALIZER) ---
 class ReservationListSerializer(serializers.ModelSerializer):
-    """
-    Serializer para LISTAR reservas (Antigo ReservationSerializer).
-    """
     user = CustomUserSerializer(read_only=True)
     auditorium = AuditoriumSerializer(read_only=True)
     meeting_room = MeetingRoomSerializer(read_only=True)
@@ -249,6 +248,7 @@ class ReservationListSerializer(serializers.ModelSerializer):
         ]
 
     def validate(self, data):
+        # Validações simplificadas, pois a lógica principal está no CreateSerializer
         initial_date = data.get('initial_date')
         final_date = data.get('final_date')
         initial_time = data.get('initial_time')
