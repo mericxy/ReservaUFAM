@@ -64,7 +64,6 @@ class LoginSerializer(serializers.Serializer):
     password = serializers.CharField(required=True, write_only=True)
 
 
-# --- NOVOS SERIALIZERS DE RESET DE SENHA (DA BRANCH DEVELOP) ---
 class PasswordResetRequestSerializer(serializers.Serializer):
     email = serializers.EmailField()
 
@@ -91,9 +90,6 @@ class PasswordResetConfirmSerializer(serializers.Serializer):
         if data["password"] != data["confirm_password"]:
             raise serializers.ValidationError("As senhas não coincidem.")
         return data
-
-
-# --- FIM DOS SERIALIZERS DE RESET DE SENHA ---
 
 
 class AuditoriumSerializer(serializers.ModelSerializer):
@@ -226,7 +222,6 @@ class ReservationCreateSerializer(serializers.ModelSerializer):
         return new_reservations[0]
 
 
-# --- SERIALIZER DE LISTAGEM (ANTIGO RESERVATIONSERIALIZER) ---
 class ReservationListSerializer(serializers.ModelSerializer):
     user = CustomUserSerializer(read_only=True)
     auditorium = AuditoriumSerializer(read_only=True)
@@ -248,7 +243,6 @@ class ReservationListSerializer(serializers.ModelSerializer):
         ]
 
     def validate(self, data):
-        # Validações simplificadas, pois a lógica principal está no CreateSerializer
         initial_date = data.get('initial_date')
         final_date = data.get('final_date')
         initial_time = data.get('initial_time')

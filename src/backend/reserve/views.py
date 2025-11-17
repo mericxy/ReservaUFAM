@@ -21,7 +21,6 @@ from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.permissions import IsAuthenticated
 
-# Serializers do projeto (Imports Mesclados)
 from .serializers import (
     AuditoriumSerializer, MeetingRoomSerializer, VehicleSerializer,
     CustomUserSerializer, LoginSerializer,
