@@ -1,1 +1,100 @@
 @import "tailwindcss";
+@import "./themes.css";
+
+body {
+    background-color: rgb(var(--color-bg));
+    color: rgb(var(--color-text));
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+input,
+select,
+textarea {
+    background-color: rgb(var(--color-bg));
+    color: rgb(var(--color-text));
+    border: var(--border-strong);
+}
+
+input::placeholder,
+textarea::placeholder {
+    color: rgb(var(--color-text-grays));
+}
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    font-weight: 600;
+    border-radius: 0.5rem;
+    padding: 0.65rem 1.25rem;
+    transition: background-color 0.2s ease, color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+    border: none;
+    box-shadow: 0 10px 15px -5px rgba(15, 23, 42, 0.15);
+}
+
+.btn:focus-visible {
+    outline: 2px solid rgb(var(--color-primary));
+    outline-offset: 2px;
+}
+
+.btn:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+.btn-primary {
+    background-color: rgb(var(--btn-primary-bg));
+    color: rgb(var(--btn-primary-text));
+    border: var(--btn-primary-border, none);
+}
+
+.btn-primary:hover:not(:disabled) {
+    filter: brightness(0.95);
+}
+
+.btn-secondary {
+    background-color: rgb(var(--color-bg));
+    color: rgb(var(--color-text));
+    border: var(--border-strong);
+    box-shadow: none;
+}
+
+.btn-secondary:hover:not(:disabled) {
+    background-color: rgb(var(--color-text) / 0.08);
+}
+
+.btn-danger {
+    background-color: red;
+    color: white;
+    border: var(--btn-danger-border, none);
+}
+
+.btn-danger:hover:not(:disabled) {
+    filter: brightness(0.93);
+}
+
+.btn-sm {
+    padding: 0.35rem 0.9rem;
+    font-size: 0.875rem;
+    box-shadow: none;
+    border: var(--border-default, none);
+}
+
+.border-theme {
+  border: var(--border-default);
+}
+
+.border-theme-strong {
+  border: var(--border-strong);
+}
+
+.shadow,
+.shadow-sm,
+.shadow-md,
+.shadow-lg,
+.shadow-xl,
+.shadow-2xl {
+  border: var(--border-default);
+}

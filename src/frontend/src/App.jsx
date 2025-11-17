@@ -1,5 +1,6 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
+import { ThemeProvider } from "./context/ThemeContext";
 import ProtectedPage from "./components/ProtectedPage";
 import Main from "./components/Main";
 import Header from "./components/Header";
@@ -77,7 +78,9 @@ const App = () => {
       )}
       <ErrorBoundary FallbackComponent={() => null} onError={handleError}>
         <AuthProvider>
-          <RouterProvider router={router} />
+          <ThemeProvider>
+            <RouterProvider router={router} />
+          </ThemeProvider>
         </AuthProvider>
       </ErrorBoundary>
     </div>

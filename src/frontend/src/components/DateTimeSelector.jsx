@@ -45,13 +45,13 @@ const DateTimeSelector = ({ formData, handleChange, timeOptions, getMinDate, occ
   });
 
   return (
-    <div className="bg-gray-50 p-4 rounded-lg">
-      <h2 className="text-xl font-semibold text-gray-800 mb-4">Período da Reserva</h2>
+    <div className="bg-[rgb(var(--color-bg))] p-4 rounded-lg">
+      <h2 className="text-xl font-semibold text-[rgb(var(--color-text))] mb-2">Período da Reserva</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Data e horário inicial */}
         <div className="space-y-4">
           <div>
-            <label className="block text-gray-700 text-sm font-bold mb-2">
+            <label className="block text-[rgb(var(--color-text))] text-sm font-bold mb-2">
               Data Inicial
             </label>
             <input
@@ -61,11 +61,11 @@ const DateTimeSelector = ({ formData, handleChange, timeOptions, getMinDate, occ
               onChange={handleChange}
               min={getMinDate()}
               required
-              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 transition-all duration-200 hover:border-green-400"
+              className="w-full p-3 border-theme-strong rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 transition-all duration-200 hover:border-green-400"
             />
           </div>
           <div>
-            <label className="block text-gray-700 text-sm font-bold mb-2">
+            <label className="block text-[rgb(var(--color-text))] text-sm font-bold mb-2">
               Horário Inicial
             </label>
             <select
@@ -73,8 +73,9 @@ const DateTimeSelector = ({ formData, handleChange, timeOptions, getMinDate, occ
               value={formData.initial_time}
               onChange={handleChange}
               required
-              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 transition-all duration-200 hover:border-green-400"
+              className="w-full p-3 border-theme-strong rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 transition-all duration-200 hover:border-green-400"
               disabled={!formData.initial_date} 
+
             >
               <option value="">Selecione um horário</option>
               {filteredInitialOptions.map((time) => {
@@ -91,7 +92,7 @@ const DateTimeSelector = ({ formData, handleChange, timeOptions, getMinDate, occ
         {/* Data e horário final */}
         <div className="space-y-4">
           <div>
-            <label className="block text-gray-700 text-sm font-bold mb-2">
+            <label className="block text-[rgb(var(--color-text))] text-sm font-bold mb-2">
               Data Final
             </label>
             <input
@@ -101,12 +102,12 @@ const DateTimeSelector = ({ formData, handleChange, timeOptions, getMinDate, occ
               onChange={handleChange}
               min={formData.initial_date || getMinDate()}
               required
-              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 transition-all duration-200 hover:border-green-400"
+              className="w-full p-3 border-theme-strong rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 transition-all duration-200 hover:border-green-400"
               disabled={!formData.initial_date} 
             />
           </div>
           <div>
-            <label className="block text-gray-700 text-sm font-bold mb-2">
+            <label className="block text-[rgb(var(--color-text))] text-sm font-bold mb-2">
               Horário Final
             </label>
             <select
@@ -114,7 +115,7 @@ const DateTimeSelector = ({ formData, handleChange, timeOptions, getMinDate, occ
               value={formData.final_time}
               onChange={handleChange}
               required
-              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 transition-all duration-200 hover:border-green-400"
+              className="w-full p-3 border-theme-strong rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 transition-all duration-200 hover:border-green-400"
               disabled={!formData.final_date || !formData.initial_time} 
             >
               <option value="">Selecione um horário</option>

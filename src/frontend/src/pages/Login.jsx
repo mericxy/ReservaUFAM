@@ -70,9 +70,9 @@ const Login = () => {
 
     return (
         <section className="flex items-center justify-center flex-col gap-6 py-8 min-h-screen">
-            <img src={logo} alt="logo" className="w-60 h-20" />
+            <img src={logo} alt="logo" className="w-60" />
             
-            <div className="border border-gray-300 rounded-xl p-8 w-full max-w-2xl shadow-lg bg-white px-12">
+            <div className="border-theme-strong rounded-xl p-8 w-full max-w-2xl shadow-lg bg-[rgb(var(--color-bg))] px-12 text-[rgb(var(--color-text))]">
                 <h2 className="text-2xl font-bold bg-gradient-to-r from-green-500 to-blue-500 text-transparent bg-clip-text mb-4">
                     Login
                 </h2>
@@ -82,8 +82,7 @@ const Login = () => {
                         type="text"
                         name="identifier"
                         value={formData.identifier}
-                        className='w-full border p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500'
-                        style={{ border: "1px solid #ccc" }}
+                        className='w-full p-3 rounded-lg border-theme-strong bg-[rgb(var(--color-bg))] text-[rgb(var(--color-text))] focus:outline-none focus:ring-2 focus:ring-green-500'
                         onChange={handleChange}
                         placeholder="Digite seu identificador"
                         required
@@ -95,8 +94,7 @@ const Login = () => {
                             type={showPassword ? "text" : "password"}
                             name="password"
                             value={formData.password}
-                            className='w-full border p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500'
-                            style={{ border: "1px solid #ccc" }}
+                            className='w-full p-3 rounded-lg border-theme-strong bg-[rgb(var(--color-bg))] text-[rgb(var(--color-text))] focus:outline-none focus:ring-2 focus:ring-green-500'
                             onChange={handleChange}
                             placeholder="Senha"
                             required
@@ -107,12 +105,12 @@ const Login = () => {
                             className="absolute right-3 top-1/2 transform -translate-y-1/2"
                         >
                             {showPassword ? (
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-500" viewBox="0 0 20 20" fill="currentColor">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-[rgb(var(--color-text-grays))]" viewBox="0 0 20 20" fill="currentColor">
                                     <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
                                     <path fillRule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd" />
                                 </svg>
                             ) : (
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-500" viewBox="0 0 20 20" fill="currentColor">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-[rgb(var(--color-text-grays))]" viewBox="0 0 20 20" fill="currentColor">
                                     <path fillRule="evenodd" d="M3.707 2.293a1 1 0 00-1.414 1.414l14 14a1 1 0 001.414-1.414l-1.473-1.473A10.014 10.014 0 0019.542 10C18.268 5.943 14.478 3 10 3a9.958 9.958 0 00-4.512 1.074l-1.78-1.781zm4.261 4.26l1.514 1.515a2.003 2.003 0 012.45 2.45l1.514 1.514a4 4 0 00-5.478-5.478z" clipRule="evenodd" />
                                     <path d="M12.454 16.697L9.75 13.992a4 4 0 01-3.742-3.741L2.335 6.578A9.98 9.98 0 00.458 10c1.274 4.057 5.065 7 9.542 7 .847 0 1.669-.105 2.454-.303z" />
                                 </svg>
@@ -135,10 +133,10 @@ const Login = () => {
                         </Link>
                     </div>
                     
-                    <div className="text-center text-xs text-gray-500 border-t pt-3">
+                    <div className="text-center text-xs text-[rgb(var(--color-text-grays))] border-t pt-3">
                         <Link
                             to="/privacy-policy"
-                            className="hover:text-gray-700 underline"
+                            className="hover:text-[rgb(var(--color-text))] underline"
                         >
                             Política de Privacidade
                         </Link>

@@ -165,13 +165,13 @@ const CreateReservation = () => {
             )}
             <BackButton />
             <div className="max-w-6xl mx-auto">
-                <h1 className="text-3xl font-bold mb-4 bg-linear-to-r from-green-500 to-blue-500 text-transparent bg-clip-text">
+                <h1 className="text-2xl font-bold mb-4 bg-gradient-to-r from-green-500 to-blue-500 text-transparent bg-clip-text">
                     Solicitar Reserva
                 </h1>
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     <div className="lg:col-span-2">
-                        <div className="bg-white p-2 rounded-xl shadow-lg">
+                        <div className="bg-[rgb(var(--color-bg))] p-2 rounded-xl shadow-lg">
                             <form onSubmit={handleSubmit} className="space-y-6">
                                 <ResourceSelector
                                     formData={formData}
@@ -198,9 +198,9 @@ const CreateReservation = () => {
                                         type="submit"
                                         disabled={!formModified}
                                         className={`font-bold py-3 px-6 rounded-lg transition-all duration-300 shadow-md
-                                        ${formModified 
-                                            ? 'bg-green-500 hover:bg-green-600 text-white hover:shadow-lg cursor-pointer' 
-                                            : 'bg-gray-300 text-gray-500 cursor-not-allowed'}`}
+                                            ${formModified 
+                                                ? 'bg-green-500 hover:bg-green-600 text-white hover:shadow-lg cursor-pointer' 
+                                                : 'bg-gray-300 text-[rgb(var(--color-text-grays))] cursor-not-allowed'}`}
                                     >
                                         Solicitar Reserva
                                     </button>
@@ -212,38 +212,39 @@ const CreateReservation = () => {
                     <div className="lg:col-span-1 space-y-6">
                         {selectedResource ? (
                             <>
-                                <div className="bg-white p-6 rounded-xl shadow-lg">
-                                    <h3 className="text-xl font-semibold mb-4 text-gray-800">
-                                        Detalhes do Recurso
+                                <div className="bg-[rgb(var(--color-bg))] p-6 rounded-xl shadow-lg">
+                                    <h3 className="text-xl font-semibold mb-4 text-[rgb(var(--color-text))]">
+                                        Detalhes do Recurso  
+                                        <span className="text-red-500">*</span>
                                     </h3>
                                     <div className="space-y-3">
                                         {formData.resource_type === 'vehicle' ? (
                                             <>
-                                                <div className="flex items-center p-3 bg-gray-50 rounded-lg">
-                                                    <span className="font-medium w-24">Modelo:</span>
+                                                <div className="flex items-center p-3 bg-[rgb(var(--color-bg))] rounded-lg">
+                                                    <span className="font-medium w-24">Modelo:<span className="text-red-500">*</span></span>
                                                     <span>{selectedResource.model}</span>
                                                 </div>
-                                                <div className="flex items-center p-3 bg-gray-50 rounded-lg">
-                                                    <span className="font-medium w-24">Placa:</span>
+                                                <div className="flex items-center p-3 bg-[rgb(var(--color-bg))] rounded-lg">
+                                                    <span className="font-medium w-24">Placa:<span className="text-red-500">*</span></span>
                                                     <span>{selectedResource.plate_number}</span>
                                                 </div>
-                                                <div className="flex items-center p-3 bg-gray-50 rounded-lg">
-                                                    <span className="font-medium w-24">Capacidade:</span>
+                                                <div className="flex items-center p-3 bg-[rgb(var(--color-bg))] rounded-lg">
+                                                    <span className="font-medium w-24">Capacidade:<span className="text-red-500">*</span></span>
                                                     <span>{selectedResource.capacity} pessoas</span>
                                                 </div>
                                             </>
                                         ) : (
                                             <>
-                                                <div className="flex items-center p-3 bg-gray-50 rounded-lg">
-                                                    <span className="font-medium w-24">Nome:</span>
+                                                <div className="flex items-center p-3 bg-[rgb(var(--color-bg))] rounded-lg">
+                                                    <span className="font-medium w-24">Nome:<span className="text-red-500">*</span></span>
                                                     <span>{selectedResource.name}</span>
                                                 </div>
-                                                <div className="flex items-center p-3 bg-gray-50 rounded-lg">
-                                                    <span className="font-medium w-24">Local:</span>
+                                                <div className="flex items-center p-3 bg-[rgb(var(--color-bg))] rounded-lg">
+                                                    <span className="font-medium w-24">Local:<span className="text-red-500">*</span></span>
                                                     <span>{selectedResource.location}</span>
                                                 </div>
-                                                <div className="flex items-center p-3 bg-gray-50 rounded-lg">
-                                                    <span className="font-medium w-24">Capacidade:</span>
+                                                <div className="flex items-center p-3 bg-[rgb(var(--color-bg))] rounded-lg">
+                                                    <span className="font-medium w-24">Capacidade:<span className="text-red-500">*</span></span>
                                                     <span>{selectedResource.capacity} pessoas</span>
                                                 </div>
                                             </>
@@ -251,24 +252,24 @@ const CreateReservation = () => {
                                     </div>
                                 </div>
 
-                                <div className="bg-white p-6 rounded-xl shadow-lg">
-                                    <h3 className="text-xl font-semibold mb-4 text-gray-800">
+                                <div className="bg-[rgb(var(--color-bg))] p-6 rounded-xl shadow-lg">
+                                    <h3 className="text-xl font-semibold mb-4 text-[rgb(var(--color-text))]">
                                         Horários Ocupados
                                     </h3>
                                     <div className="space-y-3">
                                         {occupiedDates.length > 0 ? (
                                             occupiedDates.map((date, index) => (
-                                                <div key={index} className="p-3 bg-gray-50 rounded-lg">
-                                                    <p className="font-medium text-gray-800">
+                                                <div key={index} className="p-3 bg-[rgb(var(--color-bg))] rounded-lg">
+                                                    <p className="font-medium text-[rgb(var(--color-text))]">
                                                         {new Date(date.date).toLocaleDateString()}
                                                     </p>
-                                                    <p className="text-sm text-gray-600 mt-1">
+                                                    <p className="text-sm text-[rgb(var(--color-text-grays))] mt-1">
                                                         {date.initial_time} - {date.final_time}
                                                     </p>
                                                 </div>
                                             ))
                                         ) : (
-                                            <p className="text-gray-600 text-center py-4">
+                                            <p className="text-[rgb(var(--color-text-grays))] text-center py-4">
                                                 Nenhum horário ocupado
                                             </p>
                                         )}
@@ -276,15 +277,15 @@ const CreateReservation = () => {
                                 </div>
                             </>
                         ) : (
-                            <div className="bg-white p-6 rounded-xl shadow-lg">
+                            <div className="bg-[rgb(var(--color-bg))] p-6 rounded-xl shadow-lg">
                                 <div className="text-center py-8">
-                                    <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <svg className="mx-auto h-12 w-12 text-[rgb(var(--color-text-grays))]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                     </svg>
-                                    <h3 className="mt-4 text-lg font-medium text-gray-900">
+                                    <h3 className="mt-4 text-lg font-medium text-[rgb(var(--color-text))]">
                                         Selecione um recurso
                                     </h3>
-                                    <p className="mt-2 text-sm text-gray-500">
+                                    <p className="mt-2 text-sm text-[rgb(var(--color-text-grays))]">
                                         As informações de disponibilidade aparecerão aqui
                                     </p>
                                 </div>

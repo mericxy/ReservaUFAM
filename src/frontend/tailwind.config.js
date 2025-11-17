@@ -10,9 +10,29 @@ export default {
       },
       animation: {
         'fade-in': 'fade-in 0.3s ease-out'
+      },
+
+      // Suporte às variáveis de borda
+      borderWidth: {
+        DEFAULT: "var(--border-width, 1px)"
+      },
+      borderColor: {
+        DEFAULT: "var(--border-color, transparent)"
       }
     },
   },
-  plugins: [],
-}
 
+  plugins: [
+    // Utilities de borda dependentes do tema
+    function ({ addUtilities }) {
+      addUtilities({
+        ".border-theme": {
+          border: "var(--border-default)",
+        },
+        ".border-theme-strong": {
+          border: "var(--border-strong)",
+        },
+      });
+    }
+  ],
+}
