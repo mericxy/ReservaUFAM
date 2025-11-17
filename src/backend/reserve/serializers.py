@@ -1,6 +1,7 @@
 # serializers.py
 from rest_framework import serializers
 from django.db.models import Q
+from django.contrib.auth.password_validation import validate_password
 from .models import CustomUser, Auditorium, MeetingRoom, Vehicle, Reservation
 
 def validate_positive_capacity(value):
@@ -79,6 +80,28 @@ class LoginSerializer(serializers.Serializer):
     """
     identifier = serializers.CharField(required=True)
     password = serializers.CharField(required=True, write_only=True)
+
+
+class PasswordResetRequestSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+
+
+class PasswordResetValidateSerializer(serializers.Serializer):
+    token = serializers.CharField()
+
+
+class PasswordResetConfirmSerializer(serializers.Serializer):
+    token = serializers.CharField()
+    password = serializers.CharField(write_only=True)
+    password_confirmation = serializers.CharField(write_only=True)
+
+    def validate(self, attrs):
+        if attrs["password"] != attrs["password_confirmation"]:
+            raise serializers.ValidationError(
+                {"password_confirmation": "As senhas não coincidem."}
+            )
+        validate_password(attrs["password"])
+        return attrs
 class AuditoriumSerializer(serializers.ModelSerializer):
 
     capacity = serializers.IntegerField(validators=[validate_positive_capacity])

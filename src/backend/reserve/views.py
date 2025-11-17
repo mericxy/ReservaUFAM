@@ -1,10 +1,18 @@
 # views.py
 # Bibliotecas padrão do Django
 from django.contrib.auth import login, authenticate
+from django.contrib.sessions.models import Session
 from django.shortcuts import get_object_or_404
 from django.utils.timezone import now
+from django.utils import timezone
 from django.db.models import Q
 from django.utils.translation import gettext_lazy as _
+from django.conf import settings
+
+# Bibliotecas padrão de utilidades
+import hashlib
+import secrets
+from datetime import timedelta
 
 # Bibliotecas do Django REST Framework
 from rest_framework import generics, permissions, status
@@ -16,10 +24,183 @@ from rest_framework.permissions import IsAuthenticated
 # Serializers do projeto
 from .serializers import (
     AuditoriumSerializer, MeetingRoomSerializer, VehicleSerializer,
-    CustomUserSerializer, ReservationSerializer, LoginSerializer
+    CustomUserSerializer, ReservationSerializer, LoginSerializer,
+    PasswordResetRequestSerializer, PasswordResetConfirmSerializer,
+    PasswordResetValidateSerializer
 )
 
 from .services import EmailService
+from .models import PasswordResetToken, CustomUser
+
+
+class PasswordResetTokenMixin:
+    @staticmethod
+    def _hash_token(raw_token):
+        return hashlib.sha256(raw_token.encode("utf-8")).hexdigest()
+
+    def _get_active_token(self, raw_token):
+        token_hash = self._hash_token(raw_token)
+        token = PasswordResetToken.objects.filter(
+            token_hash=token_hash,
+            used_at__isnull=True
+        ).first()
+
+        if not token:
+            return None
+
+        if token.expires_at < timezone.now():
+            return None
+
+        return token
+
+
+class PasswordResetRequestView(PasswordResetTokenMixin, APIView):
+    """
+    Orquestra a criação do token e o envio do e-mail de redefinição.
+    """
+
+    permission_classes = [permissions.AllowAny]
+
+    def post(self, request):
+        serializer = PasswordResetRequestSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        email = serializer.validated_data["email"].strip().lower()
+        user = CustomUser.objects.filter(
+            email__iexact=email,
+            is_active=True,
+            is_anonymized=False
+        ).first()
+
+        if user and not self._is_rate_limited(user):
+            raw_token = self._create_reset_token(user, request)
+            reset_link = self._build_reset_link(raw_token)
+            EmailService.send_password_reset_email(
+                user_email=user.email,
+                user_name=user.get_full_name() or user.username,
+                reset_link=reset_link,
+                expires_minutes=settings.PASSWORD_RESET_TOKEN_EXPIRATION_MINUTES,
+            )
+
+        return Response(
+            {"detail": "Se o e-mail estiver cadastrado, enviaremos instruções para redefinir sua senha."},
+            status=status.HTTP_200_OK
+        )
+
+    def _create_reset_token(self, user, request):
+        raw_token = secrets.token_urlsafe(48)
+        PasswordResetToken.objects.create(
+            user=user,
+            token_hash=self._hash_token(raw_token),
+            requested_email=user.email,
+            request_ip=self._get_client_ip(request),
+            user_agent=(request.META.get("HTTP_USER_AGENT") or "")[:255],
+            expires_at=timezone.now() + timedelta(
+                minutes=settings.PASSWORD_RESET_TOKEN_EXPIRATION_MINUTES
+            ),
+        )
+        return raw_token
+
+    def _get_client_ip(self, request):
+        forwarded = request.META.get("HTTP_X_FORWARDED_FOR")
+        if forwarded:
+            return forwarded.split(",")[0].strip()
+        return request.META.get("REMOTE_ADDR")
+
+    def _is_rate_limited(self, user):
+        window_start = timezone.now() - timedelta(
+            minutes=settings.PASSWORD_RESET_RATE_LIMIT_WINDOW_MINUTES
+        )
+        recent_requests = PasswordResetToken.objects.filter(
+            user=user,
+            created_at__gte=window_start
+        ).count()
+        return recent_requests >= settings.PASSWORD_RESET_RATE_LIMIT
+
+    def _build_reset_link(self, raw_token):
+        base_url = getattr(settings, "FRONTEND_BASE_URL", "http://localhost:5173").rstrip("/")
+        return f"{base_url}/reset-password?token={raw_token}"
+
+
+class PasswordResetValidateView(PasswordResetTokenMixin, APIView):
+    """
+    Valida o token enviado quando o usuário abre o link do e-mail.
+    """
+
+    permission_classes = [permissions.AllowAny]
+
+    def get(self, request):
+        serializer = PasswordResetValidateSerializer(data=request.query_params)
+        serializer.is_valid(raise_exception=True)
+
+        token = serializer.validated_data["token"]
+        reset_token = self._get_active_token(token)
+
+        if not reset_token:
+            return Response(
+                {"detail": "Token inválido ou expirado."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        return Response({"detail": "Token válido."}, status=status.HTTP_200_OK)
+
+
+class PasswordResetConfirmView(PasswordResetTokenMixin, APIView):
+    """
+    Recebe o novo password + token e finaliza o fluxo de redefinição.
+    """
+
+    permission_classes = [permissions.AllowAny]
+
+    def post(self, request):
+        serializer = PasswordResetConfirmSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        token = serializer.validated_data["token"]
+        reset_token = self._get_active_token(token)
+
+        if not reset_token:
+            return Response(
+                {"detail": "Token inválido ou expirado."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        user = reset_token.user
+        user.set_password(serializer.validated_data["password"])
+        user.save()
+
+        reset_token.mark_used()
+        PasswordResetToken.objects.filter(
+            user=user,
+            used_at__isnull=True
+        ).exclude(pk=reset_token.pk).update(used_at=timezone.now())
+
+        self._revoke_user_sessions(user)
+
+        return Response({"detail": "Senha atualizada com sucesso."})
+
+    def _revoke_user_sessions(self, user):
+        """
+        Remove sessões autenticadas conhecidas após uma redefinição de senha.
+        """
+        # Revoga tokens de autenticação do DRF, quando existirem
+        auth_token_set = getattr(user, "auth_token_set", None)
+        if auth_token_set is not None:
+            auth_token_set.all().delete()
+
+        auth_token = getattr(user, "auth_token", None)
+        if auth_token is not None:
+            try:
+                auth_token.delete()
+            except Exception:
+                pass
+
+        # Revoga sessões de login baseadas em cookie
+        for session in Session.objects.filter(expire_date__gte=timezone.now()):
+            data = session.get_decoded()
+            if str(data.get("_auth_user_id")) == str(user.pk):
+                session.delete()
+
 class AdminOrAuthenticatedReadOnlyPermissionMixin:
     """
     Mixin de permissão que permite acesso de leitura para qualquer usuário autenticado
