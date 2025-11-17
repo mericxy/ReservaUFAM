@@ -23,23 +23,28 @@ function AdminReservations() {
     }, [isAuthenticated, isAdmin, navigate]);
 
     const fetchReservations = async () => {
+        setLoading(true); 
         try {
             const token = localStorage.getItem("accessToken");
-            const data = await apiFetch("/api/admin/reservations/", {
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                }
-            });
+            const headers = { 
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            };
 
-            const pendentes = data.filter(res => res.status === 'Pendente');
-            const aprovadas = data.filter(res => res.status === 'Aprovado');
-            const arquivadas = data.filter(res => res.status === 'Reprovado');
+            const [pendentesRes, aprovadasRes, arquivadasRes] = await Promise.allSettled([
+                apiFetch("/api/admin/reservations/?status=Pendente", { headers }),
+                apiFetch("/api/admin/reservations/?status=Aprovado", { headers }),
+                apiFetch("/api/admin/reservations/?status=Reprovado", { headers })
+            ]);
+
+            const pendentes = pendentesRes.status === 'fulfilled' ? pendentesRes.value : [];
+            const aprovadas = aprovadasRes.status === 'fulfilled' ? aprovadasRes.value : [];
+            const arquivadas = arquivadasRes.status === 'fulfilled' ? arquivadasRes.value : [];
 
             setReservations({ pendentes, aprovadas, arquivadas });
+
         } catch (error) {
             setError("Não foi possível carregar as reservas. Verifique sua conexão com a internet e tente novamente.");
-
             if (error.message.includes("401")) {
                 setError("Sua sessão expirou por inatividade. Faça login novamente para continuar.");
             }
@@ -60,10 +65,9 @@ function AdminReservations() {
                 body: JSON.stringify({ status: newStatus })
             });
 
-            fetchReservations();
+            fetchReservations(); 
         } catch (error) {
             setError("Erro ao atualizar o status da reserva. Verifique sua conexão com a internet e tente novamente.");
-
             if (error.message.includes("401")) {
                 setError("Sua sessão expirou por inatividade. Faça login novamente para continuar.");
             }
@@ -88,7 +92,7 @@ function AdminReservations() {
                                     ? 'bg-green-100 text-green-800' 
                                     : reservation.status === 'Pendente'
                                         ? 'bg-yellow-100 text-yellow-800'
-                                        : 'bg-gray-100 text-[rgb(var(--color-text))]'
+                                        : 'bg-red-100 text-red-800'
                             }`}>
                                 {reservation.status}
                             </span>
@@ -154,7 +158,12 @@ function AdminReservations() {
                     <div className="space-y-4">
                         {reservations.aprovadas.length > 0 ? (
                             reservations.aprovadas.map(reservation =>
-                                renderReservationCard(reservation, null)
+                                renderReservationCard(reservation, (
+                                    <button onClick={() => handleStatusUpdate(reservation.id, 'Reprovado')}
+                                        className="bg-red-500 hover:bg-red-600 text-white py-1 px-3 rounded-lg">
+                                        Cancelar
+                                    </button>
+                                ))
                             )
                         ) : (
                             <p className="text-[rgb(var(--color-text-grays))] text-center py-4">Nenhuma reserva aprovada</p>
@@ -171,7 +180,7 @@ function AdminReservations() {
                                 renderReservationCard(reservation, (
                                     <button onClick={() => handleStatusUpdate(reservation.id, 'Aprovado')}
                                         className="bg-blue-500 hover:bg-blue-600 text-white py-1 px-3 rounded-lg">
-                                        Restaurar
+                                        Restaurar (Aprovar)
                                     </button>
                                 ))
                             )
