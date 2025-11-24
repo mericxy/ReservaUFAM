@@ -76,6 +76,12 @@ Esta seção documenta as funcionalidades principais do sistema na perspectiva d
 * **Padrão:** Tema claro para novos usuários.
 * **Alternância:** Permite troca livre entre os temas.
 
+**Modo branco**
+<img width="2538" height="1407" alt="Captura de tela 2025-11-17 092856" src="https://github.com/user-attachments/assets/4761c337-3746-4ea0-b8fa-f59ccc72bb4d" />
+
+**Modo escuro**
+<img width="2532" height="1401" alt="image" src="https://github.com/user-attachments/assets/e0d56736-3644-498c-a77f-529fd15a78dc" />
+
 ---
 
 ### H4 — Atalhos na Página Inicial (Usuário Comum)
@@ -393,7 +399,7 @@ Esta seção apresenta a representação formal da estrutura e do comportamento 
 O Diagrama de Classes abaixo representa a estrutura estática do domínio do sistema, evidenciando as principais entidades, seus atributos e relacionamentos, conforme implementado no backend.
 
 <div align="center">
-  <img src="imgs/Diagrama-Classe.png" alt="Diagrama de Classes do Sistema ReservaUFAM">
+  <img src="imgs/diagrama-classe.png" alt="Diagrama de Classes do Sistema ReservaUFAM">
   <p><em>Figura 14: Diagrama de Classes do Domínio</em></p>
 </div>
 
