@@ -393,7 +393,7 @@ Esta seção apresenta a representação formal da estrutura e do comportamento 
 O Diagrama de Classes abaixo representa a estrutura estática do domínio do sistema, evidenciando as principais entidades, seus atributos e relacionamentos, conforme implementado no backend.
 
 <div align="center">
-  <img src="imgs/Diagrama-Classe.png" alt="Diagrama de Classes do Sistema ReservaUFAM">
+  <img src="imgs/diagrama-classe.png" alt="Diagrama de Classes do Sistema ReservaUFAM">
   <p><em>Figura 14: Diagrama de Classes do Domínio</em></p>
 </div>
 
